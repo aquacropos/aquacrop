@@ -7,24 +7,30 @@ entries:
 - folders:
   - folderitems:
     - output: web,pdf
-      title: Export to modules
-      url: /export.html
+      title: Overview
+      url: /
     - output: web,pdf
-      title: Convert to html
-      url: /export2html.html
+      title: core
+      url: core.html
     - output: web,pdf
-      title: Show doc
-      url: /showdoc.html
+      title: initialize
+      url: initialize.html
     - output: web,pdf
-      title: Test functions
-      url: /test.html
+      title: timestep
+      url: timestep.html
     - output: web,pdf
-      title: Core functions
-      url: /core.html
+      title: solution
+      url: solution.html
     - output: web,pdf
-      title: Command line functions
-      url: /cli.html
+      title: classes
+      url: classes.html
+    - output: web,pdf
+      title: comparison
+      url: comparison.html
+    - output: web,pdf
+      title: lars
+      url: lars.html
     output: web
-    title: Notebook
+    title: aquacrop
   output: web
   title: Sidebar

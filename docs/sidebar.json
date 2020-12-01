@@ -1,10 +1,12 @@
 {
-  "Notebook": {
-    "Export to modules": "/export",
-    "Convert to html": "/export2html",
-    "Show doc": "/showdoc",
-    "Test functions": "/test",
-    "Core functions": "/core",
-    "Command line functions": "/cli"
+  "aquacrop": {
+    "Overview": "/",
+    "core": "core.html",
+    "initialize": "initialize.html",
+    "timestep": "timestep.html",
+    "solution": "solution.html",
+    "classes": "classes.html",
+    "comparison": "comparison.html",
+    "lars": "lars.html"
   }
 }
