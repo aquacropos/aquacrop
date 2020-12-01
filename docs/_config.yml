@@ -3,7 +3,7 @@ output: web
 topnav_title: aquacrop
 site_title: aquacrop
 company_name: Tom Kelly
-description: AquaCrop-OSPy: crop model based on AquaCropOS
+description: AquaCrop-OSPy crop model based on AquaCropOS
 # Set to false to disable KaTeX math
 use_math: true
 # Add Google analytics id if you have one and want to use it here
