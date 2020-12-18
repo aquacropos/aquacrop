@@ -23,7 +23,7 @@ def prepare_lars_weather(file,year,generated=True,order=["year","jday","minTemp"
         df.columns=order
         df["tdelta"]=pd.to_timedelta(df.jday,unit='D')
         df["date"]=pd.to_datetime(f'{year-1}/12/31')+df["tdelta"]
-        df["eto"] = df.rad*(0.0023)*(((df.maxTemp-df.minTemp)/2)+17.8)*(df.maxTemp-df.minTemp)**0.5
+        df["eto"] = df.rad*(0.0023)*(((df.maxTemp+df.minTemp)/2)+17.8)*(df.maxTemp-df.minTemp)**0.5
         df.eto=df.eto.clip(0.1)
         df=df[["simyear","minTemp","maxTemp","precip","eto",'date']]
         df.columns=["simyear","MinTemp","MaxTemp","Precipitation","ReferenceET","Date"]
@@ -32,7 +32,7 @@ def prepare_lars_weather(file,year,generated=True,order=["year","jday","minTemp"
     else:
         df.columns=order
         df['date'] = pd.to_datetime(df.year, format='%Y') + pd.to_timedelta(df.jday - 1, unit='d')
-        df["eto"] = df.rad*(0.0023)*(((df.maxTemp-df.minTemp)/2)+17.8)*(df.maxTemp-df.minTemp)**0.5
+        df["eto"] = df.rad*(0.0023)*(((df.maxTemp+df.minTemp)/2)+17.8)*(df.maxTemp-df.minTemp)**0.5
         df.eto=df.eto.clip(0.1)
         df=df[["minTemp","maxTemp","precip","eto",'date']]
         df.columns=["MinTemp","MaxTemp","Precipitation","ReferenceET","Date"]

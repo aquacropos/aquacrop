@@ -155,7 +155,9 @@ class AquaCropModel:
         Outputs.Water = np.zeros((len(self.ClockStruct.TimeSpan),15))
         Outputs.Flux = np.zeros((len(self.ClockStruct.TimeSpan),16))
         Outputs.Growth = np.zeros((len(self.ClockStruct.TimeSpan),13))
-        Outputs.Final = pd.DataFrame(columns = ['Season','Name','HarvestDate','Step','Yield','Tirr'])
+        Outputs.Final = pd.DataFrame(columns = ['Season','Crop Type','Harvest Date (YYYY/MM/DD)',
+                                                'Harvest Date (Step)','Yield (tonne/ha)',
+                                                'Seasonal irrigation (mm)'])
 
 
         self.Outputs=Outputs
