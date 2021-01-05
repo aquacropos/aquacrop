@@ -34,6 +34,7 @@ def run_comparison(model,name):
     Outputs = model.Outputs
 
     py = Outputs.Final.round(3)
+    py.columns = ["Season","CropType","HarvestDate","Harvest Date (Step)","Yield","Seasonal irrigation (mm)"]
 
     matlab = pd.read_csv(get_filepath(name+'_matlab.txt'),delim_whitespace=True,header=None)
     matlab.columns = ["season","crop","plantdate","stepplant","harvestdate","stepharvest","Yield","tirr"]

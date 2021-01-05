@@ -69,8 +69,9 @@ nb_path: "nbs/06_lars.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="prepare_lars_weather" class="doc_header"><code>prepare_lars_weather</code><a href="https://github.com/thomasdkelly/aquacrop/tree/master/aquacrop/lars.py#L18" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>prepare_lars_weather</code>(<strong><code>file</code></strong>, <strong><code>year</code></strong>, <strong><code>generated</code></strong>=<em><code>True</code></em>, <strong><code>order</code></strong>=<em><code>['year', 'jday', 'minTemp', 'maxTemp', 'precip', 'rad']</code></em>)</p>
+<h4 id="prepare_lars_weather" class="doc_header"><code>prepare_lars_weather</code><a href="https://github.com/thomasdkelly/aquacrop/tree/master/aquacrop/lars.py#L18" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>prepare_lars_weather</code>(<strong><code>file</code></strong>, <strong><code>year</code></strong>, <strong><code>generated</code></strong>=<em><code>True</code></em>, <strong><code>order</code></strong>=<em><code>['year', 'jday', 'minTemp', 'maxTemp', 'precip', 'rad']</code></em>, <strong><code>wind_speed</code></strong>=<em><code>3.4</code></em>)</p>
 </blockquote>
+<p>Uses FAO-PM to calculate reference evapotranspiration for LARS generated and baseline input data.</p>
 
 </div>
 
@@ -100,7 +101,7 @@ nb_path: "nbs/06_lars.ipynb"
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h4 id="select_lars_wdf" class="doc_header"><code>select_lars_wdf</code><a href="https://github.com/thomasdkelly/aquacrop/tree/master/aquacrop/lars.py#L44" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>select_lars_wdf</code>(<strong><code>df</code></strong>, <strong><code>simyear</code></strong>)</p>
+<h4 id="select_lars_wdf" class="doc_header"><code>select_lars_wdf</code><a href="https://github.com/thomasdkelly/aquacrop/tree/master/aquacrop/lars.py#L81" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>select_lars_wdf</code>(<strong><code>df</code></strong>, <strong><code>simyear</code></strong>)</p>
 </blockquote>
 
 </div>
@@ -206,7 +207,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>3.89</td>
       <td>17.22</td>
       <td>0.00</td>
-      <td>3.183494</td>
+      <td>1.868710</td>
       <td>1981-05-20</td>
     </tr>
     <tr>
@@ -214,7 +215,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>6.67</td>
       <td>21.67</td>
       <td>0.00</td>
-      <td>6.649714</td>
+      <td>2.665948</td>
       <td>1981-05-21</td>
     </tr>
     <tr>
@@ -222,7 +223,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>5.56</td>
       <td>25.00</td>
       <td>2.01</td>
-      <td>7.651855</td>
+      <td>3.420034</td>
       <td>1981-05-22</td>
     </tr>
     <tr>
@@ -230,7 +231,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>5.56</td>
       <td>19.44</td>
       <td>0.00</td>
-      <td>6.719384</td>
+      <td>2.440758</td>
       <td>1981-05-23</td>
     </tr>
     <tr>
@@ -238,7 +239,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>5.56</td>
       <td>24.44</td>
       <td>0.00</td>
-      <td>9.529008</td>
+      <td>3.520489</td>
       <td>1981-05-24</td>
     </tr>
   </tbody>
@@ -325,7 +326,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>-0.2</td>
       <td>0.7</td>
       <td>0.0</td>
-      <td>0.346584</td>
+      <td>0.120413</td>
       <td>2050-01-01</td>
     </tr>
     <tr>
@@ -334,7 +335,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>-9.1</td>
       <td>20.8</td>
       <td>0.0</td>
-      <td>2.766161</td>
+      <td>3.571857</td>
       <td>2050-01-02</td>
     </tr>
     <tr>
@@ -343,7 +344,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>-7.1</td>
       <td>10.1</td>
       <td>0.0</td>
-      <td>1.712113</td>
+      <td>1.641596</td>
       <td>2050-01-03</td>
     </tr>
     <tr>
@@ -352,7 +353,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>-4.0</td>
       <td>18.3</td>
       <td>0.0</td>
-      <td>2.547292</td>
+      <td>2.675223</td>
       <td>2050-01-04</td>
     </tr>
     <tr>
@@ -361,7 +362,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>-6.5</td>
       <td>1.1</td>
       <td>0.0</td>
-      <td>0.861696</td>
+      <td>0.603963</td>
       <td>2050-01-05</td>
     </tr>
   </tbody>
@@ -429,7 +430,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>-0.2</td>
       <td>0.7</td>
       <td>0.0</td>
-      <td>0.346584</td>
+      <td>0.120413</td>
       <td>2050-01-01</td>
     </tr>
     <tr>
@@ -437,7 +438,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>-9.1</td>
       <td>20.8</td>
       <td>0.0</td>
-      <td>2.766161</td>
+      <td>3.571857</td>
       <td>2050-01-02</td>
     </tr>
     <tr>
@@ -445,7 +446,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>-7.1</td>
       <td>10.1</td>
       <td>0.0</td>
-      <td>1.712113</td>
+      <td>1.641596</td>
       <td>2050-01-03</td>
     </tr>
     <tr>
@@ -453,7 +454,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>-4.0</td>
       <td>18.3</td>
       <td>0.0</td>
-      <td>2.547292</td>
+      <td>2.675223</td>
       <td>2050-01-04</td>
     </tr>
     <tr>
@@ -461,7 +462,7 @@ nb_path: "nbs/06_lars.ipynb"
       <td>-6.5</td>
       <td>1.1</td>
       <td>0.0</td>
-      <td>0.861696</td>
+      <td>0.603963</td>
       <td>2050-01-05</td>
     </tr>
   </tbody>
