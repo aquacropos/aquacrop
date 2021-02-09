@@ -225,7 +225,7 @@ class SoilClass:
         self.zGerm = zGerm # Thickness of soil surface (m) used to calculate water content for germination
         self.AdjCN = AdjCN # Adjust curve number for antecedent moisture content (0: No, 1: Yes)
         self.fshape_cr = fshape_cr # Capillary rise shape factor
-        self.zTop = zTop # Thickness of soil surface layer for water stress comparisons (m)
+        self.zTop = max(zTop,dz[0]) # Thickness of soil surface layer for water stress comparisons (m)
 
         if soilType == 'custom':
             self.create_df(dz)
@@ -235,7 +235,6 @@ class SoilClass:
             self.CN = 77
             self.CalcCN = 0
             self.REW = 14
-            dz = [0.1]*12
             self.create_df(dz)
             self.add_layer(sum(dz), 0.39, 0.54, 0.55, 35, 100)
 
@@ -243,7 +242,6 @@ class SoilClass:
             self.CN = 72
             self.CalcCN = 0
             self.REW = 11
-            dz = [0.1]*12
             self.create_df(dz)
             self.add_layer(sum(dz), 0.23, 0.39, 0.5, 125, 100)
 
@@ -251,7 +249,6 @@ class SoilClass:
             self.CN = 61
             self.CalcCN = 0
             self.REW = 9
-            dz = [0.1]*12
             self.create_df(dz)
             self.add_layer(sum(dz), 0.15, 0.31, 0.46, 500, 100)
 
@@ -259,7 +256,6 @@ class SoilClass:
             self.CN = 46
             self.CalcCN = 0
             self.REW = 5
-            dz = [0.1]*12
             self.create_df(dz)
             self.add_layer(sum(dz), 0.08, 0.16, 0.38, 2200, 100)
 
@@ -267,7 +263,6 @@ class SoilClass:
             self.CN = 46
             self.CalcCN = 0
             self.REW = 4
-            dz = [0.1]*12
             self.create_df(dz)
             self.add_layer(sum(dz), 0.06, 0.13, 0.36, 3000, 100)
 
@@ -275,7 +270,6 @@ class SoilClass:
             self.CN = 77
             self.CalcCN = 0
             self.REW = 10
-            dz = [0.1]*12
             self.create_df(dz)
             self.add_layer(sum(dz), 0.27, 0.39, 0.5, 35, 100)
 
@@ -283,7 +277,6 @@ class SoilClass:
             self.CN = 72
             self.CalcCN = 0
             self.REW = 9
-            dz = [0.1]*12
             self.create_df(dz)
             self.add_layer(sum(dz), 0.20, 0.32, 0.47, 225, 100)
 
@@ -291,7 +284,6 @@ class SoilClass:
             self.CN = 46
             self.CalcCN = 0
             self.REW = 7
-            dz = [0.1]*12
             self.create_df(dz)
             self.add_layer(sum(dz), 0.10, 0.22, 0.41, 1200, 100)
 
@@ -299,7 +291,6 @@ class SoilClass:
             self.CN = 61
             self.CalcCN = 0
             self.REW = 11
-            dz = [0.1]*12
             self.create_df(dz)
             self.add_layer(sum(dz), 0.09, 0.33, 0.43, 500, 100)
 
@@ -307,7 +298,6 @@ class SoilClass:
             self.CN = 72
             self.CalcCN = 0
             self.REW = 13
-            dz = [0.1]*12
             self.create_df(dz)
             self.add_layer(sum(dz), 0.23, 0.44, 0.52, 150, 100)
 
@@ -315,7 +305,6 @@ class SoilClass:
             self.CN = 61
             self.CalcCN = 0
             self.REW = 11
-            dz = [0.1]*12
             self.create_df(dz)
             self.add_layer(sum(dz), 0.13, 0.33, 0.46, 575, 100)
 
@@ -323,7 +312,6 @@ class SoilClass:
             self.CN = 72
             self.CalcCN = 0
             self.REW = 14
-            dz = [0.1]*12
             self.create_df(dz)
             self.add_layer(sum(dz), 0.32, 0.50, 0.54, 100, 100)
 
@@ -331,8 +319,6 @@ class SoilClass:
             self.CN = 77
             self.CalcCN = 0
             self.REW = 10
-            dz = [0.1]*12
-            #dz = [0.1]*5 + [0.2]*6 + [0.3]
             self.create_df(dz)
             self.add_layer(0.5, 0.32, 0.50, 0.54, 15, 100)
             self.add_layer(1.5, 0.39, 0.54, 0.55, 2, 100)

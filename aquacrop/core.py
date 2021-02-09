@@ -79,6 +79,9 @@ def prepare_weather(weatherFilePath):
     # drop the day month year columns
     weather_df = weather_df.drop(["Day","Month","Year"],axis=1)
 
+    # set limit on ET0 to avoid divide by zero errors
+    weather_df.ReferenceET.clip(lower=0.1,inplace=True)
+
 
     return weather_df
 
@@ -152,7 +155,7 @@ class AquaCropModel:
         #self.InitCond.ParamStruct = self.ParamStruct
 
         Outputs = OutputClass()
-        Outputs.Water = np.zeros((len(self.ClockStruct.TimeSpan),15))
+        Outputs.Water = np.zeros((len(self.ClockStruct.TimeSpan),3+len(self.InitCond.th)))
         Outputs.Flux = np.zeros((len(self.ClockStruct.TimeSpan),16))
         Outputs.Growth = np.zeros((len(self.ClockStruct.TimeSpan),13))
         Outputs.Final = pd.DataFrame(columns = ['Season','Crop Type','Harvest Date (YYYY/MM/DD)',

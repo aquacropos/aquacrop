@@ -6,6 +6,8 @@
 
 `pip install aquacrop`
 
+Current version: `0.1.4` : 9th Feb 2021
+
 AquaCrop-OSPy is a python implementation of the popular crop-water model AquaCrop, built from the AquaCrop-OS source code.
 
 AquaCrop-OS, an open source version of FAO’s multi-crop model, was released in August 2016 and is the result of collaboration between researchers at the University of Manchester, Water for Food Global Institute, U.N. Food and Agriculture Organization, and Imperial College London.
