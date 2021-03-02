@@ -799,7 +799,11 @@ class CropClass:
             # temporary solution for new crops
             # if using this ensure that all paramaters in 'allowed_keys'
             # are passed in as arguments at initialization
-            _=1
+
+            self.PlantingDate= PlantingDate # Planting Date (mm/dd)
+            self.HarvestDate= HarvestDate # Latest Harvest Date (mm/dd)
+            self.Name = 'custom'
+
 
         else:
             assert 1==2, 'wrong crop name'

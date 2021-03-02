@@ -6,7 +6,7 @@
 
 `pip install aquacrop`
 
-Current version: `0.1.4` : 9th Feb 2021
+Current version: `0.1.5` : 2nd March 2021
 
 AquaCrop-OSPy is a python implementation of the popular crop-water model AquaCrop, built from the AquaCrop-OS source code.
 
