@@ -378,15 +378,15 @@ class SoilClass:
         th_wp = Pred_thWP+(0.14*Pred_thWP)-0.02
 
         # Water content at field capacity and saturation
-        Pred_thFC = ( -(0.0251*Sand) + (0.195*Clay) + (0.011*OrgMat)
+        Pred_thFC = ( -(0.251*Sand) + (0.195*Clay) + (0.011*OrgMat)
                       +(0.006*Sand*OrgMat) - (0.027*Clay*OrgMat)
                       +(0.452*Sand*Clay) + 0.299 )
 
         PredAdj_thFC = Pred_thFC+((1.283*(np.power(Pred_thFC,2)))-(0.374*Pred_thFC)-0.015)
 
-        Pred_thS33 = ( (0.0278*Sand) + (0.034*Clay) + (0.022*OrgMat)
+        Pred_thS33 = ( (0.278*Sand) + (0.034*Clay) + (0.022*OrgMat)
                       -(0.018*Sand*OrgMat) - (0.027*Clay*OrgMat)
-                      +(0.584*Sand*Clay) + 0.078 )
+                      -(0.584*Sand*Clay) + 0.078 )
 
         PredAdj_thS33 = Pred_thS33+((0.636*Pred_thS33)-0.107)
         Pred_thS = (PredAdj_thFC+PredAdj_thS33)+((-0.097*Sand)+0.043)
@@ -952,7 +952,7 @@ class IrrMngtClass:
             self.depth = 0
 
 
-        allowed_keys = {'name','WetSurf','AppEff','MaxIrr','MaxIrrSeason','SMT','IrrInterval','NetIrrSMT','Schedule'}
+        allowed_keys = {'name','WetSurf','AppEff','MaxIrr','MaxIrrSeason','SMT','IrrInterval','NetIrrSMT','Schedule','depth'}
 
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in allowed_keys)
 

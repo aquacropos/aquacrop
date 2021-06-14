@@ -1289,7 +1289,7 @@ def read_model_initial_conditions(ParamStruct,ClockStruct,InitWC):
         comp_top = np.append([0],SoilDepths[:-1])
         comp_bot = SoilDepths
         comp_mid = (comp_top+comp_bot)/2
-        idx = comp_mid[comp_mid>=InitCond.zGW].iloc[0]
+        idx = np.where(comp_mid>=InitCond.zGW)[0][0]
         for ii in range(idx,len(profile)):
             layeri = profile.loc[ii].Layer
             InitCond.th[ii] = hydf.th_s.loc[layeri]
