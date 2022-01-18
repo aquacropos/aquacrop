@@ -19,4 +19,4 @@ jobs:
     - name: deploy docs 
       run: |
         pip install mkdocs-material mkdocstrings mkdocs-jupyter
-        mkdocs gh-deploy
+        mkdocs gh-deploy --force
