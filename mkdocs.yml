@@ -1,0 +1,28 @@
+site_name: AquaCrop-OSPy
+theme:
+  name: material
+
+plugins:
+    - search
+    - mkdocstrings
+    - mkdocs-jupyter:
+          include_source: True
+          ignore_h1_titles: True
+
+
+nav:
+  - Home: index.md
+
+  - Notebooks:
+    - Getting Started: notebooks/AquaCrop_OSPy_Notebook_1.ipynb
+    - Estimating Irrigation Demand: notebooks/AquaCrop_OSPy_Notebook_2.ipynb
+    - Optimizing Irrigation: notebooks/AquaCrop_OSPy_Notebook_3.ipynb
+    - Climate Change Impacts: notebooks/AquaCrop_OSPy_Notebook_4.ipynb
+  - API:
+    - Core: core.md
+    - Classes: classes.md
+    - Initialize: initialize.md
+    - Solution: solution.md
+    - Timestep: timestep.md
+    - Comparison: comparison.md
+    - Lars: lars.md
