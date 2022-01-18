@@ -4,12 +4,19 @@ on:
         branches:
             - master
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-python@v2
-              with:
-                  python-version: 3.9
-            - run: pip install mkdocs-material mkdocstrings mkdocs-jupyter
-            - run: mkdocs gh-deploy
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.6 - 3.9'
+        architecture: 'x64'
+    - name: Install the library
+      run: |
+        pip install nbdev jupyter
+        pip install -e .
+    - name: deploy docs 
+      run: |
+        pip install mkdocs-material mkdocstrings mkdocs-jupyter
+        mkdocs gh-deploy
