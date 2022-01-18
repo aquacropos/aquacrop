@@ -970,7 +970,7 @@ spec = [
     ('NetIrrSMT', float64),
     ('depth', float64),
 ]
-@jitclass(spec)
+#@jitclass(spec)
 class IrrMngtStruct:
 
     """
@@ -1047,7 +1047,7 @@ spec = [
     ('BundWater', float64),
     ('CNadjPct', float64),
 ]
-@jitclass(spec)
+#@jitclass(spec)
 class FieldMngtStruct:
 
     """
@@ -1217,7 +1217,7 @@ spec=[
 
 
 ]
-@jitclass(spec)
+#@jitclass(spec)
 class CropStruct(object):
     '''
     The Crop Class contains Paramaters and variables of the crop used in the simulation
@@ -1412,7 +1412,7 @@ spec=[
     ('TAW', float64),
 
 ]
-@jitclass(spec)
+#@jitclass(spec)
 class InitCondClass:
     '''
     The InitCond Class contains all Paramaters and variables used in the simulation
@@ -1531,7 +1531,7 @@ spec = [
     ('Wp', float64),
     ('Dry', float64),
 ]
-@jitclass(spec)
+#@jitclass(spec)
 class WevapClass(object):
     """
     stores soil water contents in the evaporation layer
@@ -1580,7 +1580,7 @@ spec = [
     ('aCR', float64[:]),
     ('bCR', float64[:]),
 ]
-@jitclass(spec)
+#@jitclass(spec)
 class SoilProfileClass:
     """
 
@@ -1607,31 +1607,31 @@ class SoilProfileClass:
     """
     def __init__(self,length):
 
-        self.Comp = np.zeros(length,dtype=int64)
-        self.dz = np.zeros(length,dtype=float64)
-        self.Layer = np.zeros(length,dtype=int64)
-        self.dzsum = np.zeros(length,dtype=float64)
-        self.th_fc = np.zeros(length,dtype=float64)
-        self.Layer_dz = np.zeros(length,dtype=float64)
-        self.th_s = np.zeros(length,dtype=float64)
-        self.th_wp = np.zeros(length,dtype=float64)
-        self.Ksat = np.zeros(length,dtype=float64)
-        self.Penetrability = np.zeros(length,dtype=float64)
-        self.th_dry = np.zeros(length,dtype=float64)
-        self.tau = np.zeros(length,dtype=float64)
-        self.zBot = np.zeros(length,dtype=float64)
-        self.zTop = np.zeros(length,dtype=float64)
-        self.zMid = np.zeros(length,dtype=float64)
-        self.th_fc_Adj = np.zeros(length,dtype=float64)
-        self.aCR = np.zeros(length,dtype=float64)
-        self.bCR = np.zeros(length,dtype=float64)
+        self.Comp = np.zeros(length,dtype=np.int64)
+        self.dz = np.zeros(length,dtype=np.float64)
+        self.Layer = np.zeros(length,dtype=np.int64)
+        self.dzsum = np.zeros(length,dtype=np.float64)
+        self.th_fc = np.zeros(length,dtype=np.float64)
+        self.Layer_dz = np.zeros(length,dtype=np.float64)
+        self.th_s = np.zeros(length,dtype=np.float64)
+        self.th_wp = np.zeros(length,dtype=np.float64)
+        self.Ksat = np.zeros(length,dtype=np.float64)
+        self.Penetrability = np.zeros(length,dtype=np.float64)
+        self.th_dry = np.zeros(length,dtype=np.float64)
+        self.tau = np.zeros(length,dtype=np.float64)
+        self.zBot = np.zeros(length,dtype=np.float64)
+        self.zTop = np.zeros(length,dtype=np.float64)
+        self.zMid = np.zeros(length,dtype=np.float64)
+        self.th_fc_Adj = np.zeros(length,dtype=np.float64)
+        self.aCR = np.zeros(length,dtype=np.float64)
+        self.bCR = np.zeros(length,dtype=np.float64)
 
 # Cell
 spec = [
     ('Rz', float64),
     ('Zt', float64),
 ]
-@jitclass(spec)
+#@jitclass(spec)
 class TAWClass:
     """
     **Attributes:**\n
@@ -1656,7 +1656,7 @@ spec = [
     ('Rz', float64),
     ('Zt', float64),
 ]
-@jitclass(spec)
+#@jitclass(spec)
 class DrClass:
 
     """
@@ -1684,7 +1684,7 @@ spec = [
     ('Dry', float64),
     ('Aer', float64),
 ]
-@jitclass(spec)
+#@jitclass(spec)
 class thRZClass(object):
     """
     root zone water content
@@ -1725,7 +1725,7 @@ spec = [
     ('Pol', float64),
     ('StoLin', float64),
 ]
-@jitclass(spec)
+#@jitclass(spec)
 class KswClass(object):
 
     """
@@ -1762,7 +1762,7 @@ spec = [
     ('PolH', float64),
     ('PolC', float64),
 ]
-@jitclass(spec)
+#@jitclass(spec)
 class KstClass(object):
 
     """
@@ -1789,7 +1789,7 @@ spec = [
     ('RefConc', float64),
     ('CurrentConc', float64),
 ]
-@jitclass(spec)
+#@jitclass(spec)
 class CO2Class(object):
 
     """
