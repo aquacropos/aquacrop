@@ -5,13 +5,11 @@ import sys
 
 _ = [sys.path.append(i) for i in [".", ".."]]
 
-# Cell
-import matplotlib.pyplot as plt
+
 import numpy as np
 import pandas as pd
 from .core import *
 from .classes import *
-import seaborn as sns
 
 # Cell
 def prepare_lars_weather(

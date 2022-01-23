@@ -1,9 +1,6 @@
 __all__ = ["list_data", "get_filepath", "get_data", "prepare_weather", "AquaCropModel"]
 
-# Cell
-import matplotlib.pyplot as plt
 import numpy as np
-import pathlib
 import os
 import pandas as pd
 import sys
