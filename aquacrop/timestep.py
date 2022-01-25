@@ -7,6 +7,10 @@ from .classes import *
 import numpy as np
 import pandas as pd
 
+
+# compiled functions
+from .solution_aot import growing_degree_day,drainage
+
 # Cell
 def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
     """
@@ -134,7 +138,15 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
     NewCond, PreIrr = pre_irrigation(Soil.Profile, Crop, NewCond, GrowingSeason, IrrMngt)
 
     # 4. Drainage
-    NewCond.th, DeepPerc, FluxOut = drainage(Soil.Profile, NewCond.th, NewCond.th_fc_Adj)
+    
+    NewCond.th, DeepPerc, FluxOut = drainage(Soil.Profile.th_fc,
+                                            Soil.Profile.th_s,
+                                            Soil.Profile.tau,
+                                            Soil.Profile.dz,
+                                            Soil.Profile.dzsum,
+                                            Soil.Profile.Ksat, 
+                                            NewCond.th, 
+                                            NewCond.th_fc_Adj)
 
     # 5. Surface runoff
     Runoff, Infl, NewCond = rainfall_partition(
