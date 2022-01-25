@@ -1,18 +1,41 @@
-__all__ = ['growing_degree_day', 'root_zone_water', 'check_groundwater_table', 'root_development', 'pre_irrigation',
-           'drainage', 'rainfall_partition', 'irrigation', 'infiltration', 'capillary_rise', 'germination',
+# __all__ = ['growing_degree_day', 'root_zone_water', 'check_groundwater_table', 'root_development', 'pre_irrigation',
+#            'drainage', 'rainfall_partition', 'irrigation', 'infiltration', 'capillary_rise', 'germination',
+#            'growth_stage', 'water_stress', 'cc_development', 'cc_required_time', 'adjust_CCx', 'update_CCx_CDC',
+#            'canopy_cover', 'evap_layer_water_content', 'soil_evaporation', 'aeration_stress', 'transpiration',
+#            'groundwater_inflow', 'HIref_current_day', 'biomass_accumulation', 'temperature_stress',
+#            'HIadj_pre_anthesis', 'HIadj_pollination', 'HIadj_post_anthesis', 'harvest_index']
+
+
+
+# remove functions from __all__ as they become replace by compiled equivalent
+__all__ = ['root_zone_water', 'check_groundwater_table', 'root_development', 'pre_irrigation',
+           'rainfall_partition', 'irrigation', 'infiltration', 'capillary_rise', 'germination',
            'growth_stage', 'water_stress', 'cc_development', 'cc_required_time', 'adjust_CCx', 'update_CCx_CDC',
            'canopy_cover', 'evap_layer_water_content', 'soil_evaporation', 'aeration_stress', 'transpiration',
            'groundwater_inflow', 'HIref_current_day', 'biomass_accumulation', 'temperature_stress',
            'HIadj_pre_anthesis', 'HIadj_pollination', 'HIadj_post_anthesis', 'harvest_index']
 
 # Cell
-from .classes import *
+if __name__ == "__main__":
+    from classes import *
+else:
+    from .classes import *
+
 import numpy as np
 import pandas as pd
 from numba import njit
 
+
+
+from numba.pycc import CC
+
+# temporary name for compiled module
+cc = CC("solution_aot")
+
+
 # Cell
-@njit()
+#@njit()
+@cc.export("growing_degree_day", "f8(i4,f8,f8,f8,f8)")
 def growing_degree_day(GDDmethod,Tupp,Tbase,Tmax,Tmin):
     """
     Function to calculate number of growing degree days on current day
@@ -77,7 +100,7 @@ def growing_degree_day(GDDmethod,Tupp,Tbase,Tmax,Tmin):
     return GDD
 
 # Cell
-@njit()
+#@njit()
 def root_zone_water(prof,InitCond_Zroot,InitCond_th,Soil_zTop,Crop_Zmin,Crop_Aer):
     """
     Function to calculate actual and total available water in the rootzone at current time step
@@ -218,7 +241,7 @@ def root_zone_water(prof,InitCond_Zroot,InitCond_th,Soil_zTop,Crop_Zmin,Crop_Aer
     return WrAct,Dr,TAW,thRZ
 
 # Cell
-@njit()
+#@njit()
 def check_groundwater_table(ClockStruct_TimeStepCounter,prof,NewCond,
                             ParamStruct_WaterTable,zGW):
     """
@@ -316,7 +339,7 @@ def check_groundwater_table(ClockStruct_TimeStepCounter,prof,NewCond,
     return NewCond, prof
 
 # Cell
-@njit()
+#@njit()
 def root_development(Crop,prof,InitCond,GDD,GrowingSeason,ParamStruct_WaterTable):
     """
     Function to calculate root zone expansion
@@ -535,7 +558,7 @@ def root_development(Crop,prof,InitCond,GDD,GrowingSeason,ParamStruct_WaterTable
     return NewCond
 
 # Cell
-@njit()
+#@njit()
 def pre_irrigation(prof,Crop,InitCond,GrowingSeason,IrrMngt):
     """
     Function to calculate pre-irrigation when in net irrigation mode
@@ -605,8 +628,16 @@ def pre_irrigation(prof,Crop,InitCond,GrowingSeason,IrrMngt):
 
 
 # Cell
-@njit()
-def drainage(prof,th_init,th_fc_Adj_init):
+#@njit()
+@cc.export("drainage", "(f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],f8[:])")
+def drainage(prof_th_fc,
+            prof_th_s,
+            prof_tau,
+            prof_dz,
+            prof_dzsum,
+            prof_Ksat,
+            th_init,
+            th_fc_Adj_init):
     """
     Function to redistribute stored soil water
 
@@ -655,15 +686,16 @@ def drainage(prof,th_init,th_fc_Adj_init):
     drainsum = 0
 
 
+
     # Calculate drainage and updated water contents %%
     for ii in range(th_init.shape[0]):
         # Specify layer for compartment
-        cth_fc = prof.th_fc[ii]
-        cth_s = prof.th_s[ii]
-        ctau = prof.tau[ii]
-        cdz = prof.dz[ii]
-        cdzsum = prof.dzsum[ii]
-        cKsat = prof.Ksat[ii]
+        cth_fc = prof_th_fc[ii]
+        cth_s = prof_th_s[ii]
+        ctau = prof_tau[ii]
+        cdz = prof_dz[ii]
+        cdzsum = prof_dzsum[ii]
+        cKsat = prof_Ksat[ii]
 
 
         # Calculate drainage ability of compartment ii
@@ -901,12 +933,12 @@ def drainage(prof,th_init,th_fc_Adj_init):
                     FluxOut[precomp] = FluxOut[precomp]-excess
 
                 # Increase water content to store excess
-                thnew[precomp] = thnew[precomp]+(excess/(1000*prof.dz[precomp]))
+                thnew[precomp] = thnew[precomp]+(excess/(1000*prof_dz[precomp]))
 
                 # Limit water content to saturation and adjust excess counter
-                if thnew[precomp] > prof.th_s[precomp]:
-                    excess = (thnew[precomp]-prof.th_s[precomp])*1000*prof.dz[precomp]
-                    thnew[precomp] = prof.th_s[precomp]
+                if thnew[precomp] > prof_th_s[precomp]:
+                    excess = (thnew[precomp]-prof_th_s[precomp])*1000*prof_dz[precomp]
+                    thnew[precomp] = prof_th_s[precomp]
                 else:
                     excess = 0
 
@@ -920,7 +952,7 @@ def drainage(prof,th_init,th_fc_Adj_init):
     return thnew,DeepPerc,FluxOut
 
 # Cell
-@njit()
+#@njit()
 def rainfall_partition(P,InitCond,
                        FieldMngt,
                        Soil_CN, Soil_AdjCN, Soil_zCN, Soil_nComp,prof):
@@ -1046,7 +1078,7 @@ def rainfall_partition(P,InitCond,
     return Runoff,Infl,NewCond
 
 # Cell
-@njit()
+#@njit()
 def irrigation(InitCond,IrrMngt,Crop,prof,Soil_zTop,GrowingSeason,Rain,Runoff):
     """
     Function to get irrigation depth for current day
@@ -1199,7 +1231,7 @@ def irrigation(InitCond,IrrMngt,Crop,prof,Soil_zTop,GrowingSeason,Rain,Runoff):
 
 
 # Cell
-@njit()
+#@njit()
 def infiltration(prof,InitCond,Infl,Irr,IrrMngt_AppEff,
                  FieldMngt,
                  FluxOut,DeepPerc0,Runoff0,GrowingSeason):
@@ -1477,7 +1509,7 @@ def infiltration(prof,InitCond,Infl,Irr,IrrMngt_AppEff,
     return NewCond,DeepPerc,RunoffTot,Infl,FluxOut
 
 # Cell
-@njit()
+#@njit()
 def capillary_rise(prof,Soil_nLayer,Soil_fshape_cr,NewCond,FluxOut,ParamStruct_WaterTable):
     """
     Function to calculate capillary rise from a shallow groundwater table
@@ -1663,7 +1695,7 @@ def capillary_rise(prof,Soil_nLayer,Soil_fshape_cr,NewCond,FluxOut,ParamStruct_W
 
 
 # Cell
-@njit()
+#@njit()
 def germination(InitCond,Soil_zGerm,prof,Crop_GermThr,Crop_PlantMethod,GDD,GrowingSeason):
     """
     Function to check if crop has germinated
@@ -1768,7 +1800,7 @@ def germination(InitCond,Soil_zGerm,prof,Crop_GermThr,Crop_PlantMethod,GDD,Growi
     return NewCond
 
 # Cell
-@njit()
+#@njit()
 def growth_stage(Crop,InitCond,GrowingSeason):
     """
     Function to determine current growth stage of crop
@@ -1827,7 +1859,7 @@ def growth_stage(Crop,InitCond,GrowingSeason):
 
 
 # Cell
-@njit()
+#@njit()
 def water_stress(Crop,InitCond,Dr,TAW,Et0,beta):
     """
     Function to calculate water stress coefficients
@@ -1928,7 +1960,7 @@ def water_stress(Crop,InitCond,Dr,TAW,Et0,beta):
     return Ksw
 
 # Cell
-@njit()
+#@njit()
 def cc_development(CCo,CCx,CGC,CDC,dt,Mode,CCx0):
     """
     Function to calculate canopy cover development by end of the current simulation day
@@ -1998,7 +2030,7 @@ def cc_development(CCo,CCx,CGC,CDC,dt,Mode,CCx0):
     return CC
 
 # Cell
-@njit()
+#@njit()
 def cc_required_time(CCprev,CCo,CCx,CGC,CDC,Mode):
     """
     Function to find time required to reach CC at end of previous day, given current CGC or CDC
@@ -2055,7 +2087,7 @@ def cc_required_time(CCprev,CCo,CCx,CGC,CDC,Mode):
 
 
 # Cell
-@njit()
+#@njit()
 def adjust_CCx(CCprev,CCo,CCx,CGC,CDC,dt,tSum,Crop_CanopyDevEnd, Crop_CCx):
     """
     Function to adjust CCx value for changes in CGC due to water stress during the growing season
@@ -2109,7 +2141,7 @@ def adjust_CCx(CCprev,CCo,CCx,CGC,CDC,dt,tSum,Crop_CanopyDevEnd, Crop_CCx):
     return CCxAdj
 
 # Cell
-@njit()
+#@njit()
 def update_CCx_CDC(CCprev,CDC,CCx,dt):
     """
     Function to update CCx and CDC parameter valyes for rewatering in late season of an early declining canopy
@@ -2151,7 +2183,7 @@ def update_CCx_CDC(CCprev,CDC,CCx,dt):
     return CCXadj,CDCadj
 
 # Cell
-@njit()
+#@njit()
 def canopy_cover(Crop,Soil_Profile,Soil_zTop,InitCond,GDD,Et0,GrowingSeason):
 #def canopy_cover(Crop,Soil_Profile,Soil_zTop,InitCond,GDD,Et0,GrowingSeason):
 
@@ -2525,7 +2557,7 @@ def canopy_cover(Crop,Soil_Profile,Soil_zTop,InitCond,GDD,Et0,GrowingSeason):
     return NewCond
 
 # Cell
-@njit()
+#@njit()
 def evap_layer_water_content(InitCond_th,InitCond_EvapZ,prof):
     """
     Function to get water contents in the evaporation layer
@@ -2600,7 +2632,7 @@ def evap_layer_water_content(InitCond_th,InitCond_EvapZ,prof):
     return Wevap_Sat,Wevap_Fc,Wevap_Wp,Wevap_Dry,Wevap_Act
 
 # Cell
-@njit()
+#@njit()
 def soil_evaporation(ClockStruct_EvapTimeSteps,ClockStruct_SimOffSeason,ClockStruct_TimeStepCounter,
                     Soil_EvapZmin,Soil_EvapZmax,Soil_Profile,Soil_REW,Soil_Kex,Soil_fwcc,Soil_fWrelExp,Soil_fevap,
                     Crop_CalendarType,Crop_Senescence,
@@ -2974,7 +3006,7 @@ def soil_evaporation(ClockStruct_EvapTimeSteps,ClockStruct_SimOffSeason,ClockStr
     return NewCond,EsAct,EsPot
 
 # Cell
-@njit()
+#@njit()
 def aeration_stress(NewCond_AerDays, Crop_LagAer,thRZ):
     """
     Function to calculate aeration stress coefficient
@@ -3028,7 +3060,7 @@ def aeration_stress(NewCond_AerDays, Crop_LagAer,thRZ):
     return Ksa_Aer,NewCond_AerDays
 
 # Cell
-@njit()
+#@njit()
 def transpiration(Soil_Profile,Soil_nComp,Soil_zTop,
                   Crop,
                   IrrMngt_IrrMethod,IrrMngt_NetIrrSMT,
@@ -3491,7 +3523,7 @@ def transpiration(Soil_Profile,Soil_nComp,Soil_zTop,
     return TrAct,TrPot_NS,TrPot0,NewCond,IrrNet
 
 # Cell
-@njit()
+#@njit()
 def groundwater_inflow(prof,NewCond):
     """
     Function to calculate capillary rise in the presence of a shallow groundwater table
@@ -3545,7 +3577,7 @@ def groundwater_inflow(prof,NewCond):
     return NewCond,GwIn
 
 # Cell
-@njit()
+#@njit()
 def HIref_current_day(InitCond,Crop,GrowingSeason):
     """
     Function to calculate reference (no adjustment for stress effects)
@@ -3656,7 +3688,7 @@ def HIref_current_day(InitCond,Crop,GrowingSeason):
     return NewCond
 
 # Cell
-@njit()
+#@njit()
 def biomass_accumulation(Crop,InitCond,Tr,TrPot,Et0,GrowingSeason):
     """
     Function to calculate biomass accumulation
@@ -3745,7 +3777,7 @@ def biomass_accumulation(Crop,InitCond,Tr,TrPot,Et0,GrowingSeason):
     return NewCond
 
 # Cell
-@njit()
+#@njit()
 def temperature_stress(Crop,Tmax,Tmin):
     # Function to calculate temperature stress coefficients
     """
@@ -3823,7 +3855,7 @@ def temperature_stress(Crop,Tmax,Tmin):
     return Kst
 
 # Cell
-@njit()
+#@njit()
 def HIadj_pre_anthesis(InitCond,Crop_dHI_pre):
     """
     Function to calculate adjustment to harvest index for pre-anthesis water
@@ -3887,7 +3919,7 @@ def HIadj_pre_anthesis(InitCond,Crop_dHI_pre):
     return NewCond
 
 # Cell
-@njit()
+#@njit()
 def HIadj_pollination(InitCond_CC,InitCond_Fpol,
                       Crop_FloweringCD,Crop_CCmin,Crop_exc,
                       Ksw,Kst,HIt):
@@ -3984,7 +4016,7 @@ def HIadj_pollination(InitCond_CC,InitCond_Fpol,
     return NewCond_Fpol
 
 # Cell
-@njit()
+#@njit()
 def HIadj_post_anthesis(InitCond,Crop,Ksw):
     """
     Function to calculate adjustment to harvest index for post-anthesis water
@@ -4071,7 +4103,7 @@ def HIadj_post_anthesis(InitCond,Crop,Ksw):
     return NewCond
 
 # Cell
-@njit()
+#@njit()
 def harvest_index(Soil_Profile,Soil_zTop,Crop,InitCond,Et0,Tmax,Tmin,GrowingSeason):
 
     """
@@ -4215,3 +4247,7 @@ def harvest_index(Soil_Profile,Soil_zTop,Crop,InitCond,Et0,Tmax,Tmin,GrowingSeas
 
     #print([NewCond.DAP , Crop.YldFormCD])
     return NewCond
+
+
+if __name__ == "__main__":
+    cc.compile()
