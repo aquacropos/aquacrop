@@ -9,7 +9,7 @@ import pandas as pd
 
 
 # compiled functions
-from .solution_aot import growing_degree_day,drainage
+from .solution_aot import _growing_degree_day,_drainage,_root_zone_water,_rainfall_partition
 
 # Cell
 def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
@@ -100,7 +100,7 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
         NewCond.DAP = NewCond.DAP + 1
         # Growing degree days after planting
 
-        GDD = growing_degree_day(Crop.GDDmethod, Crop.Tupp, Crop.Tbase, Tmax, Tmin)
+        GDD = _growing_degree_day(Crop.GDDmethod, Crop.Tupp, Crop.Tbase, Tmax, Tmin)
 
         ## Update cumulative GDD counter ##
         NewCond.GDD = GDD
@@ -139,7 +139,7 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
 
     # 4. Drainage
     
-    NewCond.th, DeepPerc, FluxOut = drainage(Soil.Profile.th_fc,
+    NewCond.th, DeepPerc, FluxOut = _drainage(Soil.Profile.th_fc,
                                             Soil.Profile.th_s,
                                             Soil.Profile.tau,
                                             Soil.Profile.dz,
@@ -149,10 +149,15 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
                                             NewCond.th_fc_Adj)
 
     # 5. Surface runoff
-    Runoff, Infl, NewCond = rainfall_partition(
-        P, NewCond, FieldMngt, Soil.CN, Soil.AdjCN, Soil.zCN, Soil.nComp, Soil.Profile
+    Runoff, Infl, NewCond.DaySubmerged = _rainfall_partition(
+        P,
+        NewCond.th,
+        NewCond.DaySubmerged,
+        FieldMngt.SRinhb,FieldMngt.Bunds,FieldMngt.zBund,FieldMngt.CNadjPct,
+        Soil.CN, Soil.AdjCN, Soil.zCN, Soil.nComp,
+        Soil.Profile.dzsum,Soil.Profile.th_wp,Soil.Profile.th_fc
     )
-
+                        
     # 6. Irrigation
     NewCond, Irr = irrigation(
         NewCond, IrrMngt, Crop, Soil.Profile, Soil.zTop, GrowingSeason, P, Runoff
@@ -257,9 +262,28 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
         NewCond.Y = 0
 
     # 19. Root zone water
-    Wr, _Dr, _TAW, _thRZ = root_zone_water(
-        Soil.Profile, NewCond.Zroot, NewCond.th, Soil.zTop, float(Crop.Zmin), Crop.Aer
-    )
+
+    _TAW = TAWClass()
+    _Dr = DrClass()
+    # thRZ = thRZClass()
+    Wr,_Dr.Zt,_Dr.Rz,_TAW.Zt,_TAW.Rz,_,_,_,_,_,_ = _root_zone_water(Soil.Profile.th_fc,
+                                                            Soil.Profile.th_s,
+                                                            Soil.Profile.th_wp,
+                                                            Soil.Profile.dz,
+                                                            Soil.Profile.dzsum,
+                                                            Soil.Profile.th_dry,
+                                                            float(NewCond.Zroot),
+                                                            NewCond.th,
+                                                            Soil.zTop,
+                                                            float(Crop.Zmin),
+                                                            Crop.Aer)
+
+
+
+
+    # Wr, _Dr, _TAW, _thRZ = root_zone_water(
+    #     Soil.Profile, NewCond.Zroot, NewCond.th, Soil.zTop, float(Crop.Zmin), Crop.Aer
+    # )
 
     # 20. Update net irrigation to add any pre irrigation
     IrrNet = IrrNet + PreIrr

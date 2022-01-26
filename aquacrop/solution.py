@@ -8,7 +8,7 @@
 
 
 # remove functions from __all__ as they become replace by compiled equivalent
-__all__ = ['root_zone_water', 'check_groundwater_table', 'root_development', 'pre_irrigation',
+__all__ = ['check_groundwater_table', 'root_development', 'pre_irrigation',
            'rainfall_partition', 'irrigation', 'infiltration', 'capillary_rise', 'germination',
            'growth_stage', 'water_stress', 'cc_development', 'cc_required_time', 'adjust_CCx', 'update_CCx_CDC',
            'canopy_cover', 'evap_layer_water_content', 'soil_evaporation', 'aeration_stress', 'transpiration',
@@ -32,10 +32,14 @@ from numba.pycc import CC
 # temporary name for compiled module
 cc = CC("solution_aot")
 
+# This compiled function is called a few times inside other functions
+if __name__ != "__main__":
+    from .solution_aot import _root_zone_water
+
 
 # Cell
 #@njit()
-@cc.export("growing_degree_day", "f8(i4,f8,f8,f8,f8)")
+@cc.export("_growing_degree_day", "f8(i4,f8,f8,f8,f8)")
 def growing_degree_day(GDDmethod,Tupp,Tbase,Tmax,Tmin):
     """
     Function to calculate number of growing degree days on current day
@@ -101,7 +105,18 @@ def growing_degree_day(GDDmethod,Tupp,Tbase,Tmax,Tmin):
 
 # Cell
 #@njit()
-def root_zone_water(prof,InitCond_Zroot,InitCond_th,Soil_zTop,Crop_Zmin,Crop_Aer):
+@cc.export("_root_zone_water", "(f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],f8,f8[:],f8,f8,f8)")
+def root_zone_water(prof_th_fc,
+                    prof_th_s,
+                    prof_th_wp,
+                    prof_dz,
+                    prof_dzsum,
+                    prof_th_dry,
+                    InitCond_Zroot,
+                    InitCond_th,
+                    Soil_zTop,
+                    Crop_Zmin,
+                    Crop_Aer):
     """
     Function to calculate actual and total available water in the rootzone at current time step
 
@@ -140,7 +155,7 @@ def root_zone_water(prof,InitCond_Zroot,InitCond_th,Soil_zTop,Crop_Zmin,Crop_Aer
     ## Calculate root zone water content and available water ##
     # Compartments covered by the root zone
     rootdepth = round(np.maximum(InitCond_Zroot,Crop_Zmin),2)
-    comp_sto = np.argwhere(prof.dzsum>=rootdepth).flatten()[0]
+    comp_sto = np.argwhere(prof_dzsum>=rootdepth).flatten()[0]
 
     # Initialise counters
     WrAct = 0
@@ -151,56 +166,56 @@ def root_zone_water(prof,InitCond_Zroot,InitCond_th,Soil_zTop,Crop_Zmin,Crop_Aer
     WrAer = 0
     for ii in range(comp_sto+1):
         # Fraction of compartment covered by root zone
-        if prof.dzsum[ii] > rootdepth:
-            factor = 1-((prof.dzsum[ii]-rootdepth)/prof.dz[ii])
+        if prof_dzsum[ii] > rootdepth:
+            factor = 1-((prof_dzsum[ii]-rootdepth)/prof_dz[ii])
         else:
             factor = 1
 
         # Actual water storage in root zone (mm)
-        WrAct = WrAct+round(factor*1000*InitCond_th[ii]*prof.dz[ii],2)
+        WrAct = WrAct+round(factor*1000*InitCond_th[ii]*prof_dz[ii],2)
         # Water storage in root zone at saturation (mm)
-        WrS = WrS+round(factor*1000*prof.th_s[ii]*prof.dz[ii],2)
+        WrS = WrS+round(factor*1000*prof_th_s[ii]*prof_dz[ii],2)
         # Water storage in root zone at field capacity (mm)
-        WrFC = WrFC+round(factor*1000*prof.th_fc[ii]*prof.dz[ii],2)
+        WrFC = WrFC+round(factor*1000*prof_th_fc[ii]*prof_dz[ii],2)
         # Water storage in root zone at permanent wilting point (mm)
-        WrWP = WrWP+round(factor*1000*prof.th_wp[ii]*prof.dz[ii],2)
+        WrWP = WrWP+round(factor*1000*prof_th_wp[ii]*prof_dz[ii],2)
         # Water storage in root zone at air dry (mm)
-        WrDry = WrDry+round(factor*1000*prof.th_dry[ii]*prof.dz[ii],2)
+        WrDry = WrDry+round(factor*1000*prof_th_dry[ii]*prof_dz[ii],2)
         # Water storage in root zone at aeration stress threshold (mm)
-        WrAer = WrAer+round(factor*1000*(prof.th_s[ii]-(Crop_Aer/100))*prof.dz[ii],2)
+        WrAer = WrAer+round(factor*1000*(prof_th_s[ii]-(Crop_Aer/100))*prof_dz[ii],2)
 
 
     if WrAct < 0:
         WrAct = 0
 
     # define total available water, depletion, root zone water content
-    TAW = TAWClass()
-    Dr = DrClass()
-    thRZ = thRZClass()
+    # TAW = TAWClass()
+    # Dr = DrClass()
+    # thRZ = thRZClass()
 
     # Calculate total available water (m3/m3)
-    TAW.Rz = max(WrFC-WrWP,0.)
+    TAW_Rz = max(WrFC-WrWP,0.)
     # Calculate soil water depletion (mm)
-    Dr.Rz = min(WrFC-WrAct,TAW.Rz)
+    Dr_Rz = min(WrFC-WrAct,TAW_Rz)
 
     # Actual root zone water content (m3/m3)
-    thRZ.Act = WrAct/(rootdepth*1000)
+    thRZ_Act = WrAct/(rootdepth*1000)
     # Root zone water content at saturation (m3/m3)
-    thRZ.S = WrS/(rootdepth*1000)
+    thRZ_S = WrS/(rootdepth*1000)
     # Root zone water content at field capacity (m3/m3)
-    thRZ.FC = WrFC/(rootdepth*1000)
+    thRZ_FC = WrFC/(rootdepth*1000)
     # Root zone water content at permanent wilting point (m3/m3)
-    thRZ.WP = WrWP/(rootdepth*1000)
+    thRZ_WP = WrWP/(rootdepth*1000)
     # Root zone water content at air dry (m3/m3)
-    thRZ.Dry = WrDry/(rootdepth*1000)
+    thRZ_Dry = WrDry/(rootdepth*1000)
     # Root zone water content at aeration stress threshold (m3/m3)
-    thRZ.Aer = WrAer/(rootdepth*1000)
+    thRZ_Aer = WrAer/(rootdepth*1000)
 
     ## Calculate top soil water content and available water ##
     if rootdepth > Soil_zTop:
         # Determine compartments covered by the top soil
         ztopdepth = round(Soil_zTop,2)
-        comp_sto = np.sum(prof.dzsum<=ztopdepth)
+        comp_sto = np.sum(prof_dzsum<=ztopdepth)
         # Initialise counters
         WrAct_Zt = 0
         WrFC_Zt = 0
@@ -211,34 +226,34 @@ def root_zone_water(prof,InitCond_Zroot,InitCond_th,Soil_zTop,Crop_Zmin,Crop_Aer
         for ii in range(comp_sto):
 
             # Fraction of compartment covered by root zone
-            if prof.dzsum[ii] > ztopdepth:
-                factor = 1-((prof.dzsum[ii]-ztopdepth)/prof.dz[ii])
+            if prof_dzsum[ii] > ztopdepth:
+                factor = 1-((prof_dzsum[ii]-ztopdepth)/prof_dz[ii])
             else:
                 factor = 1
 
             # Actual water storage in top soil (mm)
-            WrAct_Zt = WrAct_Zt+(factor*1000*InitCond_th[ii]*prof.dz[ii])
+            WrAct_Zt = WrAct_Zt+(factor*1000*InitCond_th[ii]*prof_dz[ii])
             # Water storage in top soil at field capacity (mm)
-            WrFC_Zt = WrFC_Zt+(factor*1000*prof.th_fc[ii]*prof.dz[ii])
+            WrFC_Zt = WrFC_Zt+(factor*1000*prof_th_fc[ii]*prof_dz[ii])
             # Water storage in top soil at permanent wilting point (mm)
-            WrWP_Zt = WrWP_Zt+(factor*1000*prof.th_wp[ii]*prof.dz[ii])
+            WrWP_Zt = WrWP_Zt+(factor*1000*prof_th_wp[ii]*prof_dz[ii])
 
         # Ensure available water in top soil is not less than zero
         if WrAct_Zt < 0:
             WrAct_Zt = 0
 
         # Calculate total available water in top soil (m3/m3)
-        TAW.Zt = max(WrFC_Zt-WrWP_Zt,0)
+        TAW_Zt = max(WrFC_Zt-WrWP_Zt,0)
         # Calculate depletion in top soil (mm)
-        Dr.Zt = min(WrFC_Zt-WrAct_Zt,TAW.Zt)
+        Dr_Zt = min(WrFC_Zt-WrAct_Zt,TAW_Zt)
     else:
         # Set top soil depletions and TAW to root zone values
-        Dr.Zt = Dr.Rz
-        TAW.Zt = TAW.Rz
+        Dr_Zt = Dr_Rz
+        TAW_Zt = TAW_Rz
 
 
 
-    return WrAct,Dr,TAW,thRZ
+    return WrAct,Dr_Zt,Dr_Rz,TAW_Zt,TAW_Rz,thRZ_Act,thRZ_S,thRZ_FC,thRZ_WP,thRZ_Dry,thRZ_Aer
 
 # Cell
 #@njit()
@@ -629,7 +644,7 @@ def pre_irrigation(prof,Crop,InitCond,GrowingSeason,IrrMngt):
 
 # Cell
 #@njit()
-@cc.export("drainage", "(f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],f8[:])")
+@cc.export("_drainage", "(f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],f8[:])")
 def drainage(prof_th_fc,
             prof_th_s,
             prof_tau,
@@ -953,9 +968,13 @@ def drainage(prof_th_fc,
 
 # Cell
 #@njit()
-def rainfall_partition(P,InitCond,
-                       FieldMngt,
-                       Soil_CN, Soil_AdjCN, Soil_zCN, Soil_nComp,prof):
+@cc.export("_rainfall_partition", "(f8,f8[:],f8,f8,f8,f8,f8,f8,f8,f8,f8,f8[:],f8[:],f8[:])")
+def rainfall_partition(P,
+                        InitCond_th,
+                        NewCond_DaySubmerged,
+                        FieldMngt_SRinhb,FieldMngt_Bunds,FieldMngt_zBund,FieldMngt_CNadjPct,
+                        Soil_CN, Soil_AdjCN, Soil_zCN, Soil_nComp,
+                        prof_dzsum,prof_th_wp,prof_th_fc):
     """
     Function to partition rainfall into surface runoff and infiltration using the curve number approach
 
@@ -1002,24 +1021,23 @@ def rainfall_partition(P,InitCond,
     # can probs make this faster by doing a if P=0 loop
 
     ## Store initial conditions for updating ##
-    NewCond = InitCond
-
+    # NewCond = InitCond
 
 
     ## Calculate runoff ##
-    if (FieldMngt.SRinhb == False) and ((FieldMngt.Bunds == False) or (FieldMngt.zBund < 0.001)):
+    if (FieldMngt_SRinhb == False) and ((FieldMngt_Bunds == False) or (FieldMngt_zBund < 0.001)):
         # Surface runoff is not inhibited and no soil bunds are on field
         # Reset submerged days
-        NewCond.DaySubmerged = 0
+        NewCond_DaySubmerged = 0
         # Adjust curve number for field management practices
-        CN = Soil_CN*(1+(FieldMngt.CNadjPct/100))
+        CN = Soil_CN*(1+(FieldMngt_CNadjPct/100))
         if Soil_AdjCN == 1: # Adjust CN for antecedent moisture
             # Calculate upper and lowe curve number bounds
             CNbot = round(1.4*(np.exp(-14*np.log(10)))+(0.507*CN)-(0.00374*CN**2)+(0.0000867*CN**3))
             CNtop = round(5.6*(np.exp(-14*np.log(10)))+(2.33*CN)-(0.0209*CN**2)+(0.000076*CN**3))
             # Check which compartment cover depth of top soil used to adjust
             # curve number
-            comp_sto_array = prof.dzsum[prof.dzsum>=Soil_zCN]
+            comp_sto_array = prof_dzsum[prof_dzsum>=Soil_zCN]
             if comp_sto_array.shape[0]==0:
                 comp_sto = int(Soil_nComp)
             else:
@@ -1029,10 +1047,10 @@ def rainfall_partition(P,InitCond,
             xx = 0
             wrel = np.zeros(comp_sto)
             for ii in range(comp_sto):
-                if prof.dzsum[ii] > Soil_zCN:
-                    prof.dzsum[ii] = Soil_zCN
+                if prof_dzsum[ii] > Soil_zCN:
+                    prof_dzsum[ii] = Soil_zCN
 
-                wx = 1.016*(1-np.exp(-4.16*(prof.dzsum[ii]/Soil_zCN)))
+                wx = 1.016*(1-np.exp(-4.16*(prof_dzsum[ii]/Soil_zCN)))
                 wrel[ii] = wx-xx
                 if wrel[ii] < 0:
                     wrel[ii] = 0
@@ -1043,11 +1061,11 @@ def rainfall_partition(P,InitCond,
 
             # Calculate relative wetness of top soil
             wet_top = 0
-            prof = prof
+            # prof = prof
 
             for ii in range(comp_sto):
-                th = max(prof.th_wp[ii],InitCond.th[ii])
-                wet_top = wet_top+(wrel[ii]*((th-prof.th_wp[ii])/(prof.th_fc[ii]-prof.th_wp[ii])))
+                th = max(prof_th_wp[ii],InitCond_th[ii])
+                wet_top = wet_top+(wrel[ii]*((th-prof_th_wp[ii])/(prof_th_fc[ii]-prof_th_wp[ii])))
 
             # Calculate adjusted curve number
             if wet_top > 1:
@@ -1075,7 +1093,7 @@ def rainfall_partition(P,InitCond,
 
 
 
-    return Runoff,Infl,NewCond
+    return Runoff,Infl,NewCond_DaySubmerged
 
 # Cell
 #@njit()
@@ -1120,7 +1138,21 @@ def irrigation(InitCond,IrrMngt,Crop,prof,Soil_zTop,GrowingSeason,Rain,Runoff):
     ## Determine irrigation depth (mm/day) to be applied ##
     if GrowingSeason == True:
         # Calculate root zone water content and depletion
-        WrAct,Dr_,TAW_,thRZ = root_zone_water(prof,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+        TAW_ = TAWClass()
+        Dr_ = DrClass()
+        thRZ = thRZClass()
+        WrAct,Dr_.Zt,Dr_.Rz,TAW_.Zt,TAW_.Rz,thRZ.Act,thRZ.S,thRZ.FC,thRZ.WP,thRZ.Dry,thRZ.Aer = _root_zone_water(prof.th_fc,
+                                                                                                                prof.th_s,
+                                                                                                                prof.th_wp,
+                                                                                                                prof.dz,
+                                                                                                                prof.dzsum,
+                                                                                                                prof.th_dry,
+                                                                                                                float(NewCond.Zroot),
+                                                                                                                NewCond.th,
+                                                                                                                Soil_zTop,
+                                                                                                                float(Crop.Zmin),
+                                                                                                                Crop.Aer)
+        # WrAct,Dr_,TAW_,thRZ = root_zone_water(prof,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Use root zone depletions and TAW only for triggering irrigation
         Dr = Dr_.Rz
         TAW = TAW_.Rz
@@ -2184,7 +2216,7 @@ def update_CCx_CDC(CCprev,CDC,CCx,dt):
 
 # Cell
 #@njit()
-def canopy_cover(Crop,Soil_Profile,Soil_zTop,InitCond,GDD,Et0,GrowingSeason):
+def canopy_cover(Crop,prof,Soil_zTop,InitCond,GDD,Et0,GrowingSeason):
 #def canopy_cover(Crop,Soil_Profile,Soil_zTop,InitCond,GDD,Et0,GrowingSeason):
 
     """
@@ -2198,7 +2230,7 @@ def canopy_cover(Crop,Soil_Profile,Soil_zTop,InitCond,GDD,Et0,GrowingSeason):
 
     `Crop`: `CropClass` : Crop object
 
-    `Soil_Profile`: `SoilProfileClass` : Soil object
+    `prof`: `SoilProfileClass` : Soil object
 
     `Soil_zTop`: `float` : top soil depth
 
@@ -2239,7 +2271,22 @@ def canopy_cover(Crop,Soil_Profile,Soil_zTop,InitCond,GDD,Et0,GrowingSeason):
     ## Calculate canopy development (if in growing season) ##
     if GrowingSeason == True:
         # Calculate root zone water content
-        _,Dr,TAW,_ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+        TAW = TAWClass()
+        Dr = DrClass()
+        # thRZ = thRZClass()
+        _,Dr.Zt,Dr.Rz,TAW.Zt,TAW.Rz,_,_,_,_,_,_ = _root_zone_water(  prof.th_fc,
+                                                                    prof.th_s,
+                                                                    prof.th_wp,
+                                                                    prof.dz,
+                                                                    prof.dzsum,
+                                                                    prof.th_dry,
+                                                                    float(NewCond.Zroot),
+                                                                    NewCond.th,
+                                                                    Soil_zTop,
+                                                                    float(Crop.Zmin),
+                                                                    Crop.Aer)
+
+        # _,Dr,TAW,_ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Check whether to use root zone or top soil depletions for calculating
         # water stress
         if (Dr.Rz/TAW.Rz) <= (Dr.Zt/TAW.Zt):
@@ -3260,7 +3307,25 @@ def transpiration(Soil_Profile,Soil_nComp,Soil_zTop,
         ## Update potential root zone transpiration for water stress ##
         # Determine root zone and top soil depletion, and root zone water
         # content
-        _,Dr,TAW,thRZ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+
+        TAW = TAWClass()
+        Dr = DrClass()
+        thRZ = thRZClass()
+        _,Dr.Zt,Dr.Rz,TAW.Zt,TAW.Rz,thRZ.Act,thRZ.S,thRZ.FC,thRZ.WP,thRZ.Dry,thRZ.Aer = _root_zone_water(prof.th_fc,
+                                                                                                        prof.th_s,
+                                                                                                        prof.th_wp,
+                                                                                                        prof.dz,
+                                                                                                        prof.dzsum,
+                                                                                                        prof.th_dry,
+                                                                                                        float(NewCond.Zroot),
+                                                                                                        NewCond.th,
+                                                                                                        Soil_zTop,
+                                                                                                        float(Crop.Zmin),
+                                                                                                        Crop.Aer)
+
+
+
+        #_,Dr,TAW,thRZ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Check whether to use root zone or top soil depletions for calculating
         # water stress
         if (Dr.Rz/TAW.Rz) <= (Dr.Zt/TAW.Zt):
@@ -3442,9 +3507,28 @@ def transpiration(Soil_Profile,Soil_nComp,Soil_zTop,
             # Initialise net irrigation counter
             IrrNet = 0
             # Get root zone water content
-            _,_Dr,_TAW,thRZ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
-            NewCond.Depletion =  _Dr.Rz
-            NewCond.TAW = _TAW.Rz
+
+
+            TAW = TAWClass()
+            Dr = DrClass()
+            thRZ = thRZClass()
+            _,Dr.Zt,Dr.Rz,TAW.Zt,TAW.Rz,thRZ.Act,thRZ.S,thRZ.FC,thRZ.WP,thRZ.Dry,thRZ.Aer = _root_zone_water(prof.th_fc,
+                                                                                                            prof.th_s,
+                                                                                                            prof.th_wp,
+                                                                                                            prof.dz,
+                                                                                                            prof.dzsum,
+                                                                                                            prof.th_dry,
+                                                                                                            float(NewCond.Zroot),
+                                                                                                            NewCond.th,
+                                                                                                            Soil_zTop,
+                                                                                                            float(Crop.Zmin),
+                                                                                                            Crop.Aer)
+
+
+            
+            # _,_Dr,_TAW,thRZ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+            NewCond.Depletion =  Dr.Rz
+            NewCond.TAW = TAW.Rz
             # Determine critical water content for net irrigation
             thCrit = thRZ.WP+((IrrMngt_NetIrrSMT/100)*(thRZ.FC-thRZ.WP))
             # Check if root zone water content is below net irrigation trigger
@@ -4104,7 +4188,7 @@ def HIadj_post_anthesis(InitCond,Crop,Ksw):
 
 # Cell
 #@njit()
-def harvest_index(Soil_Profile,Soil_zTop,Crop,InitCond,Et0,Tmax,Tmin,GrowingSeason):
+def harvest_index(prof,Soil_zTop,Crop,InitCond,Et0,Tmax,Tmin,GrowingSeason):
 
     """
     Function to simulate build up of harvest index
@@ -4153,7 +4237,26 @@ def harvest_index(Soil_Profile,Soil_zTop,Crop,InitCond,Et0,Tmax,Tmin,GrowingSeas
     ## Calculate harvest index build up (if in growing season) ##
     if GrowingSeason == True:
         # Calculate root zone water content
-        _,Dr,TAW,_ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+
+        TAW = TAWClass()
+        Dr = DrClass()
+        # thRZ = thRZClass()
+        _,Dr.Zt,Dr.Rz,TAW.Zt,TAW.Rz,_,_,_,_,_,_ = _root_zone_water(prof.th_fc,
+                                                                prof.th_s,
+                                                                prof.th_wp,
+                                                                prof.dz,
+                                                                prof.dzsum,
+                                                                prof.th_dry,
+                                                                float(NewCond.Zroot),
+                                                                NewCond.th,
+                                                                Soil_zTop,
+                                                                float(Crop.Zmin),
+                                                                Crop.Aer)
+
+
+
+
+        # _,Dr,TAW,_ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Check whether to use root zone or top soil depletions for calculating
         # water stress
         if (Dr.Rz/TAW.Rz) <= (Dr.Zt/TAW.Zt):
