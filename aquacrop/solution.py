@@ -10,7 +10,6 @@
 __all__ = [
     "root_development",
     "pre_irrigation",
-    "rainfall_partition",
     "irrigation",
     "infiltration",
     "capillary_rise",
@@ -285,7 +284,7 @@ def root_zone_water(
 
 
 # Cell
-@cc.export("_check_groundwater_table", "f8(f8,f8,f8,f8,f8,f8,f8,i4,f8)")
+@cc.export("_check_groundwater_table", "(f8[:],f8[:],f8[:],f8[:],f8,f8[:],f8[:],i4,f8)")
 def check_groundwater_table(
     prof_zMid,
     prof_Comp,
@@ -384,14 +383,8 @@ def check_groundwater_table(
         prof_th_fc_Adj = thfcAdj
 
     return (
-        NewCond_zGW,
         NewCond_th_fc_Adj,
-        NewCond_th,
-        prof_zMid,
-        prof_Comp,
-        prof_th_s,
-        prof_th_fc,
-        prof_th_fc_Adj,
+        prof_th_fc_Adj
     )
 
 

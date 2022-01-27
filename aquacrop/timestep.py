@@ -9,7 +9,7 @@ import pandas as pd
 
 
 # compiled functions
-from .solution_aot import _growing_degree_day, _drainage, _root_zone_water, _rainfall_partition
+from .solution_aot import _growing_degree_day, _drainage, _root_zone_water, _rainfall_partition, _check_groundwater_table
 
 # Cell
 def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
@@ -126,15 +126,9 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
     # Run simulations %%
     # 1. Check for groundwater table
     (
-        NewCond.zGW,
         NewCond.th_fc_Adj,
-        NewCond.th,
-        Soil.Profile.zMid,
-        Soil.Profile.Comp,
-        Soil.Profile.th_s,
-        Soil.Profile.th_fc,
-        Soil.Profile.th_fc_Adj,
-    ) = check_groundwater_table(
+        Soil.Profile.th_fc_Adj
+    ) = _check_groundwater_table(
         Soil.Profile.zMid,
         Soil.Profile.Comp,
         Soil.Profile.th_s,
