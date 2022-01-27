@@ -15,13 +15,11 @@ __all__ = [
     "capillary_rise",
     "germination",
     "growth_stage",
-    "water_stress",
     "cc_development",
     "cc_required_time",
     "adjust_CCx",
     "update_CCx_CDC",
     "canopy_cover",
-    "evap_layer_water_content",
     "soil_evaporation",
     "aeration_stress",
     "transpiration",
@@ -53,7 +51,9 @@ cc = CC("solution_aot")
 
 # This compiled function is called a few times inside other functions
 if __name__ != "__main__":
-    from .solution_aot import _root_zone_water
+    from .solution_aot import _root_zone_water,_water_stress,_evap_layer_water_content
+else:
+    from solution_aot import _evap_layer_water_content
 
 
 # Cell
@@ -983,7 +983,7 @@ def drainage(
 
 # Cell
 # @njit()
-@cc.export("_rainfall_partition", "(f8,f8[:],f8,f8,f8,f8,f8,f8,f8,f8,f8,f8[:],f8[:],f8[:])")
+@cc.export("_rainfall_partition", "(f8,f8[:],i8,f8,f8,f8,f8,f8,f8,f8,f8,f8[:],f8[:],f8[:])")
 def rainfall_partition(
     P,
     InitCond_th,
@@ -1909,8 +1909,18 @@ def growth_stage(Crop, InitCond, GrowingSeason):
 
 
 # Cell
-# @njit()
-def water_stress(Crop, InitCond, Dr, TAW, Et0, beta):
+@njit
+@cc.export("_water_stress", "(f8[:],f8[:],f8,f8,f8[:],f8,f8,f8,f8,f8)")
+def water_stress(Crop_p_up,
+                Crop_p_lo,
+                Crop_ETadj,
+                Crop_beta,
+                Crop_fshape_w,
+                InitCond_tEarlySen,
+                Dr,
+                TAW,
+                Et0,
+                beta):
     """
     Function to calculate water stress coefficients
 
@@ -1937,20 +1947,16 @@ def water_stress(Crop, InitCond, Dr, TAW, Et0, beta):
 
     `Ksw`: `KswClass` : Ksw object containint water stress coefficients
 
-
-
-
-
     """
 
     ## Calculate relative root zone water depletion for each stress type ##
     # Number of stress variables
-    nstress = len(Crop.p_up)
+    nstress = len(Crop_p_up)
 
     # Store stress thresholds
-    p_up = np.ones(nstress) * Crop.p_up
-    p_lo = np.ones(nstress) * Crop.p_lo
-    if Crop.ETadj == 1:
+    p_up = np.ones(nstress) * Crop_p_up
+    p_lo = np.ones(nstress) * Crop_p_lo
+    if Crop_ETadj == 1:
         # Adjust stress thresholds for Et0 on currentbeta day (don't do this for
         # pollination water stress coefficient)
 
@@ -1959,8 +1965,8 @@ def water_stress(Crop, InitCond, Dr, TAW, Et0, beta):
             p_lo[ii] = p_lo[ii] + (0.04 * (5 - Et0)) * (np.log10(10 - 9 * p_lo[ii]))
 
     # Adjust senescence threshold if early sensescence is triggered
-    if (beta == True) and (InitCond.tEarlySen > 0):
-        p_up[2] = p_up[2] * (1 - Crop.beta / 100)
+    if (beta == True) and (InitCond_tEarlySen > 0):
+        p_up[2] = p_up[2] * (1 - Crop_beta / 100)
 
     # Limit values
     p_up = np.maximum(p_up, np.zeros(4))
@@ -1984,22 +1990,23 @@ def water_stress(Crop, InitCond, Dr, TAW, Et0, beta):
     ## Calculate root zone water stress coefficients ##
     Ks = np.ones(3)
     for ii in range(3):
-        Ks[ii] = 1 - ((np.exp(Drel[ii] * Crop.fshape_w[ii]) - 1) / (np.exp(Crop.fshape_w[ii]) - 1))
+        Ks[ii] = 1 - ((np.exp(Drel[ii] * Crop_fshape_w[ii]) - 1) / (np.exp(Crop_fshape_w[ii]) - 1))
 
-    Ksw = KswClass()
+    # Ksw = KswClass()
 
     # Water stress coefficient for leaf expansion
-    Ksw.Exp = Ks[0]
+    Ksw_Exp = Ks[0]
     # Water stress coefficient for stomatal closure
-    Ksw.Sto = Ks[1]
+    Ksw_Sto = Ks[1]
     # Water stress coefficient for senescence
-    Ksw.Sen = Ks[2]
+    Ksw_Sen = Ks[2]
     # Water stress coefficient for pollination failure
-    Ksw.Pol = 1 - Drel[3]
+    Ksw_Pol = 1 - Drel[3]
     # Mean water stress coefficient for stomatal closure
-    Ksw.StoLin = 1 - Drel[1]
+    Ksw_StoLin = 1 - Drel[1]
 
-    return Ksw
+    return Ksw_Exp,Ksw_Sto,Ksw_Sen,Ksw_Pol,Ksw_StoLin
+
 
 
 # Cell
@@ -2307,7 +2314,21 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
 
         # Determine if water stress is occurring
         beta = True
-        Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
+        Ksw = KswClass()
+        Ksw.Exp,Ksw.Sto,Ksw.Sen,Ksw.Pol,Ksw.StoLin = _water_stress(Crop.p_up,
+                                                                    Crop.p_lo,
+                                                                    Crop.ETadj,
+                                                                    Crop.beta,
+                                                                    Crop.fshape_w,
+                                                                    NewCond.tEarlySen,
+                                                                    Dr,
+                                                                    TAW,
+                                                                    Et0,
+                                                                    beta)
+        
+        #water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
+
+
         # Get canopy cover growth time
         if Crop.CalendarType == 1:
             dtCC = 1
@@ -2516,7 +2537,20 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
                     NewCond.tEarlySen = InitCond_tEarlySen + dtCC
                     # Adjust canopy decline coefficient for water stress
                     beta = False
-                    Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
+
+                    Ksw = KswClass()
+                    Ksw.Exp,Ksw.Sto,Ksw.Sen,Ksw.Pol,Ksw.StoLin = _water_stress(Crop.p_up,
+                                                                                Crop.p_lo,
+                                                                                Crop.ETadj,
+                                                                                Crop.beta,
+                                                                                Crop.fshape_w,
+                                                                                NewCond.tEarlySen,
+                                                                                Dr,
+                                                                                TAW,
+                                                                                Et0,
+                                                                                beta)
+
+                    # Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
                     if Ksw.Sen > 0.99999:
                         CDCadj = 0.0001
                     else:
@@ -2633,8 +2667,16 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
 
 
 # Cell
-# @njit()
-def evap_layer_water_content(InitCond_th, InitCond_EvapZ, prof):
+@njit
+@cc.export("_evap_layer_water_content", "(f8[:],f8,f8[:],f8[:],f8[:],f8[:],f8[:],f8[:])")
+def _evap_layer_water_content(InitCond_th,
+                            InitCond_EvapZ,
+                            prof_dz,
+                            prof_dzsum,
+                            prof_th_dry,
+                            prof_th_wp,
+                            prof_th_fc,
+                            prof_th_s,):
     """
     Function to get water contents in the evaporation layer
 
@@ -2670,7 +2712,7 @@ def evap_layer_water_content(InitCond_th, InitCond_EvapZ, prof):
     """
 
     # Find soil compartments covered by evaporation layer
-    comp_sto = np.sum(prof.dzsum < InitCond_EvapZ) + 1
+    comp_sto = np.sum(prof_dzsum < InitCond_EvapZ) + 1
 
     Wevap_Sat = 0
     Wevap_Fc = 0
@@ -2681,21 +2723,21 @@ def evap_layer_water_content(InitCond_th, InitCond_EvapZ, prof):
     for ii in range(int(comp_sto)):
 
         # Determine fraction of soil compartment covered by evaporation layer
-        if prof.dzsum[ii] > InitCond_EvapZ:
-            factor = 1 - ((prof.dzsum[ii] - InitCond_EvapZ) / prof.dz[ii])
+        if prof_dzsum[ii] > InitCond_EvapZ:
+            factor = 1 - ((prof_dzsum[ii] - InitCond_EvapZ) / prof_dz[ii])
         else:
             factor = 1
 
         # Actual water storage in evaporation layer (mm)
-        Wevap_Act += factor * 1000 * InitCond_th[ii] * prof.dz[ii]
+        Wevap_Act += factor * 1000 * InitCond_th[ii] * prof_dz[ii]
         # Water storage in evaporation layer at saturation (mm)
-        Wevap_Sat += factor * 1000 * prof.th_s[ii] * prof.dz[ii]
+        Wevap_Sat += factor * 1000 * prof_th_s[ii] * prof_dz[ii]
         # Water storage in evaporation layer at field capacity (mm)
-        Wevap_Fc += factor * 1000 * prof.th_fc[ii] * prof.dz[ii]
+        Wevap_Fc += factor * 1000 * prof_th_fc[ii] * prof_dz[ii]
         # Water storage in evaporation layer at permanent wilting point (mm)
-        Wevap_Wp += factor * 1000 * prof.th_wp[ii] * prof.dz[ii]
+        Wevap_Wp += factor * 1000 * prof_th_wp[ii] * prof_dz[ii]
         # Water storage in evaporation layer at air dry (mm)
-        Wevap_Dry += factor * 1000 * prof.th_dry[ii] * prof.dz[ii]
+        Wevap_Dry += factor * 1000 * prof_th_dry[ii] * prof_dz[ii]
 
     if Wevap_Act < 0:
         Wevap_Act = 0
@@ -2705,13 +2747,21 @@ def evap_layer_water_content(InitCond_th, InitCond_EvapZ, prof):
 
 # Cell
 # @njit()
+@cc.export("_soil_evaporation", "(i8,i8,i8,f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],\
+    f8,f8,f8,f8,f8,f8,f8,i8,f8,i8,f8,b1,f8,f8,i8,f8,f8,f8,f8[:],f8,f8,f8,f8,f8,f8,\
+        f8,b1,f8,f8,f8,f8,f8,f8,f8,b1)")
 def soil_evaporation(
     ClockStruct_EvapTimeSteps,
     ClockStruct_SimOffSeason,
     ClockStruct_TimeStepCounter,
+    prof_dz,
+    prof_dzsum,
+    prof_th_dry,
+    prof_th_wp,
+    prof_th_fc,
+    prof_th_s,
     Soil_EvapZmin,
     Soil_EvapZmax,
-    Soil_Profile,
     Soil_REW,
     Soil_Kex,
     Soil_fwcc,
@@ -2721,8 +2771,25 @@ def soil_evaporation(
     Crop_Senescence,
     IrrMngt_IrrMethod,
     IrrMngt_WetSurf,
-    FieldMngt,
-    InitCond,
+    FieldMngt_Mulches,
+    FieldMngt_fMulch,
+    FieldMngt_MulchPct,
+    NewCond_DAP,
+    NewCond_Wsurf,
+    NewCond_EvapZ,
+    NewCond_Stage2,
+    NewCond_th,
+    NewCond_DelayedCDs,
+    NewCond_GDDcum,
+    NewCond_DelayedGDDs,
+    NewCond_CCxW,
+    NewCond_CCadj,
+    NewCond_CCxAct,
+    NewCond_CC,
+    NewCond_PrematSenes,
+    NewCond_SurfaceStorage,
+    NewCond_Wstage2,
+    NewCond_Epot,
     Et0,
     Infl,
     Rain,
@@ -2778,32 +2845,39 @@ def soil_evaporation(
 
     """
 
-    Wevap = WevapClass()
+    # Wevap = WevapClass()
 
     ## Store initial conditions in new structure that will be updated ##
-    NewCond = InitCond
+    # NewCond = InitCond
 
     ## Prepare stage 2 evaporation (REW gone) ##
     # Only do this if it is first day of simulation, or if it is first day of
     # growing season and not simulating off-season
     if (ClockStruct_TimeStepCounter == 0) or (
-        (NewCond.DAP == 1) and (ClockStruct_SimOffSeason == False)
+        (NewCond_DAP == 1) and (ClockStruct_SimOffSeason == False)
     ):
         # Reset storage in surface soil layer to zero
-        NewCond.Wsurf = 0
+        NewCond_Wsurf = 0
         # Set evaporation depth to minimum
-        NewCond.EvapZ = Soil_EvapZmin
+        NewCond_EvapZ = Soil_EvapZmin
         # Trigger stage 2 evaporation
-        NewCond.Stage2 = True
+        NewCond_Stage2 = True
         # Get relative water content for start of stage 2 evaporation
-        Wevap.Sat, Wevap.Fc, Wevap.Wp, Wevap.Dry, Wevap.Act = evap_layer_water_content(
-            NewCond.th, NewCond.EvapZ, Soil_Profile
+        Wevap_Sat, Wevap_Fc, Wevap_Wp, Wevap_Dry, Wevap_Act = _evap_layer_water_content(
+            NewCond_th,
+            NewCond_EvapZ,
+            prof_dz,
+            prof_dzsum,
+            prof_th_dry,
+            prof_th_wp,
+            prof_th_fc,
+            prof_th_s,
         )
-        NewCond.Wstage2 = round(
-            (Wevap.Act - (Wevap.Fc - Soil_REW)) / (Wevap.Sat - (Wevap.Fc - Soil_REW)), 2
+        NewCond_Wstage2 = round(
+            (Wevap_Act - (Wevap_Fc - Soil_REW)) / (Wevap_Sat - (Wevap_Fc - Soil_REW)), 2
         )
-        if NewCond.Wstage2 < 0:
-            NewCond.Wstage2 = 0
+        if NewCond_Wstage2 < 0:
+            NewCond_Wstage2 = 0
 
     ## Prepare soil evaporation stage 1 ##
     # Adjust water in surface evaporation layer for any infiltration
@@ -2813,44 +2887,44 @@ def soil_evaporation(
         if Infl > 0:
             # Update storage in surface evaporation layer for incoming
             # infiltration
-            NewCond.Wsurf = Infl
+            NewCond_Wsurf = Infl
             # Water stored in surface evaporation layer cannot exceed REW
-            if NewCond.Wsurf > Soil_REW:
-                NewCond.Wsurf = Soil_REW
+            if NewCond_Wsurf > Soil_REW:
+                NewCond_Wsurf = Soil_REW
 
             # Reset variables
-            NewCond.Wstage2 = 0
-            NewCond.EvapZ = Soil_EvapZmin
-            NewCond.Stage2 = False
+            NewCond_Wstage2 = 0
+            NewCond_EvapZ = Soil_EvapZmin
+            NewCond_Stage2 = False
 
     ## Calculate potential soil evaporation rate (mm/day) ##
     if GrowingSeason == True:
         # Adjust time for any delayed development
         if Crop_CalendarType == 1:
-            tAdj = NewCond.DAP - NewCond.DelayedCDs
+            tAdj = NewCond_DAP - NewCond_DelayedCDs
         elif Crop_CalendarType == 2:
-            tAdj = NewCond.GDDcum - NewCond.DelayedGDDs
+            tAdj = NewCond_GDDcum - NewCond_DelayedGDDs
 
         # Calculate maximum potential soil evaporation
-        EsPotMax = Soil_Kex * Et0 * (1 - NewCond.CCxW * (Soil_fwcc / 100))
+        EsPotMax = Soil_Kex * Et0 * (1 - NewCond_CCxW * (Soil_fwcc / 100))
         # Calculate potential soil evaporation (given current canopy cover
         # size)
-        EsPot = Soil_Kex * (1 - NewCond.CCadj) * Et0
+        EsPot = Soil_Kex * (1 - NewCond_CCadj) * Et0
 
         # Adjust potential soil evaporation for effects of withered canopy
-        if (tAdj > Crop_Senescence) and (NewCond.CCxAct > 0):
-            if NewCond.CC > (NewCond.CCxAct / 2):
-                if NewCond.CC > NewCond.CCxAct:
+        if (tAdj > Crop_Senescence) and (NewCond_CCxAct > 0):
+            if NewCond_CC > (NewCond_CCxAct / 2):
+                if NewCond_CC > NewCond_CCxAct:
                     mult = 0
                 else:
-                    mult = (NewCond.CCxAct - NewCond.CC) / (NewCond.CCxAct / 2)
+                    mult = (NewCond_CCxAct - NewCond_CC) / (NewCond_CCxAct / 2)
 
             else:
                 mult = 1
 
-            EsPot = EsPot * (1 - NewCond.CCxAct * (Soil_fwcc / 100) * mult)
+            EsPot = EsPot * (1 - NewCond_CCxAct * (Soil_fwcc / 100) * mult)
             CCxActAdj = (
-                (1.72 * NewCond.CCxAct) - (NewCond.CCxAct ** 2) + 0.3 * (NewCond.CCxAct ** 3)
+                (1.72 * NewCond_CCxAct) - (NewCond_CCxAct ** 2) + 0.3 * (NewCond_CCxAct ** 3)
             )
             EsPotMin = Soil_Kex * (1 - CCxActAdj) * Et0
             if EsPotMin < 0:
@@ -2861,7 +2935,7 @@ def soil_evaporation(
             elif EsPot > EsPotMax:
                 EsPot = EsPotMax
 
-        if NewCond.PrematSenes == True:
+        if NewCond_PrematSenes == True:
             if EsPot > EsPotMax:
                 EsPot = EsPotMax
 
@@ -2872,13 +2946,14 @@ def soil_evaporation(
 
     ## Adjust potential soil evaporation for mulches and/or partial wetting ##
     # Mulches
-    if NewCond.SurfaceStorage < 0.000001:
-        if not FieldMngt.Mulches:
+    if NewCond_SurfaceStorage < 0.000001:
+        if not FieldMngt_Mulches:
             # No mulches present
             EsPotMul = EsPot
-        elif FieldMngt.Mulches:
+        elif FieldMngt_Mulches:
             # Mulches present
-            EsPotMul = EsPot * (1 - FieldMngt.fMulch * (FieldMngt.MulchPct / 100))
+            EsPotMul = EsPot * (1 - FieldMngt_fMulch * (FieldMngt_MulchPct / 100))
+
 
     else:
         # Surface is flooded - no adjustment of potential soil evaporation for
@@ -2889,7 +2964,7 @@ def soil_evaporation(
     if (Irr > 0) and (IrrMngt_IrrMethod != 4):
         # Only apply adjustment if irrigation occurs and not in net irrigation
         # mode
-        if (Rain > 1) or (NewCond.SurfaceStorage > 0):
+        if (Rain > 1) or (NewCond_SurfaceStorage > 0):
             # No adjustment for partial wetting - assume surface is fully wet
             EsPotIrr = EsPot
         else:
@@ -2907,49 +2982,49 @@ def soil_evaporation(
     # Initialise actual evaporation counter
     EsAct = 0
     # Evaporate surface storage
-    if NewCond.SurfaceStorage > 0:
-        if NewCond.SurfaceStorage > EsPot:
+    if NewCond_SurfaceStorage > 0:
+        if NewCond_SurfaceStorage > EsPot:
             # All potential soil evaporation can be supplied by surface storage
             EsAct = EsPot
             # Update surface storage
-            NewCond.SurfaceStorage = NewCond.SurfaceStorage - EsAct
+            NewCond_SurfaceStorage = NewCond_SurfaceStorage - EsAct
         else:
             # Surface storage is not sufficient to meet all potential soil
             # evaporation
-            EsAct = NewCond.SurfaceStorage
+            EsAct = NewCond_SurfaceStorage
             # Update surface storage, evaporation layer depth, stage
-            NewCond.SurfaceStorage = 0
-            NewCond.Wsurf = Soil_REW
-            NewCond.Wstage2 = 0
-            NewCond.EvapZ = Soil_EvapZmin
-            NewCond.Stage2 = False
+            NewCond_SurfaceStorage = 0
+            NewCond_Wsurf = Soil_REW
+            NewCond_Wstage2 = 0
+            NewCond_EvapZ = Soil_EvapZmin
+            NewCond_Stage2 = False
 
     ## Stage 1 evaporation ##
     # Determine total water to be extracted
     ToExtract = EsPot - EsAct
     # Determine total water to be extracted in stage one (limited by surface
     # layer water storage)
-    ExtractPotStg1 = min(ToExtract, NewCond.Wsurf)
+    ExtractPotStg1 = min(ToExtract, NewCond_Wsurf)
     # Extract water
     if ExtractPotStg1 > 0:
         # Find soil compartments covered by evaporation layer
-        comp_sto = np.sum(Soil_Profile.dzsum < Soil_EvapZmin) + 1
+        comp_sto = np.sum(prof_dzsum < Soil_EvapZmin) + 1
         comp = -1
-        prof = Soil_Profile
+        # prof = Soil_Profile
         while (ExtractPotStg1 > 0) and (comp < comp_sto):
             # Increment compartment counter
             comp = comp + 1
             # Specify layer number
             # Determine proportion of compartment in evaporation layer
-            if prof.dzsum[comp] > Soil_EvapZmin:
-                factor = 1 - ((prof.dzsum[comp] - Soil_EvapZmin) / prof.dz[comp])
+            if prof_dzsum[comp] > Soil_EvapZmin:
+                factor = 1 - ((prof_dzsum[comp] - Soil_EvapZmin) / prof_dz[comp])
             else:
                 factor = 1
 
             # Water storage (mm) at air dry
-            Wdry = 1000 * prof.th_dry[comp] * prof.dz[comp]
+            Wdry = 1000 * prof_th_dry[comp] * prof_dz[comp]
             # Available water (mm)
-            W = 1000 * NewCond.th[comp] * prof.dz[comp]
+            W = 1000 * NewCond_th[comp] * prof_dz[comp]
             # Water available in compartment for extraction (mm)
             AvW = (W - Wdry) * factor
             if AvW < 0:
@@ -2975,65 +3050,86 @@ def soil_evaporation(
                 W = W - AvW
 
             # Update water content
-            NewCond.th[comp] = W / (1000 * prof.dz[comp])
+            NewCond_th[comp] = W / (1000 * prof_dz[comp])
 
         # Update surface evaporation layer water balance
-        NewCond.Wsurf = NewCond.Wsurf - EsAct
-        if (NewCond.Wsurf < 0) or (ExtractPotStg1 > 0.0001):
-            NewCond.Wsurf = 0
+        NewCond_Wsurf = NewCond_Wsurf - EsAct
+        if (NewCond_Wsurf < 0) or (ExtractPotStg1 > 0.0001):
+            NewCond_Wsurf = 0
 
         # If surface storage completely depleted, prepare stage 2
-        if NewCond.Wsurf < 0.0001:
+        if NewCond_Wsurf < 0.0001:
             # Get water contents (mm)
-            Wevap.Sat, Wevap.Fc, Wevap.Wp, Wevap.Dry, Wevap.Act = evap_layer_water_content(
-                NewCond.th, NewCond.EvapZ, Soil_Profile
+            Wevap_Sat, Wevap_Fc, Wevap_Wp, Wevap_Dry, Wevap_Act = _evap_layer_water_content(
+                NewCond_th,
+                NewCond_EvapZ,
+                prof_dz,
+                prof_dzsum,
+                prof_th_dry,
+                prof_th_wp,
+                prof_th_fc,
+                prof_th_s,
             )
             # Proportional water storage for start of stage two evaporation
-            NewCond.Wstage2 = round(
-                (Wevap.Act - (Wevap.Fc - Soil_REW)) / (Wevap.Sat - (Wevap.Fc - Soil_REW)), 2
+            NewCond_Wstage2 = round(
+                (Wevap_Act - (Wevap_Fc - Soil_REW)) / (Wevap_Sat - (Wevap_Fc - Soil_REW)), 2
             )
-            if NewCond.Wstage2 < 0:
-                NewCond.Wstage2 = 0
+            if NewCond_Wstage2 < 0:
+                NewCond_Wstage2 = 0
 
     ## Stage 2 evaporation ##
     # Extract water
     if ToExtract > 0:
         # Start stage 2
-        NewCond.Stage2 = True
+        NewCond_Stage2 = True
         # Get sub-daily evaporative demand
         Edt = ToExtract / ClockStruct_EvapTimeSteps
         # Loop sub-daily steps
         for jj in range(int(ClockStruct_EvapTimeSteps)):
             # Get current water storage (mm)
-            Wevap.Sat, Wevap.Fc, Wevap.Wp, Wevap.Dry, Wevap.Act = evap_layer_water_content(
-                NewCond.th, NewCond.EvapZ, Soil_Profile
+            Wevap_Sat, Wevap_Fc, Wevap_Wp, Wevap_Dry, Wevap_Act = _evap_layer_water_content(
+                NewCond_th,
+                NewCond_EvapZ,
+                prof_dz,
+                prof_dzsum,
+                prof_th_dry,
+                prof_th_wp,
+                prof_th_fc,
+                prof_th_s,
             )
             # Get water storage (mm) at start of stage 2 evaporation
-            Wupper = NewCond.Wstage2 * (Wevap.Sat - (Wevap.Fc - Soil_REW)) + (Wevap.Fc - Soil_REW)
+            Wupper = NewCond_Wstage2 * (Wevap_Sat - (Wevap_Fc - Soil_REW)) + (Wevap_Fc - Soil_REW)
             # Get water storage (mm) when there is no evaporation
-            Wlower = Wevap.Dry
+            Wlower = Wevap_Dry
             # Get relative depletion of evaporation storage in stage 2
-            Wrel = (Wevap.Act - Wlower) / (Wupper - Wlower)
+            Wrel = (Wevap_Act - Wlower) / (Wupper - Wlower)
             # Check if need to expand evaporation layer
             if Soil_EvapZmax > Soil_EvapZmin:
                 Wcheck = Soil_fWrelExp * (
-                    (Soil_EvapZmax - NewCond.EvapZ) / (Soil_EvapZmax - Soil_EvapZmin)
+                    (Soil_EvapZmax - NewCond_EvapZ) / (Soil_EvapZmax - Soil_EvapZmin)
                 )
-                while (Wrel < Wcheck) and (NewCond.EvapZ < Soil_EvapZmax):
+                while (Wrel < Wcheck) and (NewCond_EvapZ < Soil_EvapZmax):
                     # Expand evaporation layer by 1 mm
-                    NewCond.EvapZ = NewCond.EvapZ + 0.001
+                    NewCond_EvapZ = NewCond_EvapZ + 0.001
                     # Update water storage (mm) in evaporation layer
-                    Wevap.Sat, Wevap.Fc, Wevap.Wp, Wevap.Dry, Wevap.Act = evap_layer_water_content(
-                        NewCond.th, NewCond.EvapZ, Soil_Profile
+                    Wevap_Sat, Wevap_Fc, Wevap_Wp, Wevap_Dry, Wevap_Act = _evap_layer_water_content(
+                        NewCond_th,
+                        NewCond_EvapZ,
+                        prof_dz,
+                        prof_dzsum,
+                        prof_th_dry,
+                        prof_th_wp,
+                        prof_th_fc,
+                        prof_th_s,
                     )
-                    Wupper = NewCond.Wstage2 * (Wevap.Sat - (Wevap.Fc - Soil_REW)) + (
-                        Wevap.Fc - Soil_REW
+                    Wupper = NewCond_Wstage2 * (Wevap_Sat - (Wevap_Fc - Soil_REW)) + (
+                        Wevap_Fc - Soil_REW
                     )
-                    Wlower = Wevap.Dry
+                    Wlower = Wevap_Dry
                     # Update relative depletion of evaporation storage
-                    Wrel = (Wevap.Act - Wlower) / (Wupper - Wlower)
+                    Wrel = (Wevap_Act - Wlower) / (Wupper - Wlower)
                     Wcheck = Soil_fWrelExp * (
-                        (Soil_EvapZmax - NewCond.EvapZ) / (Soil_EvapZmax - Soil_EvapZmin)
+                        (Soil_EvapZmax - NewCond_EvapZ) / (Soil_EvapZmax - Soil_EvapZmin)
                     )
 
             # Get stage 2 evaporation reduction coefficient
@@ -3045,23 +3141,23 @@ def soil_evaporation(
             ToExtractStg2 = Kr * Edt
 
             # Extract water from compartments
-            comp_sto = np.sum(Soil_Profile.dzsum < NewCond.EvapZ) + 1
+            comp_sto = np.sum(prof_dzsum < NewCond_EvapZ) + 1
             comp = -1
-            prof = Soil_Profile
+            # prof = Soil_Profile
             while (ToExtractStg2 > 0) and (comp < comp_sto):
                 # Increment compartment counter
                 comp = comp + 1
                 # Specify layer number
                 # Determine proportion of compartment in evaporation layer
-                if prof.dzsum[comp] > NewCond.EvapZ:
-                    factor = 1 - ((prof.dzsum[comp] - NewCond.EvapZ) / prof.dz[comp])
+                if prof_dzsum[comp] > NewCond_EvapZ:
+                    factor = 1 - ((prof_dzsum[comp] - NewCond_EvapZ) / prof_dz[comp])
                 else:
                     factor = 1
 
                 # Water storage (mm) at air dry
-                Wdry = 1000 * prof.th_dry[comp] * prof.dz[comp]
+                Wdry = 1000 * prof_th_dry[comp] * prof_dz[comp]
                 # Available water (mm)
-                W = 1000 * NewCond.th[comp] * prof.dz[comp]
+                W = 1000 * NewCond_th[comp] * prof_dz[comp]
                 # Water available in compartment for extraction (mm)
                 AvW = (W - Wdry) * factor
                 if AvW >= ToExtractStg2:
@@ -3084,12 +3180,12 @@ def soil_evaporation(
                     ToExtract = ToExtract - AvW
 
                 # Update water content
-                NewCond.th[comp] = W / (1000 * prof.dz[comp])
+                NewCond_th[comp] = W / (1000 * prof_dz[comp])
 
     ## Store potential evaporation for irrigation calculations on next day ##
-    NewCond.Epot = EsPot
+    NewCond_Epot = EsPot
 
-    return NewCond, EsAct, EsPot
+    return NewCond_Epot,NewCond_th,NewCond_Stage2,NewCond_Wstage2,NewCond_Wsurf,NewCond_SurfaceStorage,NewCond_EvapZ, EsAct, EsPot
 
 
 # Cell
@@ -3389,7 +3485,18 @@ def transpiration(
 
         # Calculate water stress coefficients
         beta = True
-        Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
+        Ksw = KswClass()
+        Ksw.Exp,Ksw.Sto,Ksw.Sen,Ksw.Pol,Ksw.StoLin = _water_stress(Crop.p_up,
+                                                                    Crop.p_lo,
+                                                                    Crop.ETadj,
+                                                                    Crop.beta,
+                                                                    Crop.fshape_w,
+                                                                    NewCond.tEarlySen,
+                                                                    Dr,
+                                                                    TAW,
+                                                                    Et0,
+                                                                    beta)
+        # Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
 
         # Calculate aeration stress coefficients
         Ksa_Aer, NewCond.AerDays = aeration_stress(NewCond.AerDays, Crop.LagAer, thRZ)
@@ -4311,7 +4418,18 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, Et0, Tmax, Tmin, GrowingSeaso
 
         # Calculate water stress
         beta = True
-        Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
+        # Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
+        Ksw = KswClass()
+        Ksw.Exp,Ksw.Sto,Ksw.Sen,Ksw.Pol,Ksw.StoLin = _water_stress(Crop.p_up,
+                                                                    Crop.p_lo,
+                                                                    Crop.ETadj,
+                                                                    Crop.beta,
+                                                                    Crop.fshape_w,
+                                                                    NewCond.tEarlySen,
+                                                                    Dr,
+                                                                    TAW,
+                                                                    Et0,
+                                                                    beta)
 
         # Calculate temperature stress
         Kst = temperature_stress(Crop, Tmax, Tmin)

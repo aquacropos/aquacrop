@@ -1,25 +1,12 @@
-def test_compile_time():
-    import time
+from aquacrop.classes import SoilClass, CropClass, InitWCClass
+from aquacrop.core import prepare_weather, get_filepath, AquaCropModel
+import time
 
-    start = time.time()
-    import aquacrop  # tests jit compile time
-
-    end = time.time()
-    t = end - start
-    print(f"compile time: {round(t,3)}")
-    assert t < 60
-
+# locate built in weather file
+filepath = get_filepath("tunis_climate.txt")
+weather_data = prepare_weather(filepath)
 
 def test_tunis_model_run(n=1):
-
-
-    from aquacrop.classes import SoilClass, CropClass, InitWCClass
-    from aquacrop.core import prepare_weather, get_filepath, AquaCropModel
-    import time
-
-    # locate built in weather file
-    filepath = get_filepath("tunis_climate.txt")
-    weather_data = prepare_weather(filepath)
 
     start = time.time()
 
@@ -47,6 +34,8 @@ def test_tunis_model_run(n=1):
     print(f"total sim time for {n} repetitions: {round(t,3)}")
     assert t < 60
 
-test_compile_time()
-test_tunis_model_run()
-test_tunis_model_run(10)
+from pycallgraph import PyCallGraph
+from pycallgraph.output import GraphvizOutput
+
+with PyCallGraph(output=GraphvizOutput()):
+    test_tunis_model_run()

@@ -9,7 +9,8 @@ import pandas as pd
 
 
 # compiled functions
-from .solution_aot import _growing_degree_day, _drainage, _root_zone_water, _rainfall_partition, _check_groundwater_table
+from .solution_aot import _growing_degree_day, _drainage, _root_zone_water, _rainfall_partition, \
+     _check_groundwater_table, _soil_evaporation
 
 # Cell
 def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
@@ -214,13 +215,18 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
     NewCond = canopy_cover(Crop, Soil.Profile, Soil.zTop, NewCond, GDD, Et0, GrowingSeason)
 
     # 12. Soil evaporation
-    NewCond, Es, EsPot = soil_evaporation(
+    NewCond.Epot,NewCond.th,NewCond.Stage2,NewCond.Wstage2,NewCond.Wsurf,NewCond.SurfaceStorage,NewCond.EvapZ, Es, EsPot = _soil_evaporation(
         ClockStruct.EvapTimeSteps,
         ClockStruct.SimOffSeason,
         ClockStruct.TimeStepCounter,
+        Soil.Profile.dz,
+        Soil.Profile.dzsum,
+        Soil.Profile.th_dry,
+        Soil.Profile.th_wp,
+        Soil.Profile.th_fc,
+        Soil.Profile.th_s,
         Soil.EvapZmin,
         Soil.EvapZmax,
-        Soil.Profile,
         Soil.REW,
         Soil.Kex,
         Soil.fwcc,
@@ -230,8 +236,25 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
         Crop.Senescence,
         IrrMngt.IrrMethod,
         IrrMngt.WetSurf,
-        FieldMngt,
-        NewCond,
+        FieldMngt.Mulches,
+        FieldMngt.fMulch,
+        FieldMngt.MulchPct,
+        NewCond.DAP,
+        NewCond.Wsurf,
+        NewCond.EvapZ,
+        NewCond.Stage2,
+        NewCond.th,
+        NewCond.DelayedCDs,
+        NewCond.GDDcum,
+        NewCond.DelayedGDDs,
+        NewCond.CCxW,
+        NewCond.CCadj,
+        NewCond.CCxAct,
+        NewCond.CC,
+        NewCond.PrematSenes,
+        NewCond.SurfaceStorage,
+        NewCond.Wstage2,
+        NewCond.Epot,
         Et0,
         Infl,
         P,
