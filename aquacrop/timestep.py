@@ -9,7 +9,7 @@ import pandas as pd
 
 
 # compiled functions
-from .solution_aot import _growing_degree_day,_drainage,_root_zone_water,_rainfall_partition
+from .solution_aot import _growing_degree_day, _drainage, _root_zone_water, _rainfall_partition
 
 # Cell
 def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
@@ -138,26 +138,36 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
     NewCond, PreIrr = pre_irrigation(Soil.Profile, Crop, NewCond, GrowingSeason, IrrMngt)
 
     # 4. Drainage
-    
-    NewCond.th, DeepPerc, FluxOut = _drainage(Soil.Profile.th_fc,
-                                            Soil.Profile.th_s,
-                                            Soil.Profile.tau,
-                                            Soil.Profile.dz,
-                                            Soil.Profile.dzsum,
-                                            Soil.Profile.Ksat, 
-                                            NewCond.th, 
-                                            NewCond.th_fc_Adj)
+
+    NewCond.th, DeepPerc, FluxOut = _drainage(
+        Soil.Profile.th_fc,
+        Soil.Profile.th_s,
+        Soil.Profile.tau,
+        Soil.Profile.dz,
+        Soil.Profile.dzsum,
+        Soil.Profile.Ksat,
+        NewCond.th,
+        NewCond.th_fc_Adj,
+    )
 
     # 5. Surface runoff
     Runoff, Infl, NewCond.DaySubmerged = _rainfall_partition(
         P,
         NewCond.th,
         NewCond.DaySubmerged,
-        FieldMngt.SRinhb,FieldMngt.Bunds,FieldMngt.zBund,FieldMngt.CNadjPct,
-        Soil.CN, Soil.AdjCN, Soil.zCN, Soil.nComp,
-        Soil.Profile.dzsum,Soil.Profile.th_wp,Soil.Profile.th_fc
+        FieldMngt.SRinhb,
+        FieldMngt.Bunds,
+        FieldMngt.zBund,
+        FieldMngt.CNadjPct,
+        Soil.CN,
+        Soil.AdjCN,
+        Soil.zCN,
+        Soil.nComp,
+        Soil.Profile.dzsum,
+        Soil.Profile.th_wp,
+        Soil.Profile.th_fc,
     )
-                        
+
     # 6. Irrigation
     NewCond, Irr = irrigation(
         NewCond, IrrMngt, Crop, Soil.Profile, Soil.zTop, GrowingSeason, P, Runoff
@@ -266,20 +276,19 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
     _TAW = TAWClass()
     _Dr = DrClass()
     # thRZ = thRZClass()
-    Wr,_Dr.Zt,_Dr.Rz,_TAW.Zt,_TAW.Rz,_,_,_,_,_,_ = _root_zone_water(Soil.Profile.th_fc,
-                                                            Soil.Profile.th_s,
-                                                            Soil.Profile.th_wp,
-                                                            Soil.Profile.dz,
-                                                            Soil.Profile.dzsum,
-                                                            Soil.Profile.th_dry,
-                                                            float(NewCond.Zroot),
-                                                            NewCond.th,
-                                                            Soil.zTop,
-                                                            float(Crop.Zmin),
-                                                            Crop.Aer)
-
-
-
+    Wr, _Dr.Zt, _Dr.Rz, _TAW.Zt, _TAW.Rz, _, _, _, _, _, _ = _root_zone_water(
+        Soil.Profile.th_fc,
+        Soil.Profile.th_s,
+        Soil.Profile.th_wp,
+        Soil.Profile.dz,
+        Soil.Profile.dzsum,
+        Soil.Profile.th_dry,
+        float(NewCond.Zroot),
+        NewCond.th,
+        Soil.zTop,
+        float(Crop.Zmin),
+        Crop.Aer,
+    )
 
     # Wr, _Dr, _TAW, _thRZ = root_zone_water(
     #     Soil.Profile, NewCond.Zroot, NewCond.th, Soil.zTop, float(Crop.Zmin), Crop.Aer
