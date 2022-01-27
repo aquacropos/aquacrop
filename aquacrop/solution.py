@@ -8,7 +8,6 @@
 
 # remove functions from __all__ as they become replace by compiled equivalent
 __all__ = [
-    "check_groundwater_table",
     "root_development",
     "pre_irrigation",
     "rainfall_partition",
@@ -286,8 +285,18 @@ def root_zone_water(
 
 
 # Cell
-@cc.export("_check_groundwater_table", "f8(i4,f8,f8,f8,f8)")
-def check_groundwater_table(prof, NewCond, ParamStruct_WaterTable, zGW):
+@cc.export("_check_groundwater_table", "f8(f8,f8,f8,f8,f8,f8,f8,i4,f8)")
+def check_groundwater_table(
+    prof_zMid,
+    prof_Comp,
+    prof_th_s,
+    prof_th_fc,
+    NewCond_zGW,
+    NewCond_th,
+    NewCond_th_fc_Adj,
+    water_table_presence,
+    zGW,
+):
     """
     Function to check for presence of a groundwater table, and, if present,
     to adjust compartment water contents and field capacities where necessary
@@ -301,7 +310,7 @@ def check_groundwater_table(prof, NewCond, ParamStruct_WaterTable, zGW):
 
     `InitCond`: `InitCondClass` : InitCond object containing model paramaters
 
-    `ParamStruct`: `ParamStructClass` :  model paramaters
+    `water_table_presence`: int :  indicates if water table is present or not
 
 
     *Returns:*
@@ -316,70 +325,79 @@ def check_groundwater_table(prof, NewCond, ParamStruct_WaterTable, zGW):
     """
 
     ## Perform calculations (if variable water table is present) ##
-    if ParamStruct_WaterTable == 1:
+    if water_table_presence == 1:
 
         # Update groundwater conditions for current day
-        NewCond.zGW = zGW
+        NewCond_zGW = zGW
 
         # Find compartment mid-points
-        zMid = prof.zMid
+        zMid = prof_zMid
 
         # Check if water table is within modelled soil profile
-        if NewCond.zGW >= 0:
-            if len(zMid[zMid >= NewCond.zGW]) == 0:
-                NewCond.WTinSoil = False
+        if NewCond_zGW >= 0:
+            if len(zMid[zMid >= NewCond_zGW]) == 0:
+                NewCond_WTinSoil = False
             else:
-                NewCond.WTinSoil = True
+                NewCond_WTinSoil = True
 
         # If water table is in soil profile, adjust water contents
-        if NewCond.WTinSoil == True:
-            idx = np.argwhere(zMid >= NewCond.zGW).flatten()[0]
-            for ii in range(idx, len(prof.Comp)):
-                NewCond.th[ii] = prof.th_s[ii]
+        if NewCond_WTinSoil == True:
+            idx = np.argwhere(zMid >= NewCond_zGW).flatten()[0]
+            for ii in range(idx, len(prof_Comp)):
+                NewCond_th[ii] = prof_th_s[ii]
 
         # Adjust compartment field capacity
-        compi = len(prof.Comp) - 1
+        compi = len(prof_Comp) - 1
         thfcAdj = np.zeros(compi + 1)
         # Find thFCadj for all compartments
         while compi >= 0:
-            if prof.th_fc[compi] <= 0.1:
+            if prof_th_fc[compi] <= 0.1:
                 Xmax = 1
             else:
-                if prof.th_fc[compi] >= 0.3:
+                if prof_th_fc[compi] >= 0.3:
                     Xmax = 2
                 else:
-                    pF = 2 + 0.3 * (prof.th_fc[compi] - 0.1) / 0.2
+                    pF = 2 + 0.3 * (prof_th_fc[compi] - 0.1) / 0.2
                     Xmax = (np.exp(pF * np.log(10))) / 100
 
-            if (NewCond.zGW < 0) or ((NewCond.zGW - zMid[compi]) >= Xmax):
+            if (NewCond_zGW < 0) or ((NewCond_zGW - zMid[compi]) >= Xmax):
                 for ii in range(compi):
 
-                    thfcAdj[ii] = prof.th_fc[ii]
+                    thfcAdj[ii] = prof_th_fc[ii]
 
                 compi = -1
             else:
-                if prof.th_fc[compi] >= prof.th_s[compi]:
-                    thfcAdj[compi] = prof.th_fc[compi]
+                if prof_th_fc[compi] >= prof_th_s[compi]:
+                    thfcAdj[compi] = prof_th_fc[compi]
                 else:
-                    if zMid[compi] >= NewCond.zGW:
-                        thfcAdj[compi] = prof.th_s[compi]
+                    if zMid[compi] >= NewCond_zGW:
+                        thfcAdj[compi] = prof_th_s[compi]
                     else:
-                        dV = prof.th_s[compi] - prof.th_fc[compi]
-                        dFC = (dV / (Xmax * Xmax)) * ((zMid[compi] - (NewCond.zGW - Xmax)) ** 2)
-                        thfcAdj[compi] = prof.th_fc[compi] + dFC
+                        dV = prof_th_s[compi] - prof_th_fc[compi]
+                        dFC = (dV / (Xmax * Xmax)) * ((zMid[compi] - (NewCond_zGW - Xmax)) ** 2)
+                        thfcAdj[compi] = prof_th_fc[compi] + dFC
 
                 compi = compi - 1
 
         # Store adjusted field capacity values
-        NewCond.th_fc_Adj = thfcAdj
-        prof.th_fc_Adj = thfcAdj
+        NewCond_th_fc_Adj = thfcAdj
+        prof_th_fc_Adj = thfcAdj
 
-    return NewCond, prof
+    return (
+        NewCond_zGW,
+        NewCond_th_fc_Adj,
+        NewCond_th,
+        prof_zMid,
+        prof_Comp,
+        prof_th_s,
+        prof_th_fc,
+        prof_th_fc_Adj,
+    )
 
 
 # Cell
 # @njit()
-def root_development(Crop, prof, InitCond, GDD, GrowingSeason, ParamStruct_WaterTable):
+def root_development(Crop, prof, InitCond, GDD, GrowingSeason, water_table_presence):
     """
     Function to calculate root zone expansion
 
@@ -398,7 +416,7 @@ def root_development(Crop, prof, InitCond, GDD, GrowingSeason, ParamStruct_Water
 
     `GrowingSeason`: `bool` : is growing season (True or Flase)
 
-    `ParamStruct_WaterTable`: `int` : water table present (True=1 or Flase=0)
+    `water_table_presence`: `int` : water table present (True=1 or Flase=0)
 
 
     *Returns:*
@@ -576,7 +594,7 @@ def root_development(Crop, prof, InitCond, GDD, GrowingSeason, ParamStruct_Water
 
         # Limit rooting depth if groundwater table is present (roots cannot
         # develop below the water table)
-        if (ParamStruct_WaterTable == 1) and (NewCond.zGW > 0):
+        if (water_table_presence == 1) and (NewCond.zGW > 0):
             if NewCond.Zroot > NewCond.zGW:
                 NewCond.Zroot = float(NewCond.zGW)
                 if NewCond.Zroot < Crop.Zmin:
@@ -1559,7 +1577,7 @@ def infiltration(
 
 # Cell
 # @njit()
-def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, ParamStruct_WaterTable):
+def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, water_table_presence):
     """
     Function to calculate capillary rise from a shallow groundwater table
 
@@ -1577,7 +1595,7 @@ def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, ParamStr
 
     `FluxOut`: `np.array` : FLux of water out of each soil compartment
 
-    `ParamStruct_WaterTable`: `int` : WaterTable present (1:yes, 0:no)
+    `water_table_presence`: `int` : WaterTable present (1:yes, 0:no)
 
 
     *Returns:*
@@ -1597,10 +1615,10 @@ def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, ParamStr
     zGW = NewCond.zGW
 
     ## Calculate capillary rise ##
-    if ParamStruct_WaterTable == 0:  # No water table present
+    if water_table_presence == 0:  # No water table present
         # Capillary rise is zero
         CrTot = 0
-    elif ParamStruct_WaterTable == 1:  # Water table present
+    elif water_table_presence == 1:  # Water table present
         # Get maximum capillary rise for bottom compartment
         zBot = prof.dzsum[-1]
         zBotMid = prof.zMid[-1]

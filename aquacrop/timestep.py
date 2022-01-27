@@ -125,8 +125,25 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
 
     # Run simulations %%
     # 1. Check for groundwater table
-    NewCond, Soil.Profile = check_groundwater_table(
-        ClockStruct.TimeStepCounter, Soil.Profile, NewCond, ParamStruct.WaterTable, Groundwater
+    (
+        NewCond.zGW,
+        NewCond.th_fc_Adj,
+        NewCond.th,
+        Soil.Profile.zMid,
+        Soil.Profile.Comp,
+        Soil.Profile.th_s,
+        Soil.Profile.th_fc,
+        Soil.Profile.th_fc_Adj,
+    ) = check_groundwater_table(
+        Soil.Profile.zMid,
+        Soil.Profile.Comp,
+        Soil.Profile.th_s,
+        Soil.Profile.th_fc,
+        NewCond.zGW,
+        NewCond.th,
+        NewCond.th_fc_Adj,
+        ParamStruct.WaterTable,
+        Groundwater,
     )
 
     # 2. Root development
