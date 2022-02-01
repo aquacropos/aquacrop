@@ -51,7 +51,7 @@ cc = CC("solution_aot")
 
 # This compiled function is called a few times inside other functions
 if __name__ != "__main__":
-    from .solution_aot import _root_zone_water,_water_stress,_evap_layer_water_content
+    from .solution_aot import _root_zone_water, _water_stress, _evap_layer_water_content
 else:
     from solution_aot import _evap_layer_water_content
 
@@ -382,10 +382,7 @@ def check_groundwater_table(
         NewCond_th_fc_Adj = thfcAdj
         prof_th_fc_Adj = thfcAdj
 
-    return (
-        NewCond_th_fc_Adj,
-        prof_th_fc_Adj
-    )
+    return (NewCond_th_fc_Adj, prof_th_fc_Adj)
 
 
 # Cell
@@ -1911,16 +1908,18 @@ def growth_stage(Crop, InitCond, GrowingSeason):
 # Cell
 @njit
 @cc.export("_water_stress", "(f8[:],f8[:],f8,f8,f8[:],f8,f8,f8,f8,f8)")
-def water_stress(Crop_p_up,
-                Crop_p_lo,
-                Crop_ETadj,
-                Crop_beta,
-                Crop_fshape_w,
-                InitCond_tEarlySen,
-                Dr,
-                TAW,
-                Et0,
-                beta):
+def water_stress(
+    Crop_p_up,
+    Crop_p_lo,
+    Crop_ETadj,
+    Crop_beta,
+    Crop_fshape_w,
+    InitCond_tEarlySen,
+    Dr,
+    TAW,
+    Et0,
+    beta,
+):
     """
     Function to calculate water stress coefficients
 
@@ -2005,8 +2004,7 @@ def water_stress(Crop_p_up,
     # Mean water stress coefficient for stomatal closure
     Ksw_StoLin = 1 - Drel[1]
 
-    return Ksw_Exp,Ksw_Sto,Ksw_Sen,Ksw_Pol,Ksw_StoLin
-
+    return Ksw_Exp, Ksw_Sto, Ksw_Sen, Ksw_Pol, Ksw_StoLin
 
 
 # Cell
@@ -2315,19 +2313,20 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
         # Determine if water stress is occurring
         beta = True
         Ksw = KswClass()
-        Ksw.Exp,Ksw.Sto,Ksw.Sen,Ksw.Pol,Ksw.StoLin = _water_stress(Crop.p_up,
-                                                                    Crop.p_lo,
-                                                                    Crop.ETadj,
-                                                                    Crop.beta,
-                                                                    Crop.fshape_w,
-                                                                    NewCond.tEarlySen,
-                                                                    Dr,
-                                                                    TAW,
-                                                                    Et0,
-                                                                    beta)
-        
-        #water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
+        Ksw.Exp, Ksw.Sto, Ksw.Sen, Ksw.Pol, Ksw.StoLin = _water_stress(
+            Crop.p_up,
+            Crop.p_lo,
+            Crop.ETadj,
+            Crop.beta,
+            Crop.fshape_w,
+            NewCond.tEarlySen,
+            Dr,
+            TAW,
+            Et0,
+            beta,
+        )
 
+        # water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
 
         # Get canopy cover growth time
         if Crop.CalendarType == 1:
@@ -2539,16 +2538,18 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
                     beta = False
 
                     Ksw = KswClass()
-                    Ksw.Exp,Ksw.Sto,Ksw.Sen,Ksw.Pol,Ksw.StoLin = _water_stress(Crop.p_up,
-                                                                                Crop.p_lo,
-                                                                                Crop.ETadj,
-                                                                                Crop.beta,
-                                                                                Crop.fshape_w,
-                                                                                NewCond.tEarlySen,
-                                                                                Dr,
-                                                                                TAW,
-                                                                                Et0,
-                                                                                beta)
+                    Ksw.Exp, Ksw.Sto, Ksw.Sen, Ksw.Pol, Ksw.StoLin = _water_stress(
+                        Crop.p_up,
+                        Crop.p_lo,
+                        Crop.ETadj,
+                        Crop.beta,
+                        Crop.fshape_w,
+                        NewCond.tEarlySen,
+                        Dr,
+                        TAW,
+                        Et0,
+                        beta,
+                    )
 
                     # Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
                     if Ksw.Sen > 0.99999:
@@ -2669,14 +2670,16 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
 # Cell
 @njit
 @cc.export("_evap_layer_water_content", "(f8[:],f8,f8[:],f8[:],f8[:],f8[:],f8[:],f8[:])")
-def _evap_layer_water_content(InitCond_th,
-                            InitCond_EvapZ,
-                            prof_dz,
-                            prof_dzsum,
-                            prof_th_dry,
-                            prof_th_wp,
-                            prof_th_fc,
-                            prof_th_s,):
+def _evap_layer_water_content(
+    InitCond_th,
+    InitCond_EvapZ,
+    prof_dz,
+    prof_dzsum,
+    prof_th_dry,
+    prof_th_wp,
+    prof_th_fc,
+    prof_th_s,
+):
     """
     Function to get water contents in the evaporation layer
 
@@ -2747,9 +2750,12 @@ def _evap_layer_water_content(InitCond_th,
 
 # Cell
 # @njit()
-@cc.export("_soil_evaporation", "(i8,i8,i8,f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],\
+@cc.export(
+    "_soil_evaporation",
+    "(i8,i8,i8,f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],\
     f8,f8,f8,f8,f8,f8,f8,i8,f8,i8,f8,b1,f8,f8,i8,f8,f8,f8,f8[:],f8,f8,f8,f8,f8,f8,\
-        f8,b1,f8,f8,f8,f8,f8,f8,f8,b1)")
+        f8,b1,f8,f8,f8,f8,f8,f8,f8,b1)",
+)
 def soil_evaporation(
     ClockStruct_EvapTimeSteps,
     ClockStruct_SimOffSeason,
@@ -2953,7 +2959,6 @@ def soil_evaporation(
         elif FieldMngt_Mulches:
             # Mulches present
             EsPotMul = EsPot * (1 - FieldMngt_fMulch * (FieldMngt_MulchPct / 100))
-
 
     else:
         # Surface is flooded - no adjustment of potential soil evaporation for
@@ -3185,7 +3190,17 @@ def soil_evaporation(
     ## Store potential evaporation for irrigation calculations on next day ##
     NewCond_Epot = EsPot
 
-    return NewCond_Epot,NewCond_th,NewCond_Stage2,NewCond_Wstage2,NewCond_Wsurf,NewCond_SurfaceStorage,NewCond_EvapZ, EsAct, EsPot
+    return (
+        NewCond_Epot,
+        NewCond_th,
+        NewCond_Stage2,
+        NewCond_Wstage2,
+        NewCond_Wsurf,
+        NewCond_SurfaceStorage,
+        NewCond_EvapZ,
+        EsAct,
+        EsPot,
+    )
 
 
 # Cell
@@ -3486,16 +3501,18 @@ def transpiration(
         # Calculate water stress coefficients
         beta = True
         Ksw = KswClass()
-        Ksw.Exp,Ksw.Sto,Ksw.Sen,Ksw.Pol,Ksw.StoLin = _water_stress(Crop.p_up,
-                                                                    Crop.p_lo,
-                                                                    Crop.ETadj,
-                                                                    Crop.beta,
-                                                                    Crop.fshape_w,
-                                                                    NewCond.tEarlySen,
-                                                                    Dr,
-                                                                    TAW,
-                                                                    Et0,
-                                                                    beta)
+        Ksw.Exp, Ksw.Sto, Ksw.Sen, Ksw.Pol, Ksw.StoLin = _water_stress(
+            Crop.p_up,
+            Crop.p_lo,
+            Crop.ETadj,
+            Crop.beta,
+            Crop.fshape_w,
+            NewCond.tEarlySen,
+            Dr,
+            TAW,
+            Et0,
+            beta,
+        )
         # Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
 
         # Calculate aeration stress coefficients
@@ -4420,16 +4437,18 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, Et0, Tmax, Tmin, GrowingSeaso
         beta = True
         # Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
         Ksw = KswClass()
-        Ksw.Exp,Ksw.Sto,Ksw.Sen,Ksw.Pol,Ksw.StoLin = _water_stress(Crop.p_up,
-                                                                    Crop.p_lo,
-                                                                    Crop.ETadj,
-                                                                    Crop.beta,
-                                                                    Crop.fshape_w,
-                                                                    NewCond.tEarlySen,
-                                                                    Dr,
-                                                                    TAW,
-                                                                    Et0,
-                                                                    beta)
+        Ksw.Exp, Ksw.Sto, Ksw.Sen, Ksw.Pol, Ksw.StoLin = _water_stress(
+            Crop.p_up,
+            Crop.p_lo,
+            Crop.ETadj,
+            Crop.beta,
+            Crop.fshape_w,
+            NewCond.tEarlySen,
+            Dr,
+            TAW,
+            Et0,
+            beta,
+        )
 
         # Calculate temperature stress
         Kst = temperature_stress(Crop, Tmax, Tmin)
