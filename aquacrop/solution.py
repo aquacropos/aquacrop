@@ -48,7 +48,13 @@ cc = CC("solution_aot")
 
 # This compiled function is called a few times inside other functions
 if __name__ != "__main__":
-    from .solution_aot import _root_zone_water, _water_stress, _evap_layer_water_content
+    from .solution_aot import (
+        _root_zone_water,
+        _water_stress,
+        _evap_layer_water_content,
+        _cc_development,
+        _cc_required_time
+    )
 else:
     from solution_aot import _evap_layer_water_content
 
