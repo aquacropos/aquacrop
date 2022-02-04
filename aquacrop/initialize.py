@@ -1011,9 +1011,12 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
 
     InitCond = InitCondClass(len(ParamStruct.Soil.profile))
 
+    # class_args = {key:value for key, value in InitCond_class.__dict__.items() if not key.startswith('__') and not callable(key)}
+    # InitCond = InitCondStruct(**class_args)
+
     if ClockStruct.SeasonCounter == -1:
-        InitCond.Zroot = 0
-        InitCond.CC0adj = 0
+        InitCond.Zroot = 0.
+        InitCond.CC0adj = 0.
 
     elif ClockStruct.SeasonCounter == 0:
         InitCond.Zroot = ParamStruct.Seasonal_Crop_List[0].Zmin
@@ -1318,7 +1321,33 @@ def create_soil_profile(ParamStruct):
     if ParamStruct.WaterTable == 1:
         Profile.aCR = pdf.aCR.values
         Profile.bCR = pdf.bCR.values
+    else:
+        Profile.aCR = pdf.dz.values*0.
+        Profile.bCR = pdf.dz.values*0.
 
-    ParamStruct.Soil.Profile = Profile
+    # ParamStruct.Soil.Profile = Profile
+
+
+    ParamStruct.Soil.Profile = SoilProfileNT(dz=Profile.dz,
+                                            dzsum=Profile.dzsum,
+                                            zBot=Profile.zBot,
+                                            zTop=Profile.zTop,
+                                            zMid=Profile.zMid,
+                                            Comp=Profile.Comp,
+                                            Layer=Profile.Layer,
+                                            th_wp=Profile.th_wp,
+                                            th_fc=Profile.th_fc,
+                                            th_s=Profile.th_s,
+                                            Ksat=Profile.Ksat,
+                                            Penetrability=Profile.Penetrability,
+                                            th_dry=Profile.th_dry,
+                                            tau=Profile.tau,
+                                            th_fc_Adj=Profile.th_fc_Adj,
+                                            aCR=Profile.aCR,
+                                            bCR=Profile.bCR,
+                                            )
+
+
+
 
     return ParamStruct

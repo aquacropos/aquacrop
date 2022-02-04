@@ -1,3 +1,5 @@
+
+import cProfile,pstats
 from aquacrop.classes import SoilClass, CropClass, InitWCClass
 from aquacrop.core import prepare_weather, get_filepath, AquaCropModel
 import time
@@ -34,8 +36,19 @@ def test_tunis_model_run(n=1):
     print(f"total sim time for {n} repetitions: {round(t,3)}")
     assert t < 60
 
-from pycallgraph import PyCallGraph
-from pycallgraph.output import GraphvizOutput
+# from pycallgraph import PyCallGraph
+# from pycallgraph.output import GraphvizOutput
 
-with PyCallGraph(output=GraphvizOutput()):
-    test_tunis_model_run()
+# with PyCallGraph(output=GraphvizOutput()):
+#     test_tunis_model_run(10)
+
+
+if __name__ == '__main__':
+    import cProfile, pstats
+    profiler = cProfile.Profile()
+    profiler.enable()
+    test_tunis_model_run(10)
+    profiler.disable()
+    stats = pstats.Stats(profiler).sort_stats('ncalls')
+    stats.print_stats()
+

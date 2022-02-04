@@ -8,11 +8,9 @@
 
 # remove functions from __all__ as they become replace by compiled equivalent
 __all__ = [
-    "root_development",
     "pre_irrigation",
-    "irrigation",
-    "infiltration",
     "capillary_rise",
+    "irrigation",
     "germination",
     "growth_stage",
     "cc_development",
@@ -20,16 +18,8 @@ __all__ = [
     "adjust_CCx",
     "update_CCx_CDC",
     "canopy_cover",
-    "soil_evaporation",
-    "aeration_stress",
     "transpiration",
     "groundwater_inflow",
-    "HIref_current_day",
-    "biomass_accumulation",
-    "temperature_stress",
-    "HIadj_pre_anthesis",
-    "HIadj_pollination",
-    "HIadj_post_anthesis",
     "harvest_index",
 ]
 
@@ -41,7 +31,11 @@ else:
 
 import numpy as np
 import pandas as pd
-from numba import njit
+from numba import njit, types, typed, float64, int64, f8, i8, b1
+
+# from aquacrop.classes import InitCondStructType
+# InitCond_type_sig = InitCondStructType(fields=InitCond_spec)
+
 
 
 from numba.pycc import CC
@@ -51,10 +45,9 @@ cc = CC("solution_aot")
 
 # This compiled function is called a few times inside other functions
 if __name__ != "__main__":
-    from .solution_aot import _root_zone_water, _water_stress, _evap_layer_water_content
-else:
-    from solution_aot import _evap_layer_water_content
-
+    from .solution_aot import _water_stress, _evap_layer_water_content, \
+         _root_zone_water, _aeration_stress, _temperature_stress, _HIadj_pre_anthesis, \
+              _HIadj_post_anthesis, _HIadj_pollination
 
 # Cell
 # @njit()
@@ -118,17 +111,11 @@ def growing_degree_day(GDDmethod, Tupp, Tbase, Tmax, Tmin):
 
     return GDD
 
-
 # Cell
-# @njit()
-@cc.export("_root_zone_water", "(f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],f8,f8[:],f8,f8,f8)")
+@njit
+@cc.export("_root_zone_water", (SoilProfileNT_typ_sig,f8,f8[:],f8,f8,f8))
 def root_zone_water(
-    prof_th_fc,
-    prof_th_s,
-    prof_th_wp,
-    prof_dz,
-    prof_dzsum,
-    prof_th_dry,
+    prof,
     InitCond_Zroot,
     InitCond_th,
     Soil_zTop,
@@ -173,7 +160,7 @@ def root_zone_water(
     ## Calculate root zone water content and available water ##
     # Compartments covered by the root zone
     rootdepth = round(np.maximum(InitCond_Zroot, Crop_Zmin), 2)
-    comp_sto = np.argwhere(prof_dzsum >= rootdepth).flatten()[0]
+    comp_sto = np.argwhere(prof.dzsum >= rootdepth).flatten()[0]
 
     # Initialise counters
     WrAct = 0
@@ -184,23 +171,23 @@ def root_zone_water(
     WrAer = 0
     for ii in range(comp_sto + 1):
         # Fraction of compartment covered by root zone
-        if prof_dzsum[ii] > rootdepth:
-            factor = 1 - ((prof_dzsum[ii] - rootdepth) / prof_dz[ii])
+        if prof.dzsum[ii] > rootdepth:
+            factor = 1 - ((prof.dzsum[ii] - rootdepth) / prof.dz[ii])
         else:
             factor = 1
 
         # Actual water storage in root zone (mm)
-        WrAct = WrAct + round(factor * 1000 * InitCond_th[ii] * prof_dz[ii], 2)
+        WrAct = WrAct + round(factor * 1000 * InitCond_th[ii] * prof.dz[ii], 2)
         # Water storage in root zone at saturation (mm)
-        WrS = WrS + round(factor * 1000 * prof_th_s[ii] * prof_dz[ii], 2)
+        WrS = WrS + round(factor * 1000 * prof.th_s[ii] * prof.dz[ii], 2)
         # Water storage in root zone at field capacity (mm)
-        WrFC = WrFC + round(factor * 1000 * prof_th_fc[ii] * prof_dz[ii], 2)
+        WrFC = WrFC + round(factor * 1000 * prof.th_fc[ii] * prof.dz[ii], 2)
         # Water storage in root zone at permanent wilting point (mm)
-        WrWP = WrWP + round(factor * 1000 * prof_th_wp[ii] * prof_dz[ii], 2)
+        WrWP = WrWP + round(factor * 1000 * prof.th_wp[ii] * prof.dz[ii], 2)
         # Water storage in root zone at air dry (mm)
-        WrDry = WrDry + round(factor * 1000 * prof_th_dry[ii] * prof_dz[ii], 2)
+        WrDry = WrDry + round(factor * 1000 * prof.th_dry[ii] * prof.dz[ii], 2)
         # Water storage in root zone at aeration stress threshold (mm)
-        WrAer = WrAer + round(factor * 1000 * (prof_th_s[ii] - (Crop_Aer / 100)) * prof_dz[ii], 2)
+        WrAer = WrAer + round(factor * 1000 * (prof.th_s[ii] - (Crop_Aer / 100)) * prof.dz[ii], 2)
 
     if WrAct < 0:
         WrAct = 0
@@ -228,11 +215,24 @@ def root_zone_water(
     # Root zone water content at aeration stress threshold (m3/m3)
     thRZ_Aer = WrAer / (rootdepth * 1000)
 
+    # print('inside')
+
+    # thRZ = thRZNT(
+    # Act=thRZ_Act,
+    # S=thRZ_S,
+    # FC=thRZ_FC,
+    # WP=thRZ_WP,
+    # Dry=thRZ_Dry,
+    # Aer=thRZ_Aer,
+    # )
+    # print(thRZ)
+
+
     ## Calculate top soil water content and available water ##
     if rootdepth > Soil_zTop:
         # Determine compartments covered by the top soil
         ztopdepth = round(Soil_zTop, 2)
-        comp_sto = np.sum(prof_dzsum <= ztopdepth)
+        comp_sto = np.sum(prof.dzsum <= ztopdepth)
         # Initialise counters
         WrAct_Zt = 0
         WrFC_Zt = 0
@@ -243,17 +243,17 @@ def root_zone_water(
         for ii in range(comp_sto):
 
             # Fraction of compartment covered by root zone
-            if prof_dzsum[ii] > ztopdepth:
-                factor = 1 - ((prof_dzsum[ii] - ztopdepth) / prof_dz[ii])
+            if prof.dzsum[ii] > ztopdepth:
+                factor = 1 - ((prof.dzsum[ii] - ztopdepth) / prof.dz[ii])
             else:
                 factor = 1
 
             # Actual water storage in top soil (mm)
-            WrAct_Zt = WrAct_Zt + (factor * 1000 * InitCond_th[ii] * prof_dz[ii])
+            WrAct_Zt = WrAct_Zt + (factor * 1000 * InitCond_th[ii] * prof.dz[ii])
             # Water storage in top soil at field capacity (mm)
-            WrFC_Zt = WrFC_Zt + (factor * 1000 * prof_th_fc[ii] * prof_dz[ii])
+            WrFC_Zt = WrFC_Zt + (factor * 1000 * prof.th_fc[ii] * prof.dz[ii])
             # Water storage in top soil at permanent wilting point (mm)
-            WrWP_Zt = WrWP_Zt + (factor * 1000 * prof_th_wp[ii] * prof_dz[ii])
+            WrWP_Zt = WrWP_Zt + (factor * 1000 * prof.th_wp[ii] * prof.dz[ii])
 
         # Ensure available water in top soil is not less than zero
         if WrAct_Zt < 0:
@@ -267,6 +267,7 @@ def root_zone_water(
         # Set top soil depletions and TAW to root zone values
         Dr_Zt = Dr_Rz
         TAW_Zt = TAW_Rz
+
 
     return (
         WrAct,
@@ -284,12 +285,9 @@ def root_zone_water(
 
 
 # Cell
-@cc.export("_check_groundwater_table", "(f8[:],f8[:],f8[:],f8[:],f8,f8[:],f8[:],i4,f8)")
+@cc.export("_check_groundwater_table", (SoilProfileNT_typ_sig,f8,f8[:],f8[:],i8,f8))
 def check_groundwater_table(
-    prof_zMid,
-    prof_Comp,
-    prof_th_s,
-    prof_th_fc,
+    prof,
     NewCond_zGW,
     NewCond_th,
     NewCond_th_fc_Adj,
@@ -330,7 +328,7 @@ def check_groundwater_table(
         NewCond_zGW = zGW
 
         # Find compartment mid-points
-        zMid = prof_zMid
+        zMid = prof.zMid
 
         # Check if water table is within modelled soil profile
         if NewCond_zGW >= 0:
@@ -342,52 +340,70 @@ def check_groundwater_table(
         # If water table is in soil profile, adjust water contents
         if NewCond_WTinSoil == True:
             idx = np.argwhere(zMid >= NewCond_zGW).flatten()[0]
-            for ii in range(idx, len(prof_Comp)):
-                NewCond_th[ii] = prof_th_s[ii]
+            for ii in range(idx, len(prof.Comp)):
+                NewCond_th[ii] = prof.th_s[ii]
 
         # Adjust compartment field capacity
-        compi = len(prof_Comp) - 1
+        compi = len(prof.Comp) - 1
         thfcAdj = np.zeros(compi + 1)
         # Find thFCadj for all compartments
         while compi >= 0:
-            if prof_th_fc[compi] <= 0.1:
+            if prof.th_fc[compi] <= 0.1:
                 Xmax = 1
             else:
-                if prof_th_fc[compi] >= 0.3:
+                if prof.th_fc[compi] >= 0.3:
                     Xmax = 2
                 else:
-                    pF = 2 + 0.3 * (prof_th_fc[compi] - 0.1) / 0.2
+                    pF = 2 + 0.3 * (prof.th_fc[compi] - 0.1) / 0.2
                     Xmax = (np.exp(pF * np.log(10))) / 100
 
             if (NewCond_zGW < 0) or ((NewCond_zGW - zMid[compi]) >= Xmax):
                 for ii in range(compi):
 
-                    thfcAdj[ii] = prof_th_fc[ii]
+                    thfcAdj[ii] = prof.th_fc[ii]
 
                 compi = -1
             else:
-                if prof_th_fc[compi] >= prof_th_s[compi]:
-                    thfcAdj[compi] = prof_th_fc[compi]
+                if prof.th_fc[compi] >= prof.th_s[compi]:
+                    thfcAdj[compi] = prof.th_fc[compi]
                 else:
                     if zMid[compi] >= NewCond_zGW:
-                        thfcAdj[compi] = prof_th_s[compi]
+                        thfcAdj[compi] = prof.th_s[compi]
                     else:
-                        dV = prof_th_s[compi] - prof_th_fc[compi]
+                        dV = prof.th_s[compi] - prof.th_fc[compi]
                         dFC = (dV / (Xmax * Xmax)) * ((zMid[compi] - (NewCond_zGW - Xmax)) ** 2)
-                        thfcAdj[compi] = prof_th_fc[compi] + dFC
+                        thfcAdj[compi] = prof.th_fc[compi] + dFC
 
                 compi = compi - 1
 
         # Store adjusted field capacity values
         NewCond_th_fc_Adj = thfcAdj
-        prof_th_fc_Adj = thfcAdj
+        # prof.th_fc_Adj = thfcAdj
 
-    return (NewCond_th_fc_Adj, prof_th_fc_Adj)
+    return (NewCond_th_fc_Adj, thfcAdj)
 
 
 # Cell
 # @njit()
-def root_development(Crop, prof, InitCond, GDD, GrowingSeason, water_table_presence):
+@cc.export("_root_development", (CropStructNT_type_sig,SoilProfileNT_typ_sig,f8,f8,f8,f8,f8,f8,f8[:],f8,f8,b1,f8,f8,f8,f8,b1,i8))
+def root_development(Crop,
+                    prof,
+                    NewCond_DAP,
+                    NewCond_Zroot,
+                    NewCond_DelayedCDs,
+                    NewCond_GDDcum,
+                    NewCond_DelayedGDDs,
+                    NewCond_TrRatio,
+                    NewCond_th,
+                    NewCond_CC,
+                    NewCond_CC_NS,
+                    NewCond_Germination,
+                    NewCond_rCor,
+                    NewCond_Tpot,
+                    NewCond_zGW,
+                    GDD,
+                    GrowingSeason,
+                    water_table_presence):
     """
     Function to calculate root zone expansion
 
@@ -416,24 +432,24 @@ def root_development(Crop, prof, InitCond, GDD, GrowingSeason, water_table_prese
 
     """
     # Store initial conditions for updating
-    NewCond = InitCond
+    # NewCond = InitCond
 
     # save initial zroot
-    Zroot_init = float(InitCond.Zroot) * 1.0
+    Zroot_init = float(NewCond_Zroot) * 1.0
     Soil_nLayer = np.unique(prof.Layer).shape[0]
 
     # Calculate root expansion (if in growing season)
     if GrowingSeason == True:
         # If today is first day of season, root depth is equal to minimum depth
-        if NewCond.DAP == 1:
-            NewCond.Zroot = float(Crop.Zmin) * 1.0
+        if NewCond_DAP == 1:
+            NewCond_Zroot = float(Crop.Zmin) * 1.0
             Zroot_init = float(Crop.Zmin) * 1.0
 
         # Adjust time for any delayed development
         if Crop.CalendarType == 1:
-            tAdj = NewCond.DAP - NewCond.DelayedCDs
+            tAdj = NewCond_DAP - NewCond_DelayedCDs
         elif Crop.CalendarType == 2:
-            tAdj = NewCond.GDDcum - NewCond.DelayedGDDs
+            tAdj = NewCond_GDDcum - NewCond_DelayedGDDs
 
         # Calculate root expansion #
         Zini = Crop.Zmin * (Crop.PctZmin / 100)
@@ -515,11 +531,11 @@ def root_development(Crop, prof, InitCond, GDD, GrowingSeason, water_table_prese
             dZr = Zr - ZrOld
 
         # Adjust rate of expansion for any stomatal water stress
-        if NewCond.TrRatio < 0.9999:
+        if NewCond_TrRatio < 0.9999:
             if Crop.fshape_ex >= 0:
-                dZr = dZr * NewCond.TrRatio
+                dZr = dZr * NewCond_TrRatio
             else:
-                fAdj = (np.exp(NewCond.TrRatio * Crop.fshape_ex) - 1) / (np.exp(Crop.fshape_ex) - 1)
+                fAdj = (np.exp(NewCond_TrRatio * Crop.fshape_ex) - 1) / (np.exp(Crop.fshape_ex) - 1)
                 dZr = dZr * fAdj
 
         # print(NewCond.DAP,NewCond.th)
@@ -540,15 +556,15 @@ def root_development(Crop, prof, InitCond, GDD, GrowingSeason, water_table_prese
             # Define stress threshold
             thThr = prof.th_fc[idx] - (pZexp * TAWprof)
             # Check for stress conditions
-            if NewCond.th[idx] < thThr:
+            if NewCond_th[idx] < thThr:
                 # Root expansion limited by water content at expansion front
-                if NewCond.th[idx] <= prof.th_wp[idx]:
+                if NewCond_th[idx] <= prof.th_wp[idx]:
 
                     # Expansion fully inhibited
                     dZr = 0
                 else:
                     # Expansion partially inhibited
-                    Wrel = (prof.th_fc[idx] - NewCond.th[idx]) / TAWprof
+                    Wrel = (prof.th_fc[idx] - NewCond_th[idx]) / TAWprof
                     Drel = 1 - ((1 - Wrel) / (1 - pZexp))
                     Ks = 1 - (
                         (np.exp(Drel * Crop.fshape_w[1]) - 1) / (np.exp(Crop.fshape_w[1]) - 1)
@@ -556,45 +572,45 @@ def root_development(Crop, prof, InitCond, GDD, GrowingSeason, water_table_prese
                     dZr = dZr * Ks
 
         # Adjust for early senescence
-        if (NewCond.CC <= 0) and (NewCond.CC_NS > 0.5):
+        if (NewCond_CC <= 0) and (NewCond_CC_NS > 0.5):
             dZr = 0
 
         # Adjust root expansion for failure to germinate (roots cannot expand
         # if crop has not germinated)
-        if NewCond.Germination == False:
+        if NewCond_Germination == False:
             dZr = 0
 
         # Get new rooting depth
-        NewCond.Zroot = float(Zroot_init + dZr)
+        NewCond_Zroot = float(Zroot_init + dZr)
 
         # Adjust root density if deepening is restricted due to dry subsoil
         # and/or restrictive layers
-        if NewCond.Zroot < ZrPot:
-            NewCond.rCor = (
-                2 * (ZrPot / NewCond.Zroot) * ((Crop.SxTop + Crop.SxBot) / 2) - Crop.SxTop
+        if NewCond_Zroot < ZrPot:
+            NewCond_rCor = (
+                2 * (ZrPot / NewCond_Zroot) * ((Crop.SxTop + Crop.SxBot) / 2) - Crop.SxTop
             ) / Crop.SxBot
 
-            if NewCond.Tpot > 0:
-                NewCond.rCor = NewCond.rCor * NewCond.TrRatio
-                if NewCond.rCor < 1:
-                    NewCond.rCor = 1
+            if NewCond_Tpot > 0:
+                NewCond_rCor = NewCond_rCor * NewCond_TrRatio
+                if NewCond_rCor < 1:
+                    NewCond_rCor = 1
 
         else:
-            NewCond.rCor = 1
+            NewCond_rCor = 1
 
         # Limit rooting depth if groundwater table is present (roots cannot
         # develop below the water table)
-        if (water_table_presence == 1) and (NewCond.zGW > 0):
-            if NewCond.Zroot > NewCond.zGW:
-                NewCond.Zroot = float(NewCond.zGW)
-                if NewCond.Zroot < Crop.Zmin:
-                    NewCond.Zroot = float(Crop.Zmin)
+        if (water_table_presence == 1) and (NewCond_zGW > 0):
+            if NewCond_Zroot > NewCond_zGW:
+                NewCond_Zroot = float(NewCond_zGW)
+                if NewCond_Zroot < Crop.Zmin:
+                    NewCond_Zroot = float(Crop.Zmin)
 
     else:
         # No root system outside of the growing season
-        NewCond.Zroot = 0
+        NewCond_Zroot = 0
 
-    return NewCond
+    return NewCond_Zroot
 
 
 # Cell
@@ -666,9 +682,9 @@ def pre_irrigation(prof, Crop, InitCond, GrowingSeason, IrrMngt):
 
 # Cell
 # @njit()
-@cc.export("_drainage", "(f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],f8[:])")
+@cc.export("_drainage", (SoilProfileNT_typ_sig,f8[:],f8[:]))
 def drainage(
-    prof_th_fc, prof_th_s, prof_tau, prof_dz, prof_dzsum, prof_Ksat, th_init, th_fc_Adj_init
+    prof, th_init, th_fc_Adj_init
 ):
     """
     Function to redistribute stored soil water
@@ -720,12 +736,12 @@ def drainage(
     # Calculate drainage and updated water contents %%
     for ii in range(th_init.shape[0]):
         # Specify layer for compartment
-        cth_fc = prof_th_fc[ii]
-        cth_s = prof_th_s[ii]
-        ctau = prof_tau[ii]
-        cdz = prof_dz[ii]
-        cdzsum = prof_dzsum[ii]
-        cKsat = prof_Ksat[ii]
+        cth_fc = prof.th_fc[ii]
+        cth_s = prof.th_s[ii]
+        ctau = prof.tau[ii]
+        cdz = prof.dz[ii]
+        cdzsum = prof.dzsum[ii]
+        cKsat = prof.Ksat[ii]
 
         # Calculate drainage ability of compartment ii
         if th_init[ii] <= th_fc_Adj_init[ii]:
@@ -960,12 +976,12 @@ def drainage(
                     FluxOut[precomp] = FluxOut[precomp] - excess
 
                 # Increase water content to store excess
-                thnew[precomp] = thnew[precomp] + (excess / (1000 * prof_dz[precomp]))
+                thnew[precomp] = thnew[precomp] + (excess / (1000 * prof.dz[precomp]))
 
                 # Limit water content to saturation and adjust excess counter
-                if thnew[precomp] > prof_th_s[precomp]:
-                    excess = (thnew[precomp] - prof_th_s[precomp]) * 1000 * prof_dz[precomp]
-                    thnew[precomp] = prof_th_s[precomp]
+                if thnew[precomp] > prof.th_s[precomp]:
+                    excess = (thnew[precomp] - prof.th_s[precomp]) * 1000 * prof.dz[precomp]
+                    thnew[precomp] = prof.th_s[precomp]
                 else:
                     excess = 0
 
@@ -980,7 +996,7 @@ def drainage(
 
 # Cell
 # @njit()
-@cc.export("_rainfall_partition", "(f8,f8[:],i8,f8,f8,f8,f8,f8,f8,f8,f8,f8[:],f8[:],f8[:])")
+@cc.export("_rainfall_partition", (f8,f8[:],i8,f8,f8,f8,f8,f8,f8,f8,f8,SoilProfileNT_typ_sig))
 def rainfall_partition(
     P,
     InitCond_th,
@@ -993,9 +1009,7 @@ def rainfall_partition(
     Soil_AdjCN,
     Soil_zCN,
     Soil_nComp,
-    prof_dzsum,
-    prof_th_wp,
-    prof_th_fc,
+    prof,
 ):
     """
     Function to partition rainfall into surface runoff and infiltration using the curve number approach
@@ -1068,7 +1082,7 @@ def rainfall_partition(
             )
             # Check which compartment cover depth of top soil used to adjust
             # curve number
-            comp_sto_array = prof_dzsum[prof_dzsum >= Soil_zCN]
+            comp_sto_array = prof.dzsum[prof.dzsum >= Soil_zCN]
             if comp_sto_array.shape[0] == 0:
                 comp_sto = int(Soil_nComp)
             else:
@@ -1078,10 +1092,10 @@ def rainfall_partition(
             xx = 0
             wrel = np.zeros(comp_sto)
             for ii in range(comp_sto):
-                if prof_dzsum[ii] > Soil_zCN:
-                    prof_dzsum[ii] = Soil_zCN
+                if prof.dzsum[ii] > Soil_zCN:
+                    prof.dzsum[ii] = Soil_zCN
 
-                wx = 1.016 * (1 - np.exp(-4.16 * (prof_dzsum[ii] / Soil_zCN)))
+                wx = 1.016 * (1 - np.exp(-4.16 * (prof.dzsum[ii] / Soil_zCN)))
                 wrel[ii] = wx - xx
                 if wrel[ii] < 0:
                     wrel[ii] = 0
@@ -1095,9 +1109,9 @@ def rainfall_partition(
             # prof = prof
 
             for ii in range(comp_sto):
-                th = max(prof_th_wp[ii], InitCond_th[ii])
+                th = max(prof.th_wp[ii], InitCond_th[ii])
                 wet_top = wet_top + (
-                    wrel[ii] * ((th - prof_th_wp[ii]) / (prof_th_fc[ii] - prof_th_wp[ii]))
+                    wrel[ii] * ((th - prof.th_wp[ii]) / (prof.th_fc[ii] - prof.th_wp[ii]))
                 )
 
             # Calculate adjusted curve number
@@ -1128,7 +1142,25 @@ def rainfall_partition(
 
 # Cell
 # @njit()
-def irrigation(InitCond, IrrMngt, Crop, prof, Soil_zTop, GrowingSeason, Rain, Runoff):
+# @cc.export("_irrigation", (i8,f8[:],f8,f8,i8,f8[:],f8,f8,f8,f8,f8,f8[:],i8,i8,CropStructNT_type_sig,SoilProfileNT_typ_sig,f8,b1,f8,f8))
+# @njit
+def irrigation(
+    IrrMngt_IrrMethod,
+    IrrMngt_SMT,
+    IrrMngt_AppEff,
+    IrrMngt_MaxIrr,
+    IrrMngt_IrrInterval,
+    IrrMngt_Schedule,
+    IrrMngt_depth,
+    IrrMngt_MaxIrrSeason,
+    NewCond_IrrCum,
+    NewCond_Epot,
+    NewCond_Tpot,
+    NewCond_Zroot,
+    NewCond_th,
+    NewCond_DAP,
+    NewCond_TimeStepCounter,
+    Crop, prof, Soil_zTop, GrowingSeason, Rain, Runoff):
     """
     Function to get irrigation depth for current day
 
@@ -1164,118 +1196,113 @@ def irrigation(InitCond, IrrMngt, Crop, prof, Soil_zTop, GrowingSeason, Rain, Ru
 
 """
     ## Store intial conditions for updating ##
-    NewCond = InitCond
+    # NewCond = InitCond
 
     ## Determine irrigation depth (mm/day) to be applied ##
     if GrowingSeason == True:
         # Calculate root zone water content and depletion
-        TAW_ = TAWClass()
-        Dr_ = DrClass()
-        thRZ = thRZClass()
+        # TAW_ = TAWClass()
+        # Dr_ = DrClass()
+        # thRZ = thRZClass()
         (
             WrAct,
-            Dr_.Zt,
-            Dr_.Rz,
-            TAW_.Zt,
-            TAW_.Rz,
-            thRZ.Act,
-            thRZ.S,
-            thRZ.FC,
-            thRZ.WP,
-            thRZ.Dry,
-            thRZ.Aer,
+            Dr_Zt,
+            Dr_Rz,
+            TAW_Zt,
+            TAW_Rz,
+            thRZ_Act,
+            thRZ_S,
+            thRZ_FC,
+            thRZ_WP,
+            thRZ_Dry,
+            thRZ_Aer,
         ) = _root_zone_water(
-            prof.th_fc,
-            prof.th_s,
-            prof.th_wp,
-            prof.dz,
-            prof.dzsum,
-            prof.th_dry,
-            float(NewCond.Zroot),
-            NewCond.th,
+            prof,
+            float(NewCond_Zroot),
+            NewCond_th,
             Soil_zTop,
             float(Crop.Zmin),
             Crop.Aer,
         )
         # WrAct,Dr_,TAW_,thRZ = root_zone_water(prof,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Use root zone depletions and TAW only for triggering irrigation
-        Dr = Dr_.Rz
-        TAW = TAW_.Rz
+        Dr = Dr_Rz
+        TAW = TAW_Rz
 
         # Determine adjustment for inflows and outflows on current day #
-        if thRZ.Act > thRZ.FC:
-            rootdepth = max(InitCond.Zroot, Crop.Zmin)
-            AbvFc = (thRZ.Act - thRZ.FC) * 1000 * rootdepth
+        if thRZ_Act > thRZ_FC:
+            rootdepth = max(NewCond_Zroot, Crop.Zmin)
+            AbvFc = (thRZ_Act - thRZ_FC) * 1000 * rootdepth
         else:
             AbvFc = 0
 
-        WCadj = InitCond.Tpot + InitCond.Epot - Rain + Runoff - AbvFc
+        WCadj = NewCond_Tpot + NewCond_Epot - Rain + Runoff - AbvFc
 
-        NewCond.Depletion = Dr + WCadj
-        NewCond.TAW = TAW
+        NewCond_Depletion = Dr + WCadj
+        NewCond_TAW = TAW
 
         # Update growth stage if it is first day of a growing season
-        if NewCond.DAP == 1:
-            NewCond.GrowthStage = 1
+        if NewCond_DAP == 1:
+            NewCond_GrowthStage = 1
 
-        if IrrMngt.IrrMethod == 0:
+        if IrrMngt_IrrMethod == 0:
             Irr = 0
 
-        elif IrrMngt.IrrMethod == 1:
+        elif IrrMngt_IrrMethod == 1:
 
-            Dr = NewCond.Depletion / NewCond.TAW
-            index = int(NewCond.GrowthStage) - 1
+            Dr = NewCond_Depletion / NewCond_TAW
+            index = int(NewCond_GrowthStage) - 1
 
-            if Dr > 1 - IrrMngt.SMT[index] / 100:
+            if Dr > 1 - IrrMngt_SMT[index] / 100:
                 # Irrigation occurs
-                IrrReq = max(0, NewCond.Depletion)
+                IrrReq = max(0, NewCond_Depletion)
                 # Adjust irrigation requirements for application efficiency
-                EffAdj = ((100 - IrrMngt.AppEff) + 100) / 100
+                EffAdj = ((100 - IrrMngt_AppEff) + 100) / 100
                 IrrReq = IrrReq * EffAdj
                 # Limit irrigation to maximum depth
-                Irr = min(IrrMngt.MaxIrr, IrrReq)
+                Irr = min(IrrMngt_MaxIrr, IrrReq)
             else:
                 Irr = 0
 
-        elif IrrMngt.IrrMethod == 2:  # Irrigation - fixed interval
+        elif IrrMngt_IrrMethod == 2:  # Irrigation - fixed interval
 
-            Dr = NewCond.Depletion
+            Dr = NewCond_Depletion
 
             # Get number of days in growing season so far (subtract 1 so that
             # always irrigate first on day 1 of each growing season)
-            nDays = NewCond.DAP - 1
+            nDays = NewCond_DAP - 1
 
-            if nDays % IrrMngt.IrrInterval == 0:
+            if nDays % IrrMngt_IrrInterval == 0:
                 # Irrigation occurs
                 IrrReq = max(0, Dr)
                 # Adjust irrigation requirements for application efficiency
-                EffAdj = ((100 - IrrMngt.AppEff) + 100) / 100
+                EffAdj = ((100 - IrrMngt_AppEff) + 100) / 100
                 IrrReq = IrrReq * EffAdj
                 # Limit irrigation to maximum depth
-                Irr = min(IrrMngt.MaxIrr, IrrReq)
+                Irr = min(IrrMngt_MaxIrr, IrrReq)
             else:
                 # No irrigation
                 Irr = 0
 
-        elif IrrMngt.IrrMethod == 3:  # Irrigation - pre-defined schedule
+        elif IrrMngt_IrrMethod == 3:  # Irrigation - pre-defined schedule
             # Get current date
-            idx = NewCond.TimeStepCounter
+            idx = NewCond_TimeStepCounter
             # Find irrigation value corresponding to current date
-            Irr = IrrMngt.Schedule[idx]
+            Irr = IrrMngt_Schedule[idx]
 
             assert Irr >= 0
 
-            Irr = min(IrrMngt.MaxIrr, Irr)
+            Irr = min(IrrMngt_MaxIrr, Irr)
 
-        elif IrrMngt.IrrMethod == 4:  # Irrigation - net irrigation
+        elif IrrMngt_IrrMethod == 4:  # Irrigation - net irrigation
             # Net irrigation calculation performed after transpiration, so
             # irrigation is zero here
 
             Irr = 0
 
-        elif IrrMngt.IrrMethod == 5:  # depth applied each day (usually specified outside of model)
+        elif IrrMngt_IrrMethod == 5:  # depth applied each day (usually specified outside of model)
 
-            Irr = min(IrrMngt.MaxIrr, IrrMngt.depth)
+            Irr = min(IrrMngt_MaxIrr, IrrMngt_depth)
 
         #         else:
         #             assert 1 ==2, f'somethings gone wrong in irrigation method:{IrrMngt.IrrMethod}'
@@ -1284,22 +1311,38 @@ def irrigation(InitCond, IrrMngt, Crop, prof, Soil_zTop, GrowingSeason, Rain, Ru
 
     elif GrowingSeason == False:
         # No irrigation outside growing season
-        Irr = 0
-        NewCond.IrrCum = 0
+        Irr = 0.
+        NewCond_IrrCum = 0.
+        NewCond_Depletion = 0.
+        NewCond_TAW = 0.
 
-    if NewCond.IrrCum + Irr > IrrMngt.MaxIrrSeason:
-        Irr = max(0, IrrMngt.MaxIrrSeason - NewCond.IrrCum)
+
+    if NewCond_IrrCum + Irr > IrrMngt_MaxIrrSeason:
+        Irr = max(0, IrrMngt_MaxIrrSeason - NewCond_IrrCum)
 
     # Update cumulative irrigation counter for growing season
-    NewCond.IrrCum = NewCond.IrrCum + Irr
+    NewCond_IrrCum = NewCond_IrrCum + Irr
 
-    return NewCond, Irr
+    return NewCond_Depletion,NewCond_TAW,NewCond_IrrCum, Irr
 
 
 # Cell
 # @njit()
+@cc.export("_infiltration", (SoilProfileNT_typ_sig,f8,f8[:],f8[:],f8,f8,f8,b1,f8,f8[:],f8,f8,b1))
 def infiltration(
-    prof, InitCond, Infl, Irr, IrrMngt_AppEff, FieldMngt, FluxOut, DeepPerc0, Runoff0, GrowingSeason
+     prof,
+     NewCond_SurfaceStorage, 
+     NewCond_th_fc_Adj, 
+     NewCond_th, 
+     Infl, 
+     Irr, 
+     IrrMngt_AppEff, 
+     FieldMngt_Bunds,
+     FieldMngt_zBund,
+     FluxOut, 
+     DeepPerc0, 
+     Runoff0, 
+     GrowingSeason
 ):
     """
     Function to infiltrate incoming water (rainfall and irrigation)
@@ -1351,13 +1394,13 @@ def infiltration(
 
     """
     ## Store initial conditions in new structure for updating ##
-    NewCond = InitCond
+    # NewCond = InitCond
 
-    InitCond_SurfaceStorage = InitCond.SurfaceStorage
-    InitCond_th_fc_Adj = InitCond.th_fc_Adj
-    InitCond_th = InitCond.th
+    InitCond_SurfaceStorage = NewCond_SurfaceStorage*1
+    InitCond_th_fc_Adj = NewCond_th_fc_Adj*1
+    InitCond_th = NewCond_th*1
 
-    thnew = NewCond.th.copy()
+    thnew = NewCond_th*1.
 
     Soil_nComp = thnew.shape[0]
 
@@ -1369,11 +1412,11 @@ def infiltration(
     assert Infl >= 0
 
     ## Determine surface storage (if bunds are present) ##
-    if FieldMngt.Bunds:
+    if FieldMngt_Bunds:
         # Bunds on field
-        if FieldMngt.zBund > 0.001:
+        if FieldMngt_zBund > 0.001:
             # Bund height too small to be considered
-            InflTot = Infl + NewCond.SurfaceStorage
+            InflTot = Infl + NewCond_SurfaceStorage
             if InflTot > 0:
                 # Update surface storage and infiltration storage
                 if InflTot > prof.Ksat[0]:
@@ -1381,19 +1424,19 @@ def infiltration(
                     # of surface soil layer
                     ToStore = prof.Ksat[0]
                     # Additional water ponds on surface
-                    NewCond.SurfaceStorage = InflTot - prof.Ksat[0]
+                    NewCond_SurfaceStorage = InflTot - prof.Ksat[0]
                 else:
                     # All water infiltrates
                     ToStore = InflTot
                     # Reset surface storage depth to zero
-                    NewCond.SurfaceStorage = 0
+                    NewCond_SurfaceStorage = 0
 
                 # Calculate additional runoff
-                if NewCond.SurfaceStorage > (FieldMngt.zBund * 1000):
+                if NewCond_SurfaceStorage > (FieldMngt_zBund * 1000):
                     # Water overtops bunds and runs off
-                    RunoffIni = NewCond.SurfaceStorage - (FieldMngt.zBund * 1000)
+                    RunoffIni = NewCond_SurfaceStorage - (FieldMngt_zBund * 1000)
                     # Surface storage equal to bund height
-                    NewCond.SurfaceStorage = FieldMngt.zBund * 1000
+                    NewCond_SurfaceStorage = FieldMngt_zBund * 1000
                 else:
                     # No overtopping of bunds
                     RunoffIni = 0
@@ -1403,7 +1446,7 @@ def infiltration(
                 ToStore = 0
                 RunoffIni = 0
 
-    elif FieldMngt.Bunds == False:
+    elif FieldMngt_Bunds == False:
         # No bunds on field
         if Infl > prof.Ksat[0]:
             # Infiltration limited by saturated hydraulic conductivity of top
@@ -1417,7 +1460,7 @@ def infiltration(
             RunoffIni = 0
 
         # Update surface storage
-        NewCond.SurfaceStorage = 0
+        NewCond_SurfaceStorage = 0
         # Add any water remaining behind bunds to surface runoff (needed for
         # days when bunds are removed to maintain water balance)
         RunoffIni = RunoffIni + InitCond_SurfaceStorage
@@ -1540,29 +1583,29 @@ def infiltration(
 
     ## Update surface storage (if bunds are present) ##
     if Runoff > RunoffIni:
-        if FieldMngt.Bunds:
-            if FieldMngt.zBund > 0.001:
+        if FieldMngt_Bunds:
+            if FieldMngt_zBund > 0.001:
                 # Increase surface storage
-                NewCond.SurfaceStorage = NewCond.SurfaceStorage + (Runoff - RunoffIni)
+                NewCond_SurfaceStorage = NewCond_SurfaceStorage + (Runoff - RunoffIni)
                 # Limit surface storage to bund height
-                if NewCond.SurfaceStorage > (FieldMngt.zBund * 1000):
+                if NewCond_SurfaceStorage > (FieldMngt_zBund * 1000):
                     # Additonal water above top of bunds becomes runoff
-                    Runoff = RunoffIni + (NewCond.SurfaceStorage - (FieldMngt.zBund * 1000))
+                    Runoff = RunoffIni + (NewCond_SurfaceStorage - (FieldMngt_zBund * 1000))
                     # Set surface storage to bund height
-                    NewCond.SurfaceStorage = FieldMngt.zBund * 1000
+                    NewCond_SurfaceStorage = FieldMngt_zBund * 1000
                 else:
                     # No additional overtopping of bunds
                     Runoff = RunoffIni
 
     ## Store updated water contents ##
-    NewCond.th = thnew
+    NewCond_th = thnew
 
     ## Update deep percolation, surface runoff, and infiltration values ##
     DeepPerc = DeepPerc + DeepPerc0
     Infl = Infl - Runoff
     RunoffTot = Runoff + Runoff0
 
-    return NewCond, DeepPerc, RunoffTot, Infl, FluxOut
+    return NewCond_th,NewCond_SurfaceStorage, DeepPerc, RunoffTot, Infl, FluxOut
 
 
 # Cell
@@ -1791,51 +1834,53 @@ def germination(InitCond, Soil_zGerm, prof, Crop_GermThr, Crop_PlantMethod, GDD,
 
     ## Check for germination (if in growing season) ##
     if GrowingSeason == True:
-        # Find compartments covered by top soil layer affecting germination
-        comp_sto = np.argwhere(prof.dzsum >= Soil_zGerm).flatten()[0]
-        # Calculate water content in top soil layer
-        Wr = 0
-        WrFC = 0
-        WrWP = 0
-        for ii in range(comp_sto + 1):
-            # Get soil layer
-            # Determine fraction of compartment covered by top soil layer
-            if prof.dzsum[ii] > Soil_zGerm:
-                factor = 1 - ((prof.dzsum[ii] - Soil_zGerm) / prof.dz[ii])
-            else:
-                factor = 1
 
-            # Increment actual water storage (mm)
-            Wr = Wr + round(factor * 1000 * InitCond.th[ii] * prof.dz[ii], 3)
-            # Increment water storage at field capacity (mm)
-            WrFC = WrFC + round(factor * 1000 * prof.th_fc[ii] * prof.dz[ii], 3)
-            # Increment water storage at permanent wilting point (mm)
-            WrWP = WrWP + round(factor * 1000 * prof.th_wp[ii] * prof.dz[ii], 3)
-
-        # Limit actual water storage to not be less than zero
-        if Wr < 0:
+        if (NewCond.Germination == False):
+            # Find compartments covered by top soil layer affecting germination
+            comp_sto = np.argwhere(prof.dzsum >= Soil_zGerm).flatten()[0]
+            # Calculate water content in top soil layer
             Wr = 0
+            WrFC = 0
+            WrWP = 0
+            for ii in range(comp_sto + 1):
+                # Get soil layer
+                # Determine fraction of compartment covered by top soil layer
+                if prof.dzsum[ii] > Soil_zGerm:
+                    factor = 1 - ((prof.dzsum[ii] - Soil_zGerm) / prof.dz[ii])
+                else:
+                    factor = 1
 
-        # Calculate proportional water content
-        WcProp = 1 - ((WrFC - Wr) / (WrFC - WrWP))
+                # Increment actual water storage (mm)
+                Wr = Wr + round(factor * 1000 * InitCond.th[ii] * prof.dz[ii], 3)
+                # Increment water storage at field capacity (mm)
+                WrFC = WrFC + round(factor * 1000 * prof.th_fc[ii] * prof.dz[ii], 3)
+                # Increment water storage at permanent wilting point (mm)
+                WrWP = WrWP + round(factor * 1000 * prof.th_wp[ii] * prof.dz[ii], 3)
 
-        # Check if water content is above germination threshold
-        if (WcProp >= Crop_GermThr) and (NewCond.Germination == False):
-            # Crop has germinated
-            NewCond.Germination = True
-            # If crop sown as seedling, turn on seedling protection
-            if Crop_PlantMethod == True:
-                NewCond.ProtectedSeed = True
+            # Limit actual water storage to not be less than zero
+            if Wr < 0:
+                Wr = 0
+
+            # Calculate proportional water content
+            WcProp = 1 - ((WrFC - Wr) / (WrFC - WrWP))
+
+            # Check if water content is above germination threshold
+            if (WcProp >= Crop_GermThr):
+                # Crop has germinated
+                NewCond.Germination = True
+                # If crop sown as seedling, turn on seedling protection
+                if Crop_PlantMethod == True:
+                    NewCond.ProtectedSeed = True
+                else:
+                    # Crop is transplanted so no protection
+                    NewCond.ProtectedSeed = False
+
+            # Increment delayed growth time counters if germination is yet to
+            # occur, and also set seed protection to False if yet to germinate
             else:
-                # Crop is transplanted so no protection
+                NewCond.DelayedCDs = InitCond.DelayedCDs + 1
+                NewCond.DelayedGDDs = InitCond.DelayedGDDs + GDD
                 NewCond.ProtectedSeed = False
-
-        # Increment delayed growth time counters if germination is yet to
-        # occur, and also set seed protection to False if yet to germinate
-        if NewCond.Germination == False:
-            NewCond.DelayedCDs = InitCond.DelayedCDs + 1
-            NewCond.DelayedGDDs = InitCond.DelayedGDDs + GDD
-            NewCond.ProtectedSeed = False
 
     else:
         # Not in growing season so no germination calculation is performed.
@@ -2284,13 +2329,8 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
         TAW = TAWClass()
         Dr = DrClass()
         # thRZ = thRZClass()
-        _, Dr.Zt, Dr.Rz, TAW.Zt, TAW.Rz, _, _, _, _, _, _ = _root_zone_water(
-            prof.th_fc,
-            prof.th_s,
-            prof.th_wp,
-            prof.dz,
-            prof.dzsum,
-            prof.th_dry,
+        _, Dr.Zt, Dr.Rz, TAW.Zt, TAW.Rz, _,_,_,_,_,_ = _root_zone_water(
+            prof,
             float(NewCond.Zroot),
             NewCond.th,
             Soil_zTop,
@@ -2669,16 +2709,11 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
 
 # Cell
 @njit
-@cc.export("_evap_layer_water_content", "(f8[:],f8,f8[:],f8[:],f8[:],f8[:],f8[:],f8[:])")
+@cc.export("_evap_layer_water_content", (f8[:],f8,SoilProfileNT_typ_sig))
 def _evap_layer_water_content(
     InitCond_th,
     InitCond_EvapZ,
-    prof_dz,
-    prof_dzsum,
-    prof_th_dry,
-    prof_th_wp,
-    prof_th_fc,
-    prof_th_s,
+    prof,
 ):
     """
     Function to get water contents in the evaporation layer
@@ -2715,7 +2750,7 @@ def _evap_layer_water_content(
     """
 
     # Find soil compartments covered by evaporation layer
-    comp_sto = np.sum(prof_dzsum < InitCond_EvapZ) + 1
+    comp_sto = np.sum(prof.dzsum < InitCond_EvapZ) + 1
 
     Wevap_Sat = 0
     Wevap_Fc = 0
@@ -2726,21 +2761,21 @@ def _evap_layer_water_content(
     for ii in range(int(comp_sto)):
 
         # Determine fraction of soil compartment covered by evaporation layer
-        if prof_dzsum[ii] > InitCond_EvapZ:
-            factor = 1 - ((prof_dzsum[ii] - InitCond_EvapZ) / prof_dz[ii])
+        if prof.dzsum[ii] > InitCond_EvapZ:
+            factor = 1 - ((prof.dzsum[ii] - InitCond_EvapZ) / prof.dz[ii])
         else:
             factor = 1
 
         # Actual water storage in evaporation layer (mm)
-        Wevap_Act += factor * 1000 * InitCond_th[ii] * prof_dz[ii]
+        Wevap_Act += factor * 1000 * InitCond_th[ii] * prof.dz[ii]
         # Water storage in evaporation layer at saturation (mm)
-        Wevap_Sat += factor * 1000 * prof_th_s[ii] * prof_dz[ii]
+        Wevap_Sat += factor * 1000 * prof.th_s[ii] * prof.dz[ii]
         # Water storage in evaporation layer at field capacity (mm)
-        Wevap_Fc += factor * 1000 * prof_th_fc[ii] * prof_dz[ii]
+        Wevap_Fc += factor * 1000 * prof.th_fc[ii] * prof.dz[ii]
         # Water storage in evaporation layer at permanent wilting point (mm)
-        Wevap_Wp += factor * 1000 * prof_th_wp[ii] * prof_dz[ii]
+        Wevap_Wp += factor * 1000 * prof.th_wp[ii] * prof.dz[ii]
         # Water storage in evaporation layer at air dry (mm)
-        Wevap_Dry += factor * 1000 * prof_th_dry[ii] * prof_dz[ii]
+        Wevap_Dry += factor * 1000 * prof.th_dry[ii] * prof.dz[ii]
 
     if Wevap_Act < 0:
         Wevap_Act = 0
@@ -2751,21 +2786,15 @@ def _evap_layer_water_content(
 # Cell
 # @njit()
 @cc.export(
-    "_soil_evaporation",
-    "(i8,i8,i8,f8[:],f8[:],f8[:],f8[:],f8[:],f8[:],\
-    f8,f8,f8,f8,f8,f8,f8,i8,f8,i8,f8,b1,f8,f8,i8,f8,f8,f8,f8[:],f8,f8,f8,f8,f8,f8,\
-        f8,b1,f8,f8,f8,f8,f8,f8,f8,b1)",
+    "_soil_evaporation", (i8,i8,i8,SoilProfileNT_typ_sig,
+    f8,f8,f8,f8,f8,f8,f8,i8,f8,i8,f8,b1,f8,f8,i8,f8,f8,f8,f8[:],f8,f8,f8,f8,f8,f8,
+        f8,b1,f8,f8,f8,f8,f8,f8,f8,b1),
 )
 def soil_evaporation(
     ClockStruct_EvapTimeSteps,
     ClockStruct_SimOffSeason,
     ClockStruct_TimeStepCounter,
-    prof_dz,
-    prof_dzsum,
-    prof_th_dry,
-    prof_th_wp,
-    prof_th_fc,
-    prof_th_s,
+    prof,
     Soil_EvapZmin,
     Soil_EvapZmax,
     Soil_REW,
@@ -2872,12 +2901,7 @@ def soil_evaporation(
         Wevap_Sat, Wevap_Fc, Wevap_Wp, Wevap_Dry, Wevap_Act = _evap_layer_water_content(
             NewCond_th,
             NewCond_EvapZ,
-            prof_dz,
-            prof_dzsum,
-            prof_th_dry,
-            prof_th_wp,
-            prof_th_fc,
-            prof_th_s,
+            prof,
         )
         NewCond_Wstage2 = round(
             (Wevap_Act - (Wevap_Fc - Soil_REW)) / (Wevap_Sat - (Wevap_Fc - Soil_REW)), 2
@@ -3013,7 +3037,7 @@ def soil_evaporation(
     # Extract water
     if ExtractPotStg1 > 0:
         # Find soil compartments covered by evaporation layer
-        comp_sto = np.sum(prof_dzsum < Soil_EvapZmin) + 1
+        comp_sto = np.sum(prof.dzsum < Soil_EvapZmin) + 1
         comp = -1
         # prof = Soil_Profile
         while (ExtractPotStg1 > 0) and (comp < comp_sto):
@@ -3021,15 +3045,15 @@ def soil_evaporation(
             comp = comp + 1
             # Specify layer number
             # Determine proportion of compartment in evaporation layer
-            if prof_dzsum[comp] > Soil_EvapZmin:
-                factor = 1 - ((prof_dzsum[comp] - Soil_EvapZmin) / prof_dz[comp])
+            if prof.dzsum[comp] > Soil_EvapZmin:
+                factor = 1 - ((prof.dzsum[comp] - Soil_EvapZmin) / prof.dz[comp])
             else:
                 factor = 1
 
             # Water storage (mm) at air dry
-            Wdry = 1000 * prof_th_dry[comp] * prof_dz[comp]
+            Wdry = 1000 * prof.th_dry[comp] * prof.dz[comp]
             # Available water (mm)
-            W = 1000 * NewCond_th[comp] * prof_dz[comp]
+            W = 1000 * NewCond_th[comp] * prof.dz[comp]
             # Water available in compartment for extraction (mm)
             AvW = (W - Wdry) * factor
             if AvW < 0:
@@ -3055,7 +3079,7 @@ def soil_evaporation(
                 W = W - AvW
 
             # Update water content
-            NewCond_th[comp] = W / (1000 * prof_dz[comp])
+            NewCond_th[comp] = W / (1000 * prof.dz[comp])
 
         # Update surface evaporation layer water balance
         NewCond_Wsurf = NewCond_Wsurf - EsAct
@@ -3068,12 +3092,7 @@ def soil_evaporation(
             Wevap_Sat, Wevap_Fc, Wevap_Wp, Wevap_Dry, Wevap_Act = _evap_layer_water_content(
                 NewCond_th,
                 NewCond_EvapZ,
-                prof_dz,
-                prof_dzsum,
-                prof_th_dry,
-                prof_th_wp,
-                prof_th_fc,
-                prof_th_s,
+                prof,
             )
             # Proportional water storage for start of stage two evaporation
             NewCond_Wstage2 = round(
@@ -3095,12 +3114,7 @@ def soil_evaporation(
             Wevap_Sat, Wevap_Fc, Wevap_Wp, Wevap_Dry, Wevap_Act = _evap_layer_water_content(
                 NewCond_th,
                 NewCond_EvapZ,
-                prof_dz,
-                prof_dzsum,
-                prof_th_dry,
-                prof_th_wp,
-                prof_th_fc,
-                prof_th_s,
+                prof,
             )
             # Get water storage (mm) at start of stage 2 evaporation
             Wupper = NewCond_Wstage2 * (Wevap_Sat - (Wevap_Fc - Soil_REW)) + (Wevap_Fc - Soil_REW)
@@ -3120,12 +3134,7 @@ def soil_evaporation(
                     Wevap_Sat, Wevap_Fc, Wevap_Wp, Wevap_Dry, Wevap_Act = _evap_layer_water_content(
                         NewCond_th,
                         NewCond_EvapZ,
-                        prof_dz,
-                        prof_dzsum,
-                        prof_th_dry,
-                        prof_th_wp,
-                        prof_th_fc,
-                        prof_th_s,
+                        prof,
                     )
                     Wupper = NewCond_Wstage2 * (Wevap_Sat - (Wevap_Fc - Soil_REW)) + (
                         Wevap_Fc - Soil_REW
@@ -3146,7 +3155,7 @@ def soil_evaporation(
             ToExtractStg2 = Kr * Edt
 
             # Extract water from compartments
-            comp_sto = np.sum(prof_dzsum < NewCond_EvapZ) + 1
+            comp_sto = np.sum(prof.dzsum < NewCond_EvapZ) + 1
             comp = -1
             # prof = Soil_Profile
             while (ToExtractStg2 > 0) and (comp < comp_sto):
@@ -3154,15 +3163,15 @@ def soil_evaporation(
                 comp = comp + 1
                 # Specify layer number
                 # Determine proportion of compartment in evaporation layer
-                if prof_dzsum[comp] > NewCond_EvapZ:
-                    factor = 1 - ((prof_dzsum[comp] - NewCond_EvapZ) / prof_dz[comp])
+                if prof.dzsum[comp] > NewCond_EvapZ:
+                    factor = 1 - ((prof.dzsum[comp] - NewCond_EvapZ) / prof.dz[comp])
                 else:
                     factor = 1
 
                 # Water storage (mm) at air dry
-                Wdry = 1000 * prof_th_dry[comp] * prof_dz[comp]
+                Wdry = 1000 * prof.th_dry[comp] * prof.dz[comp]
                 # Available water (mm)
-                W = 1000 * NewCond_th[comp] * prof_dz[comp]
+                W = 1000 * NewCond_th[comp] * prof.dz[comp]
                 # Water available in compartment for extraction (mm)
                 AvW = (W - Wdry) * factor
                 if AvW >= ToExtractStg2:
@@ -3185,7 +3194,7 @@ def soil_evaporation(
                     ToExtract = ToExtract - AvW
 
                 # Update water content
-                NewCond_th[comp] = W / (1000 * prof_dz[comp])
+                NewCond_th[comp] = W / (1000 * prof.dz[comp])
 
     ## Store potential evaporation for irrigation calculations on next day ##
     NewCond_Epot = EsPot
@@ -3205,6 +3214,7 @@ def soil_evaporation(
 
 # Cell
 # @njit()
+@cc.export("_aeration_stress", (f8,f8,thRZNT_type_sig))
 def aeration_stress(NewCond_AerDays, Crop_LagAer, thRZ):
     """
     Function to calculate aeration stress coefficient
@@ -3473,18 +3483,16 @@ def transpiration(
             thRZ.Dry,
             thRZ.Aer,
         ) = _root_zone_water(
-            prof.th_fc,
-            prof.th_s,
-            prof.th_wp,
-            prof.dz,
-            prof.dzsum,
-            prof.th_dry,
+            prof,
             float(NewCond.Zroot),
             NewCond.th,
             Soil_zTop,
             float(Crop.Zmin),
             Crop.Aer,
         )
+
+        class_args = {key:value for key, value in thRZ.__dict__.items() if not key.startswith('__') and not callable(key)}
+        thRZ = thRZNT(**class_args)
 
         # _,Dr,TAW,thRZ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Check whether to use root zone or top soil depletions for calculating
@@ -3516,7 +3524,7 @@ def transpiration(
         # Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
 
         # Calculate aeration stress coefficients
-        Ksa_Aer, NewCond.AerDays = aeration_stress(NewCond.AerDays, Crop.LagAer, thRZ)
+        Ksa_Aer, NewCond.AerDays = _aeration_stress(NewCond.AerDays, Crop.LagAer, thRZ)
         # Maximum stress effect
         Ks = min(Ksw.StoLin, Ksa_Aer)
         # Update potential transpiration in root zone
@@ -3690,12 +3698,7 @@ def transpiration(
                 thRZ.Dry,
                 thRZ.Aer,
             ) = _root_zone_water(
-                prof.th_fc,
-                prof.th_s,
-                prof.th_wp,
-                prof.dz,
-                prof.dzsum,
-                prof.th_dry,
+                prof,
                 float(NewCond.Zroot),
                 NewCond.th,
                 Soil_zTop,
@@ -3835,7 +3838,16 @@ def groundwater_inflow(prof, NewCond):
 
 # Cell
 # @njit()
-def HIref_current_day(InitCond, Crop, GrowingSeason):
+@cc.export("_HIref_current_day", (f8,i8,i8,b1,f8,f8,CropStructNT_type_sig,b1))
+def HIref_current_day(
+    NewCond_HIref,
+    NewCond_DAP,
+    NewCond_DelayedCDs,
+    NewCond_YieldForm,
+    NewCond_PctLagPhase,
+    NewCond_CCprev,
+    Crop,
+    GrowingSeason):
     """
     Function to calculate reference (no adjustment for stress effects)
     harvest index on current day
@@ -3866,89 +3878,104 @@ def HIref_current_day(InitCond, Crop, GrowingSeason):
     """
 
     ## Store initial conditions for updating ##
-    NewCond = InitCond
+    # NewCond = InitCond
 
-    InitCond_HIref = InitCond.HIref
+    InitCond_HIref = NewCond_HIref*1
 
     # NewCond.HIref = 0.
 
     ## Calculate reference harvest index (if in growing season) ##
     if GrowingSeason == True:
         # Check if in yield formation period
-        tAdj = NewCond.DAP - NewCond.DelayedCDs
+        tAdj = NewCond_DAP - NewCond_DelayedCDs
         if tAdj > Crop.HIstartCD:
 
-            NewCond.YieldForm = True
+            NewCond_YieldForm = True
         else:
-            NewCond.YieldForm = False
+            NewCond_YieldForm = False
 
         # Get time for harvest index calculation
-        HIt = NewCond.DAP - NewCond.DelayedCDs - Crop.HIstartCD - 1
+        HIt = NewCond_DAP - NewCond_DelayedCDs - Crop.HIstartCD - 1
 
         if HIt <= 0:
             # Yet to reach time for HI build-up
-            NewCond.HIref = 0
-            NewCond.PctLagPhase = 0
+            NewCond_HIref = 0
+            NewCond_PctLagPhase = 0
         else:
-            if NewCond.CCprev <= (Crop.CCmin * Crop.CCx):
+            if NewCond_CCprev <= (Crop.CCmin * Crop.CCx):
                 # HI cannot develop further as canopy cover is too small
-                NewCond.HIref = InitCond_HIref
+                NewCond_HIref = InitCond_HIref
             else:
                 # Check crop type
                 if (Crop.CropType == 1) or (Crop.CropType == 2):
                     # If crop type is leafy vegetable or root/tuber, then proceed with
                     # logistic growth (i.e. no linear switch)
-                    NewCond.PctLagPhase = 100  # No lag phase
+                    NewCond_PctLagPhase = 100  # No lag phase
                     # Calculate reference harvest index for current day
-                    NewCond.HIref = (Crop.HIini * Crop.HI0) / (
+                    NewCond_HIref = (Crop.HIini * Crop.HI0) / (
                         Crop.HIini + (Crop.HI0 - Crop.HIini) * np.exp(-Crop.HIGC * HIt)
                     )
                     # Harvest index apprAOSP_hing maximum limit
-                    if NewCond.HIref >= (0.9799 * Crop.HI0):
-                        NewCond.HIref = Crop.HI0
+                    if NewCond_HIref >= (0.9799 * Crop.HI0):
+                        NewCond_HIref = Crop.HI0
 
                 elif Crop.CropType == 3:
                     # If crop type is fruit/grain producing, check for linear switch
                     if HIt < Crop.tLinSwitch:
                         # Not yet reached linear switch point, therefore proceed with
                         # logistic build-up
-                        NewCond.PctLagPhase = 100 * (HIt / Crop.tLinSwitch)
+                        NewCond_PctLagPhase = 100 * (HIt / Crop.tLinSwitch)
                         # Calculate reference harvest index for current day
                         # (logistic build-up)
-                        NewCond.HIref = (Crop.HIini * Crop.HI0) / (
+                        NewCond_HIref = (Crop.HIini * Crop.HI0) / (
                             Crop.HIini + (Crop.HI0 - Crop.HIini) * np.exp(-Crop.HIGC * HIt)
                         )
                     else:
                         # Linear switch point has been reached
-                        NewCond.PctLagPhase = 100
+                        NewCond_PctLagPhase = 100
                         # Calculate reference harvest index for current day
                         # (logistic portion)
-                        NewCond.HIref = (Crop.HIini * Crop.HI0) / (
+                        NewCond_HIref = (Crop.HIini * Crop.HI0) / (
                             Crop.HIini
                             + (Crop.HI0 - Crop.HIini) * np.exp(-Crop.HIGC * Crop.tLinSwitch)
                         )
                         # Calculate reference harvest index for current day
                         # (total - logistic portion + linear portion)
-                        NewCond.HIref = NewCond.HIref + (Crop.dHILinear * (HIt - Crop.tLinSwitch))
+                        NewCond_HIref = NewCond_HIref + (Crop.dHILinear * (HIt - Crop.tLinSwitch))
 
                 # Limit HIref and round off computed value
-                if NewCond.HIref > Crop.HI0:
-                    NewCond.HIref = Crop.HI0
-                elif NewCond.HIref <= (Crop.HIini + 0.004):
-                    NewCond.HIref = 0
-                elif (Crop.HI0 - NewCond.HIref) < 0.004:
-                    NewCond.HIref = Crop.HI0
+                if NewCond_HIref > Crop.HI0:
+                    NewCond_HIref = Crop.HI0
+                elif NewCond_HIref <= (Crop.HIini + 0.004):
+                    NewCond_HIref = 0
+                elif (Crop.HI0 - NewCond_HIref) < 0.004:
+                    NewCond_HIref = Crop.HI0
 
     else:
         # Reference harvest index is zero outside of growing season
-        NewCond.HIref = 0
+        NewCond_HIref = 0
 
-    return NewCond
+    return (NewCond_HIref,
+            NewCond_YieldForm,
+            NewCond_PctLagPhase,
+            )
 
 
 # Cell
 # @njit()
-def biomass_accumulation(Crop, InitCond, Tr, TrPot, Et0, GrowingSeason):
+@cc.export("_biomass_accumulation", (CropStructNT_type_sig,i8,i8,f8,f8,f8,f8,f8,f8,f8,b1))
+def biomass_accumulation(
+                        Crop,
+                        NewCond_DAP,
+                        NewCond_DelayedCDs,
+                        NewCond_HIref,
+                        NewCond_PctLagPhase,
+                        NewCond_B,
+                        NewCond_B_NS,
+                        Tr, 
+                        TrPot, 
+                        Et0, 
+                        GrowingSeason):
     """
     Function to calculate biomass accumulation
 
@@ -3982,17 +4009,17 @@ def biomass_accumulation(Crop, InitCond, Tr, TrPot, Et0, GrowingSeason):
     """
 
     ## Store initial conditions in a new structure for updating ##
-    NewCond = InitCond
+    # NewCond = InitCond
 
     ## Calculate biomass accumulation (if in growing season) ##
     if GrowingSeason == True:
         # Get time for harvest index build-up
-        HIt = NewCond.DAP - NewCond.DelayedCDs - Crop.HIstartCD - 1
+        HIt = NewCond_DAP - NewCond_DelayedCDs - Crop.HIstartCD - 1
 
-        if ((Crop.CropType == 2) or (Crop.CropType == 3)) and (NewCond.HIref > 0):
+        if ((Crop.CropType == 2) or (Crop.CropType == 3)) and (NewCond_HIref > 0):
             # Adjust WP for reproductive stage
             if Crop.Determinant == 1:
-                fswitch = NewCond.PctLagPhase / 100
+                fswitch = NewCond_PctLagPhase / 100
             else:
                 if HIt < (Crop.YldFormCD / 3):
                     fswitch = HIt / (Crop.YldFormCD / 3)
@@ -4019,18 +4046,20 @@ def biomass_accumulation(Crop, InitCond, Tr, TrPot, Et0, GrowingSeason):
             dB = 0
 
         # Update biomass accumulation
-        NewCond.B = NewCond.B + dB
-        NewCond.B_NS = NewCond.B_NS + dB_NS
+        NewCond_B = NewCond_B + dB
+        NewCond_B_NS = NewCond_B_NS + dB_NS
     else:
         # No biomass accumulation outside of growing season
-        NewCond.B = 0
-        NewCond.B_NS = 0
+        NewCond_B = 0
+        NewCond_B_NS = 0
 
-    return NewCond
+    return (NewCond_B,
+            NewCond_B_NS)
 
 
 # Cell
 # @njit()
+@cc.export("_temperature_stress", (CropStructNT_type_sig,f8,f8))
 def temperature_stress(Crop, Tmax, Tmin):
     # Function to calculate temperature stress coefficients
     """
@@ -4069,46 +4098,51 @@ def temperature_stress(Crop, Tmax, Tmin):
     KsPol_up = 1
     KsPol_lo = 0.001
 
-    Kst = KstClass()
+    # Kst = KstClass()
 
     # Calculate effects of heat stress on pollination
     if Crop.PolHeatStress == 0:
         # No heat stress effects on pollination
-        Kst.PolH = 1
+        Kst_PolH = 1
     elif Crop.PolHeatStress == 1:
         # Pollination affected by heat stress
         if Tmax <= Crop.Tmax_lo:
-            Kst.PolH = 1
+            Kst_PolH = 1
         elif Tmax >= Crop.Tmax_up:
-            Kst.PolH = 0
+            Kst_PolH = 0
         else:
             Trel = (Tmax - Crop.Tmax_lo) / (Crop.Tmax_up - Crop.Tmax_lo)
-            Kst.PolH = (KsPol_up * KsPol_lo) / (
+            Kst_PolH = (KsPol_up * KsPol_lo) / (
                 KsPol_lo + (KsPol_up - KsPol_lo) * np.exp(-Crop.fshape_b * (1 - Trel))
             )
 
     # Calculate effects of cold stress on pollination
     if Crop.PolColdStress == 0:
         # No cold stress effects on pollination
-        Kst.PolC = 1
+        Kst_PolC = 1
     elif Crop.PolColdStress == 1:
         # Pollination affected by cold stress
         if Tmin >= Crop.Tmin_up:
-            Kst.PolC = 1
+            Kst_PolC = 1
         elif Tmin <= Crop.Tmin_lo:
-            Kst.PolC = 0
+            Kst_PolC = 0
         else:
             Trel = (Crop.Tmin_up - Tmin) / (Crop.Tmin_up - Crop.Tmin_lo)
-            Kst.PolC = (KsPol_up * KsPol_lo) / (
+            Kst_PolC = (KsPol_up * KsPol_lo) / (
                 KsPol_lo + (KsPol_up - KsPol_lo) * np.exp(-Crop.fshape_b * (1 - Trel))
             )
 
-    return Kst
+    return (Kst_PolH,Kst_PolC)
 
 
 # Cell
 # @njit()
-def HIadj_pre_anthesis(InitCond, Crop_dHI_pre):
+@cc.export("_HIadj_pre_anthesis", (f8,f8,f8,f8))
+def HIadj_pre_anthesis(
+    NewCond_B,
+    NewCond_B_NS,
+    NewCond_CC,
+    Crop_dHI_pre):
     """
     Function to calculate adjustment to harvest index for pre-anthesis water
     stress
@@ -4134,13 +4168,13 @@ def HIadj_pre_anthesis(InitCond, Crop_dHI_pre):
     """
 
     ## Store initial conditions in structure for updating ##
-    NewCond = InitCond
+    # NewCond = InitCond
 
     # check that there is an adjustment to be made
     if Crop_dHI_pre > 0:
         ## Calculate adjustment ##
         # Get parameters
-        Br = InitCond.B / InitCond.B_NS
+        Br = NewCond_B / NewCond_B_NS
         Br_range = np.log(Crop_dHI_pre) / 5.62
         Br_upp = 1
         Br_low = 1 - Br_range
@@ -4152,30 +4186,38 @@ def HIadj_pre_anthesis(InitCond, Crop_dHI_pre):
 
         # Calculate adjustment factor
         if (Br >= Br_low) and (Br < Br_top):
-            NewCond.Fpre = 1 + (
+            NewCond_Fpre = 1 + (
                 ((1 + np.sin((1.5 - ratio_low) * np.pi)) / 2) * (Crop_dHI_pre / 100)
             )
         elif (Br > Br_top) and (Br <= Br_upp):
-            NewCond.Fpre = 1 + (
+            NewCond_Fpre = 1 + (
                 ((1 + np.sin((0.5 + ratio_upp) * np.pi)) / 2) * (Crop_dHI_pre / 100)
             )
         else:
-            NewCond.Fpre = 1
+            NewCond_Fpre = 1
     else:
-        NewCond.Fpre = 1
+        NewCond_Fpre = 1
 
-    if NewCond.CC <= 0.01:
+    if NewCond_CC <= 0.01:
         # No green canopy cover left at start of flowering so no harvestable
         # crop will develop
-        NewCond.Fpre = 0
+        NewCond_Fpre = 0
 
-    return NewCond
+    return NewCond_Fpre
 
 
 # Cell
 # @njit()
+@cc.export("_HIadj_pollination", (f8,f8,f8,f8,f8,KswNT_type_sig,KstNT_type_sig,f8))
 def HIadj_pollination(
-    InitCond_CC, InitCond_Fpol, Crop_FloweringCD, Crop_CCmin, Crop_exc, Ksw, Kst, HIt
+    NewCond_CC,
+    NewCond_Fpol,
+    Crop_FloweringCD, 
+    Crop_CCmin, 
+    Crop_exc, 
+    Ksw, 
+    Kst, 
+    HIt
 ):
     """
     Function to calculate adjustment to harvest index for failure of
@@ -4251,7 +4293,7 @@ def HIadj_pollination(
         FracFlow = F
 
     # Calculate pollination adjustment for current day
-    if InitCond_CC < Crop_CCmin:
+    if NewCond_CC < Crop_CCmin:
         # No pollination can occur as canopy cover is smaller than minimum
         # threshold
         dFpol = 0
@@ -4260,7 +4302,7 @@ def HIadj_pollination(
         dFpol = Ks * FracFlow * (1 + (Crop_exc / 100))
 
     # Calculate pollination adjustment to date
-    NewCond_Fpol = InitCond_Fpol + dFpol
+    NewCond_Fpol = NewCond_Fpol + dFpol
     if NewCond_Fpol > 1:
         # Crop has fully pollinated
         NewCond_Fpol = 1
@@ -4270,7 +4312,18 @@ def HIadj_pollination(
 
 # Cell
 # @njit()
-def HIadj_post_anthesis(InitCond, Crop, Ksw):
+@cc.export("_HIadj_post_anthesis", (i8,f8,f8,i8,f8,f8,f8,f8,CropStructNT_type_sig,KswNT_type_sig,))
+def HIadj_post_anthesis(
+                    NewCond_DelayedCDs,
+                    NewCond_sCor1,
+                    NewCond_sCor2,
+                    NewCond_DAP,
+                    NewCond_Fpre,
+                    NewCond_CC,
+                    NewCond_fpost_upp,
+                    NewCond_fpost_dwn,
+                    Crop, 
+                    Ksw):
     """
     Function to calculate adjustment to harvest index for post-anthesis water
     stress
@@ -4297,63 +4350,68 @@ def HIadj_post_anthesis(InitCond, Crop, Ksw):
     """
 
     ## Store initial conditions in a structure for updating ##
-    NewCond = InitCond
+    # NewCond = InitCond
 
-    InitCond_DelayedCDs = InitCond.DelayedCDs
-    InitCond_sCor1 = InitCond.sCor1
-    InitCond_sCor2 = InitCond.sCor2
+    InitCond_DelayedCDs = NewCond_DelayedCDs*1
+    InitCond_sCor1 = NewCond_sCor1*1
+    InitCond_sCor2 = NewCond_sCor2*1
 
     ## Calculate harvest index adjustment ##
     # 1. Adjustment for leaf expansion
     tmax1 = Crop.CanopyDevEndCD - Crop.HIstartCD
-    DAP = NewCond.DAP - InitCond_DelayedCDs
+    DAP = NewCond_DAP - InitCond_DelayedCDs
     if (
         (DAP <= (Crop.CanopyDevEndCD + 1))
         and (tmax1 > 0)
-        and (NewCond.Fpre > 0.99)
-        and (NewCond.CC > 0.001)
+        and (NewCond_Fpre > 0.99)
+        and (NewCond_CC > 0.001)
         and (Crop.a_HI > 0)
     ):
         dCor = 1 + (1 - Ksw.Exp) / Crop.a_HI
-        NewCond.sCor1 = InitCond_sCor1 + (dCor / tmax1)
+        NewCond_sCor1 = InitCond_sCor1 + (dCor / tmax1)
         DayCor = DAP - 1 - Crop.HIstartCD
-        NewCond.fpost_upp = (tmax1 / DayCor) * NewCond.sCor1
+        NewCond_fpost_upp = (tmax1 / DayCor) * NewCond_sCor1
 
     # 2. Adjustment for stomatal closure
     tmax2 = Crop.YldFormCD
-    DAP = NewCond.DAP - InitCond_DelayedCDs
+    DAP = NewCond_DAP - InitCond_DelayedCDs
     if (
         (DAP <= (Crop.HIendCD + 1))
         and (tmax2 > 0)
-        and (NewCond.Fpre > 0.99)
-        and (NewCond.CC > 0.001)
+        and (NewCond_Fpre > 0.99)
+        and (NewCond_CC > 0.001)
         and (Crop.b_HI > 0)
     ):
         # print(Ksw.Sto)
         dCor = np.power(Ksw.Sto, 0.1) * (1 - (1 - Ksw.Sto) / Crop.b_HI)
-        NewCond.sCor2 = InitCond_sCor2 + (dCor / tmax2)
+        NewCond_sCor2 = InitCond_sCor2 + (dCor / tmax2)
         DayCor = DAP - 1 - Crop.HIstartCD
-        NewCond.fpost_dwn = (tmax2 / DayCor) * NewCond.sCor2
+        NewCond_fpost_dwn = (tmax2 / DayCor) * NewCond_sCor2
 
     # Determine total multiplier
     if (tmax1 == 0) and (tmax2 == 0):
-        NewCond.Fpost = 1
+        NewCond_Fpost = 1
     else:
         if tmax2 == 0:
-            NewCond.Fpost = NewCond.fpost_upp
+            NewCond_Fpost = NewCond_fpost_upp
         else:
             if tmax1 == 0:
-                NewCond.Fpost = NewCond.fpost_dwn
+                NewCond_Fpost = NewCond_fpost_dwn
             elif tmax1 <= tmax2:
-                NewCond.Fpost = NewCond.fpost_dwn * (
-                    ((tmax1 * NewCond.fpost_upp) + (tmax2 - tmax1)) / tmax2
+                NewCond_Fpost = NewCond_fpost_dwn * (
+                    ((tmax1 * NewCond_fpost_upp) + (tmax2 - tmax1)) / tmax2
                 )
             else:
-                NewCond.Fpost = NewCond.fpost_upp * (
-                    ((tmax2 * NewCond.fpost_dwn) + (tmax1 - tmax2)) / tmax1
+                NewCond_Fpost = NewCond_fpost_upp * (
+                    ((tmax2 * NewCond_fpost_dwn) + (tmax1 - tmax2)) / tmax1
                 )
 
-    return NewCond
+    return (
+            NewCond_sCor1,
+            NewCond_sCor2,
+            NewCond_fpost_upp,
+            NewCond_fpost_dwn,
+            NewCond_Fpost)
 
 
 # Cell
@@ -4407,13 +4465,8 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, Et0, Tmax, Tmin, GrowingSeaso
         TAW = TAWClass()
         Dr = DrClass()
         # thRZ = thRZClass()
-        _, Dr.Zt, Dr.Rz, TAW.Zt, TAW.Rz, _, _, _, _, _, _ = _root_zone_water(
-            prof.th_fc,
-            prof.th_s,
-            prof.th_wp,
-            prof.dz,
-            prof.dzsum,
-            prof.th_dry,
+        _, Dr.Zt, Dr.Rz, TAW.Zt, TAW.Rz, _,_,_,_,_,_, = _root_zone_water(
+            prof,
             float(NewCond.Zroot),
             NewCond.th,
             Soil_zTop,
@@ -4436,8 +4489,8 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, Et0, Tmax, Tmin, GrowingSeaso
         # Calculate water stress
         beta = True
         # Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
-        Ksw = KswClass()
-        Ksw.Exp, Ksw.Sto, Ksw.Sen, Ksw.Pol, Ksw.StoLin = _water_stress(
+        # Ksw = KswClass()
+        Ksw_Exp, Ksw_Sto, Ksw_Sen, Ksw_Pol, Ksw_StoLin = _water_stress(
             Crop.p_up,
             Crop.p_lo,
             Crop.ETadj,
@@ -4449,10 +4502,10 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, Et0, Tmax, Tmin, GrowingSeaso
             Et0,
             beta,
         )
-
+        Ksw = KswNT(Exp=Ksw_Exp, Sto=Ksw_Sto, Sen=Ksw_Sen, Pol=Ksw_Pol, StoLin=Ksw_StoLin )
         # Calculate temperature stress
-        Kst = temperature_stress(Crop, Tmax, Tmin)
-
+        (Kst_PolH,Kst_PolC) = _temperature_stress(Crop, Tmax, Tmin)
+        Kst = KstNT(PolH=Kst_PolH,PolC=Kst_PolC)
         # Get reference harvest index on current day
         HIi = NewCond.HIref
 
@@ -4467,15 +4520,18 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, Et0, Tmax, Tmin, GrowingSeaso
                 # Detemine adjustment for water stress before anthesis
                 if InitCond_PreAdj == False:
                     InitCond.PreAdj = True
-                    NewCond = HIadj_pre_anthesis(NewCond, Crop.dHI_pre)
+                    NewCond.Fpre = _HIadj_pre_anthesis(NewCond.B,
+                                                NewCond.B_NS,
+                                                NewCond.CC,
+                                                Crop.dHI_pre)
 
                 # Determine adjustment for crop pollination failure
                 if Crop.CropType == 3:  # Adjustment only for fruit/grain crops
                     if (HIt > 0) and (HIt <= Crop.FloweringCD):
 
-                        NewCond.Fpol = HIadj_pollination(
-                            InitCond.CC,
-                            InitCond.Fpol,
+                        NewCond.Fpol = _HIadj_pollination(
+                            NewCond.CC,
+                            NewCond.Fpol,
                             Crop.FloweringCD,
                             Crop.CCmin,
                             Crop.exc,
@@ -4491,7 +4547,20 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, Et0, Tmax, Tmin, GrowingSeaso
 
                 # Determine adjustments for post-anthesis water stress
                 if HIt > 0:
-                    NewCond = HIadj_post_anthesis(NewCond, Crop, Ksw)
+                    (NewCond.sCor1,
+                    NewCond.sCor2,
+                    NewCond.fpost_upp,
+                    NewCond.fpost_dwn,
+                    NewCond.Fpost) = _HIadj_post_anthesis(NewCond.DelayedCDs,
+                                                        NewCond.sCor1,
+                                                        NewCond.sCor2,
+                                                        NewCond.DAP,
+                                                        NewCond.Fpre,
+                                                        NewCond.CC,
+                                                        NewCond.fpost_upp,
+                                                        NewCond.fpost_dwn,
+                                                        Crop, 
+                                                        Ksw)
 
                 # Limit HI to maximum allowable increase due to pre- and
                 # post-anthesis water stress combinations

@@ -13,9 +13,10 @@ __all__ = [
     "GwClass",
     "InitWCClass",
     "CropStruct",
-    "spec",
+    "CropStructNT",
+    "CropStructNT_type_sig",
+    "crop_spec",
     "InitCondClass",
-    "spec",
     "WevapClass",
     "spec",
     "SoilProfileClass",
@@ -25,20 +26,32 @@ __all__ = [
     "DrClass",
     "spec",
     "thRZClass",
-    "spec",
+    "thRZNT",
+    "thRZNT_type_sig",
     "KswClass",
-    "spec",
+    "KswNT",
+    "KswNT_type_sig",
+    "Ksw_spec",
     "KstClass",
-    "spec",
+    "KstNT",
+    "KstNT_type_sig",
+    "Kst_spec",
     "CO2Class",
     "spec",
+    "SoilProfileNT",
+    "SoilProfileNT_typ_sig"
 ]
 
 # Cell
 import numpy as np
 import pandas as pd
 from numba.experimental import jitclass
-from numba import float64, int64, boolean
+from numba import float64, int64, boolean, types
+# from collections import namedtuple
+import typing
+
+from numba import njit
+from numba.experimental import structref
 
 # Cell
 class ClockStructClass:
@@ -1434,7 +1447,7 @@ class InitWCClass:
 
 
 # Cell
-spec = [
+crop_spec = [
     ("fshape_b", float64),
     ("PctZmin", float64),
     ("fshape_ex", float64),
@@ -1659,8 +1672,15 @@ class CropStruct(object):
         self.FloweringEnd = 0.0
 
 
+CropStructNT = typing.NamedTuple("CropStructNT", crop_spec)
+CropStructNT_type_sig= types.NamedTuple(tuple(dict(crop_spec).values()),CropStructNT)
+
+
+
+
+
 # Cell
-spec = [
+InitCond_spec = [
     ("AgeDays", float64),
     ("AgeDays_NS", float64),
     ("AerDays", float64),
@@ -1818,7 +1838,7 @@ class InitCondClass:
         self.ProtectedSeed = 0
         self.Y = 0
 
-        self.Zroot = 0
+        self.Zroot = 0.
         self.CC0adj = 0
         self.SurfaceStorage = 0
         self.zGW = -999
@@ -1841,6 +1861,18 @@ class InitCondClass:
 
         self.Depletion = 0
         self.TAW = 0
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Cell
@@ -1882,13 +1914,12 @@ class WevapClass(object):
 
 
 # Cell
-spec = [
+SoilProfileNT_spec = [
     ("Comp", int64[:]),
     ("dz", float64[:]),
     ("Layer", int64[:]),
     ("dzsum", float64[:]),
     ("th_fc", float64[:]),
-    ("Layer_dz", float64[:]),
     ("th_s", float64[:]),
     ("th_wp", float64[:]),
     ("Ksat", float64[:]),
@@ -1910,7 +1941,6 @@ class SoilProfileClass:
 
     **Attributes:**\n
 
-
     `Comp` : `list` :
 
     `Layer` : `list` :
@@ -1925,9 +1955,6 @@ class SoilProfileClass:
 
     `zMid` : `list` :
 
-
-
-
     """
 
     def __init__(self, length):
@@ -1937,7 +1964,6 @@ class SoilProfileClass:
         self.Layer = np.zeros(length, dtype=np.int64)
         self.dzsum = np.zeros(length, dtype=np.float64)
         self.th_fc = np.zeros(length, dtype=np.float64)
-        self.Layer_dz = np.zeros(length, dtype=np.float64)
         self.th_s = np.zeros(length, dtype=np.float64)
         self.th_wp = np.zeros(length, dtype=np.float64)
         self.Ksat = np.zeros(length, dtype=np.float64)
@@ -1950,6 +1976,10 @@ class SoilProfileClass:
         self.th_fc_Adj = np.zeros(length, dtype=np.float64)
         self.aCR = np.zeros(length, dtype=np.float64)
         self.bCR = np.zeros(length, dtype=np.float64)
+
+
+SoilProfileNT = typing.NamedTuple("SoilProfileNT", SoilProfileNT_spec)
+SoilProfileNT_typ_sig= types.NamedTuple(tuple(dict(SoilProfileNT_spec).values()),SoilProfileNT)
 
 
 # Cell
@@ -2007,7 +2037,7 @@ class DrClass:
 
 
 # Cell
-spec = [
+thRZ_spec = [
     ("Act", float64),
     ("S", float64),
     ("FC", float64),
@@ -2051,8 +2081,12 @@ class thRZClass(object):
         self.Aer = 0.0
 
 
+thRZNT = typing.NamedTuple("thRZNT", thRZ_spec)
+thRZNT_type_sig= types.NamedTuple(tuple(dict(thRZ_spec).values()),thRZNT)
+
+
 # Cell
-spec = [
+Ksw_spec = [
     ("Exp", float64),
     ("Sto", float64),
     ("Sen", float64),
@@ -2092,8 +2126,18 @@ class KswClass(object):
         self.StoLin = 1.0
 
 
+
+
+KswNT = typing.NamedTuple("KswNT", Ksw_spec)
+KswNT_type_sig= types.NamedTuple(tuple(dict(Ksw_spec).values()),KswNT)
+
+
+
+
+
+
 # Cell
-spec = [
+Kst_spec = [
     ("PolH", float64),
     ("PolC", float64),
 ]
@@ -2118,6 +2162,13 @@ class KstClass(object):
     def __init__(self):
         self.PolH = 1.0
         self.PolC = 1.0
+
+
+KstNT = typing.NamedTuple("KstNT", Kst_spec)
+KstNT_type_sig= types.NamedTuple(tuple(dict(Kst_spec).values()),KstNT)
+
+
+
 
 
 # Cell

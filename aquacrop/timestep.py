@@ -8,9 +8,13 @@ import numpy as np
 import pandas as pd
 
 
+
+
 # compiled functions
 from .solution_aot import _growing_degree_day, _drainage, _root_zone_water, _rainfall_partition, \
-     _check_groundwater_table, _soil_evaporation
+     _check_groundwater_table, _soil_evaporation,_root_development, _infiltration, \
+         _HIref_current_day, _biomass_accumulation
+
 
 # Cell
 def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
@@ -73,7 +77,7 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
             GrowingSeason = False
 
         # Assign crop, irrigation management, and field management structures
-        Crop = ParamStruct.Seasonal_Crop_List[ClockStruct.SeasonCounter]
+        Crop_ = ParamStruct.Seasonal_Crop_List[ClockStruct.SeasonCounter]
         Crop_Name = ParamStruct.CropChoices[ClockStruct.SeasonCounter]
         IrrMngt = ParamStruct.IrrMngt
 
@@ -87,13 +91,16 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
         GrowingSeason = False
         # Assign crop, irrigation management, and field management structures
         # Assign first crop as filler crop
-        Crop = ParamStruct.Fallow_Crop
+        Crop_ = ParamStruct.Fallow_Crop
         Crop_Name = "fallow"
 
-        Crop.Aer = 5
-        Crop.Zmin = 0.3
+        Crop_.Aer = 5
+        Crop_.Zmin = 0.3
         IrrMngt = ParamStruct.FallowIrrMngt
         FieldMngt = ParamStruct.FallowFieldMngt
+
+
+    
 
     # Increment time counters %%
     if GrowingSeason == True:
@@ -101,7 +108,7 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
         NewCond.DAP = NewCond.DAP + 1
         # Growing degree days after planting
 
-        GDD = _growing_degree_day(Crop.GDDmethod, Crop.Tupp, Crop.Tbase, Tmax, Tmin)
+        GDD = _growing_degree_day(Crop_.GDDmethod, Crop_.Tupp, Crop_.Tbase, Tmax, Tmin)
 
         ## Update cumulative GDD counter ##
         NewCond.GDD = GDD
@@ -124,16 +131,21 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
     NewCond.Tmin = weather_step[0]
     NewCond.Et0 = weather_step[3]
 
+
+    
+
+    class_args = {key:value for key, value in Crop_.__dict__.items() if not key.startswith('__') and not callable(key)}
+    Crop = CropStructNT(**class_args)
+
+
+
     # Run simulations %%
     # 1. Check for groundwater table
     (
         NewCond.th_fc_Adj,
-        Soil.Profile.th_fc_Adj
+        _
     ) = _check_groundwater_table(
-        Soil.Profile.zMid,
-        Soil.Profile.Comp,
-        Soil.Profile.th_s,
-        Soil.Profile.th_fc,
+        Soil.Profile,
         NewCond.zGW,
         NewCond.th,
         NewCond.th_fc_Adj,
@@ -142,8 +154,25 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
     )
 
     # 2. Root development
-    NewCond = root_development(
-        Crop, Soil.Profile, NewCond, GDD, GrowingSeason, ParamStruct.WaterTable
+    NewCond.Zroot = _root_development(
+        Crop,
+        Soil.Profile,
+        NewCond.DAP,
+        NewCond.Zroot,
+        NewCond.DelayedCDs,
+        NewCond.GDDcum,
+        NewCond.DelayedGDDs,
+        NewCond.TrRatio,
+        NewCond.th,
+        NewCond.CC,
+        NewCond.CC_NS,
+        NewCond.Germination,
+        NewCond.rCor,
+        NewCond.Tpot,
+        NewCond.zGW,
+        GDD,
+        GrowingSeason,
+        ParamStruct.WaterTable
     )
 
     # 3. Pre-irrigation
@@ -152,12 +181,7 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
     # 4. Drainage
 
     NewCond.th, DeepPerc, FluxOut = _drainage(
-        Soil.Profile.th_fc,
-        Soil.Profile.th_s,
-        Soil.Profile.tau,
-        Soil.Profile.dz,
-        Soil.Profile.dzsum,
-        Soil.Profile.Ksat,
+        Soil.Profile,
         NewCond.th,
         NewCond.th_fc_Adj,
     )
@@ -175,24 +199,40 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
         Soil.AdjCN,
         Soil.zCN,
         Soil.nComp,
-        Soil.Profile.dzsum,
-        Soil.Profile.th_wp,
-        Soil.Profile.th_fc,
+        Soil.Profile,
     )
 
     # 6. Irrigation
-    NewCond, Irr = irrigation(
-        NewCond, IrrMngt, Crop, Soil.Profile, Soil.zTop, GrowingSeason, P, Runoff
+    NewCond.Depletion,NewCond.TAW,NewCond.IrrCum, Irr = irrigation(
+
+        IrrMngt.IrrMethod,
+        IrrMngt.SMT,
+        IrrMngt.AppEff,
+        IrrMngt.MaxIrr,
+        IrrMngt.IrrInterval,
+        IrrMngt.Schedule,
+        IrrMngt.depth,
+        IrrMngt.MaxIrrSeason,
+        NewCond.IrrCum,
+        NewCond.Epot,
+        NewCond.Tpot,
+        NewCond.Zroot,
+        NewCond.th,
+        NewCond.DAP,
+        NewCond.TimeStepCounter, Crop, Soil.Profile, Soil.zTop, GrowingSeason, P, Runoff
     )
 
     # 7. Infiltration
-    NewCond, DeepPerc, RunoffTot, Infl, FluxOut = infiltration(
+    NewCond.th,NewCond.SurfaceStorage, DeepPerc, RunoffTot, Infl, FluxOut = _infiltration(
         Soil.Profile,
-        NewCond,
+        NewCond.SurfaceStorage, 
+        NewCond.th_fc_Adj, 
+        NewCond.th,
         Infl,
         Irr,
         IrrMngt.AppEff,
-        FieldMngt,
+        FieldMngt.Bunds,
+        FieldMngt.zBund,
         FluxOut,
         DeepPerc,
         Runoff,
@@ -219,12 +259,7 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
         ClockStruct.EvapTimeSteps,
         ClockStruct.SimOffSeason,
         ClockStruct.TimeStepCounter,
-        Soil.Profile.dz,
-        Soil.Profile.dzsum,
-        Soil.Profile.th_dry,
-        Soil.Profile.th_wp,
-        Soil.Profile.th_fc,
-        Soil.Profile.th_s,
+        Soil.Profile,
         Soil.EvapZmin,
         Soil.EvapZmax,
         Soil.REW,
@@ -281,10 +316,30 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
     NewCond, GwIn = groundwater_inflow(Soil.Profile, NewCond)
 
     # 15. Reference harvest index
-    NewCond = HIref_current_day(NewCond, Crop, GrowingSeason)
+    (NewCond.HIref,
+    NewCond.YieldForm,
+    NewCond.PctLagPhase,
+    ) = _HIref_current_day(NewCond.HIref,
+                        NewCond.DAP,
+                        NewCond.DelayedCDs,
+                        NewCond.YieldForm,
+                        NewCond.PctLagPhase,
+                        NewCond.CCprev,
+                        Crop,
+                        GrowingSeason)
 
     # 16. Biomass accumulation
-    NewCond = biomass_accumulation(Crop, NewCond, Tr, TrPot_NS, Et0, GrowingSeason)
+    (NewCond.B, NewCond.B_NS) = _biomass_accumulation(Crop,
+                            NewCond.DAP,
+                            NewCond.DelayedCDs,
+                            NewCond.HIref,
+                            NewCond.PctLagPhase,
+                            NewCond.B,
+                            NewCond.B_NS,
+                            Tr, 
+                            TrPot_NS, 
+                            Et0, 
+                            GrowingSeason)
 
     # 17. Harvest index
     NewCond = harvest_index(Soil.Profile, Soil.zTop, Crop, NewCond, Et0, Tmax, Tmin, GrowingSeason)
@@ -306,17 +361,12 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
         NewCond.Y = 0
 
     # 19. Root zone water
-
     _TAW = TAWClass()
     _Dr = DrClass()
     # thRZ = thRZClass()
+
     Wr, _Dr.Zt, _Dr.Rz, _TAW.Zt, _TAW.Rz, _, _, _, _, _, _ = _root_zone_water(
-        Soil.Profile.th_fc,
-        Soil.Profile.th_s,
-        Soil.Profile.th_wp,
-        Soil.Profile.dz,
-        Soil.Profile.dzsum,
-        Soil.Profile.th_dry,
+        Soil.Profile,
         float(NewCond.Zroot),
         NewCond.th,
         Soil.zTop,
