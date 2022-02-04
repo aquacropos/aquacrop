@@ -53,7 +53,8 @@ if __name__ != "__main__":
         _water_stress,
         _evap_layer_water_content,
         _cc_development,
-        _cc_required_time
+        _cc_required_time,
+        _update_CCx_CDC
     )
 else:
     from solution_aot import _evap_layer_water_content
