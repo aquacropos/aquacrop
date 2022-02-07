@@ -1161,6 +1161,7 @@ def irrigation(
     IrrMngt_Schedule,
     IrrMngt_depth,
     IrrMngt_MaxIrrSeason,
+    NewCond_GrowthStage,
     NewCond_IrrCum,
     NewCond_Epot,
     NewCond_Tpot,

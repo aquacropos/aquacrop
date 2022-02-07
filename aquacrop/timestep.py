@@ -213,6 +213,7 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
         IrrMngt.Schedule,
         IrrMngt.depth,
         IrrMngt.MaxIrrSeason,
+        NewCond.GrowthStage,
         NewCond.IrrCum,
         NewCond.Epot,
         NewCond.Tpot,
