@@ -13,6 +13,7 @@ jobs:
       run: |
         pip install nbdev jupyter
         pip install -e .
+        python aquacrop/solution.py
     - name: tests 
       run: |
         python tests/test_time.py
