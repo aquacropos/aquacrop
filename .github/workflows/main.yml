@@ -13,13 +13,13 @@ jobs:
       run: |
         pip install nbdev jupyter
         pip install -e .
+        python aquacrop/solution.py
+    - name: tests 
+      run: |
+        python tests/test_time.py
     - name: check docs 
       run: |
         pip install nbdev jupyter
         pip install -e .
         pip install mkdocs-material mkdocstrings mkdocs-jupyter
-        mkdocs build
-    - name: tests 
-      run: |
-        python tests/test_time.py
-        
+        mkdocs build        

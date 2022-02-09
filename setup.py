@@ -1,8 +1,31 @@
 from pkg_resources import parse_version
 from configparser import ConfigParser
 import setuptools
-
 assert parse_version(setuptools.__version__) >= parse_version("36.2")
+import sys
+from distutils.command.install import install
+
+
+
+# define post install script that compiles aot functions
+class post_install(install):
+    def run(self):
+        install.run(self)
+        from subprocess import call
+        call(['python', 'solution.py'],
+             cwd=self.install_lib + 'aquacrop')
+
+# do not want to compile when uploading files to pypi
+# only want to compile when user installs package
+if "--nocompile" in sys.argv:
+    COMPILE = False
+    sys.argv.remove("--nocompile")
+    ins = {}
+else:
+    ins = {'install': post_install}
+
+
+
 
 # note: all settings are in settings.ini; edit there, not here
 config = ConfigParser(delimiters=["="])
@@ -32,7 +55,7 @@ py_versions = "2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 3.0 3.1 3.2 3.3 3.4 3.5 3.6 3.7 3
 requirements = [
     "numba==0.55.0",
     "numpy>=1.18.0,<1.22.0",
-    "pandas<=1.2.5",
+    "pandas",
     "pathlib",
     "matplotlib",
     "seaborn",
@@ -63,5 +86,6 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     zip_safe=False,
     entry_points={"console_scripts": cfg.get("console_scripts", "").split()},
+    cmdclass=ins,
     **setup_cfg
 )
