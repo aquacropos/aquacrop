@@ -24,5 +24,4 @@ nav:
     - Initialize: initialize.md
     - Solution: solution.md
     - Timestep: timestep.md
-    - Comparison: comparison.md
     - Lars: lars.md
