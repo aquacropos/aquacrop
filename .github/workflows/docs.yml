@@ -16,6 +16,7 @@ jobs:
       run: |
         pip install nbdev jupyter
         pip install -e .
+        python aquacrop/solution.py
         pip install mkdocs-material mkdocstrings mkdocs-jupyter
 
     - name: deploy docs
