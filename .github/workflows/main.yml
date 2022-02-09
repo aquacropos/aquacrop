@@ -13,11 +13,12 @@ jobs:
       run: |
         pip install nbdev jupyter
         pip install -e .
-    - name: check docs 
-      run: |
-        pip install mkdocs-material mkdocstrings mkdocs-jupyter
-        mkdocs build
     - name: tests 
       run: |
         python tests/test_time.py
-        
+    - name: check docs 
+      run: |
+        pip install nbdev jupyter
+        pip install -e .
+        pip install mkdocs-material mkdocstrings mkdocs-jupyter
+        mkdocs build        
