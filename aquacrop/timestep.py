@@ -11,9 +11,17 @@ import pandas as pd
 
 
 # compiled functions
-from .solution_aot import _growing_degree_day, _drainage, _root_zone_water, _rainfall_partition, \
-     _check_groundwater_table, _soil_evaporation,_root_development, _infiltration, \
-         _HIref_current_day, _biomass_accumulation
+from .solution_aot import (
+    _growing_degree_day, 
+    _drainage, 
+    _root_zone_water, 
+    _rainfall_partition, 
+    _check_groundwater_table, 
+    _soil_evaporation,
+    _root_development, 
+    _infiltration, 
+    _HIref_current_day, 
+    _biomass_accumulation)
 
 
 # Cell

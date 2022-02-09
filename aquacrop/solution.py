@@ -27,8 +27,7 @@ else:
     from .classes import *
 
 import numpy as np
-import pandas as pd
-from numba import njit, types, typed, float64, int64, f8, i8, b1
+from numba import njit, f8, i8, b1
 
 # from aquacrop.classes import InitCondStructType
 # InitCond_type_sig = InitCondStructType(fields=InitCond_spec)

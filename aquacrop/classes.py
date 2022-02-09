@@ -45,13 +45,10 @@ __all__ = [
 # Cell
 import numpy as np
 import pandas as pd
-from numba.experimental import jitclass
 from numba import float64, int64, boolean, types
 # from collections import namedtuple
 import typing
 
-from numba import njit
-from numba.experimental import structref
 
 # Cell
 class ClockStructClass:
