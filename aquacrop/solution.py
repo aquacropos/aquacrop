@@ -21,9 +21,9 @@ __all__ = [
 ]
 
 # Cell
-if __name__ == "__main__":
+try:
     from classes import *
-else:
+except:
     from .classes import *
 
 import numpy as np
