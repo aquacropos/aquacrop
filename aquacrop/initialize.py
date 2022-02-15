@@ -665,47 +665,6 @@ def compute_crop_calander(crop, ClockStruct, weather_df):
     # Calculate variables %%
     if Mode == 1:  # Growth in calendar days
 
-    #    # Time from sowing to end of vegatative growth period
-    #     if crop.Determinant == 1:
-    #         crop.CanopyDevEnd = round(crop.HIstart + (crop.Flowering / 2))
-    #     else:
-    #         crop.CanopyDevEnd = crop.Senescence
-
-    #     # Time from sowing to 10% canopy cover (non-stressed conditions)
-    #     crop.Canopy10Pct = round(crop.Emergence + (np.log(0.1 / crop.CC0) / crop.CGC))
-
-    #     # Time from sowing to maximum canopy cover (non-stressed conditions)
-    #     crop.MaxCanopy = round(
-    #         crop.Emergence
-    #         + (
-    #             np.log((0.25 * crop.CCx * crop.CCx / crop.CC0) / (crop.CCx - (0.98 * crop.CCx)))
-    #             / crop.CGC
-    #         )
-    #     )
-
-    #     # Time from sowing to end of yield formation
-    #     crop.HIend = crop.HIstart + crop.YldForm
-
-    #     # Duplicate calendar values (needed to minimise if statements when switching between GDD and CD runs)
-    #     crop.EmergenceCD = crop.Emergence
-    #     crop.Canopy10PctCD = crop.Canopy10Pct
-    #     crop.MaxRootingCD = crop.MaxRooting
-    #     crop.SenescenceCD = crop.Senescence
-    #     crop.MaturityCD = crop.Maturity
-    #     crop.MaxCanopyCD = crop.MaxCanopy
-    #     crop.CanopyDevEndCD = crop.CanopyDevEnd
-    #     crop.HIstartCD = crop.HIstart
-    #     crop.HIendCD = crop.HIend
-    #     crop.YldFormCD = crop.YldForm
-    #     if crop.CropType == 3:
-    #         crop.FloweringEnd = crop.HIstart + crop.Flowering
-    #         crop.FloweringEndCD = crop.FloweringEnd
-    #         crop.FloweringCD = crop.Flowering
-    #     else:
-    #         crop.FloweringEnd = -999
-    #         crop.FloweringEndCD = -999
-    #         crop.FloweringCD = -999
-
         # Time from sowing to end of vegatative growth period
         if crop.Determinant == 1:
             crop.CanopyDevEndCD = round(crop.HIstartCD + (crop.FloweringCD / 2))
