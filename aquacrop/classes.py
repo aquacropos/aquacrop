@@ -913,6 +913,13 @@ class CropClass:
             self.HarvestDate = HarvestDate  # Latest Harvest Date (mm/dd)
             # self.PlantingDate= '04/25'; self.HarvestDate= '08/30'
 
+            self.EmergenceCD = 15
+            self.MaxRootingCD = 50
+            self.SenescenceCD = 105
+            self.MaturityCD = 125
+            self.HIstartCD = 46
+            self.FloweringCD = -999
+            self.YldFormCD = 77
             self.Emergence = 15
             self.MaxRooting = 50
             self.Senescence = 105
@@ -942,6 +949,8 @@ class CropClass:
             self.CCx = 0.92
             self.CDC = 0.01884
             self.CGC = 0.126
+            self.CDC_CD = 0.01884
+            self.CGC_CD = 0.126
             self.Kcb = 1.1
             self.fage = 0.15
             self.WP = 18
@@ -1065,6 +1074,7 @@ class CropClass:
             "HIini",
             "bsted",
             "bface",
+            "Name",
             "CropType",
             "PlantMethod",
             "CalendarType",
@@ -1077,7 +1087,7 @@ class CropClass:
             "Maturity",
             "HIstart",
             "Flowering",
-            "YldForm",
+            "YldForm",            
             "GDDmethod",
             "Tbase",
             "Tupp",
@@ -1124,6 +1134,16 @@ class CropClass:
             "fshape_w2",
             "fshape_w3",
             "fshape_w4",
+            "CGC_CD",
+            "CDC_CD",
+            "EmergenceCD",
+            "MaxRootingCD",
+            "SenescenceCD",
+            "MaturityCD",
+            "HIstartCD",
+            "FloweringCD",
+            "YldFormCD",
+
         }
 
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in allowed_keys)
@@ -1507,6 +1527,8 @@ crop_spec = [
     ("CCx", float64),
     ("CDC", float64),
     ("CGC", float64),
+    ("CDC_CD", float64),
+    ("CGC_CD", float64),
     ("Kcb", float64),
     ("fage", float64),
     ("WP", float64),
@@ -1633,6 +1655,8 @@ class CropStruct(object):
         self.CCx = 0.96  # Maximum canopy cover (fraction of soil cover)
         self.CDC = 0.01  # Canopy decline coefficient (fraction per GDD/calendar day)
         self.CGC = 0.0125  # Canopy growth coefficient (fraction per GDD)
+        self.CDC_CD = 0.01  # Canopy decline coefficient (fraction per GDD/calendar day)
+        self.CGC_CD = 0.0125  # Canopy growth coefficient (fraction per GDD)
         self.Kcb = 1.05  # Crop coefficient when canopy growth is complete but prior to senescence
         self.fage = 0.3  #  Decline of crop coefficient due to ageing (%/day)
         self.WP = 33.7  # Water productivity normalized for ET0 and C02 (g/m2)
