@@ -49,7 +49,10 @@ from numba import float64, int64, boolean, types
 # from collections import namedtuple
 import typing
 
-from .crops.crop_params import crop_params
+try:
+    from .crops.crop_params import crop_params
+except:
+    from crops.crop_params import crop_params
 
 
 # Cell
