@@ -664,42 +664,43 @@ def compute_crop_calander(crop, ClockStruct, weather_df):
 
     # Calculate variables %%
     if Mode == 1:  # Growth in calendar days
+
         # Time from sowing to end of vegatative growth period
         if crop.Determinant == 1:
-            crop.CanopyDevEnd = round(crop.HIstart + (crop.Flowering / 2))
+            crop.CanopyDevEndCD = round(crop.HIstartCD + (crop.FloweringCD / 2))
         else:
-            crop.CanopyDevEnd = crop.Senescence
+            crop.CanopyDevEndCD = crop.SenescenceCD
 
         # Time from sowing to 10% canopy cover (non-stressed conditions)
-        crop.Canopy10Pct = round(crop.Emergence + (np.log(0.1 / crop.CC0) / crop.CGC))
+        crop.Canopy10PctCD = round(crop.EmergenceCD + (np.log(0.1 / crop.CC0) / crop.CGC_CD))
 
         # Time from sowing to maximum canopy cover (non-stressed conditions)
-        crop.MaxCanopy = round(
-            crop.Emergence
+        crop.MaxCanopyCD = round(
+            crop.EmergenceCD
             + (
                 np.log((0.25 * crop.CCx * crop.CCx / crop.CC0) / (crop.CCx - (0.98 * crop.CCx)))
-                / crop.CGC
+                / crop.CGC_CD
             )
         )
 
         # Time from sowing to end of yield formation
-        crop.HIend = crop.HIstart + crop.YldForm
+        crop.HIendCD = crop.HIstartCD + crop.YldFormCD
 
         # Duplicate calendar values (needed to minimise if statements when switching between GDD and CD runs)
-        crop.EmergenceCD = crop.Emergence
-        crop.Canopy10PctCD = crop.Canopy10Pct
-        crop.MaxRootingCD = crop.MaxRooting
-        crop.SenescenceCD = crop.Senescence
-        crop.MaturityCD = crop.Maturity
-        crop.MaxCanopyCD = crop.MaxCanopy
-        crop.CanopyDevEndCD = crop.CanopyDevEnd
-        crop.HIstartCD = crop.HIstart
-        crop.HIendCD = crop.HIend
-        crop.YldFormCD = crop.YldForm
+        crop.Emergence = crop.EmergenceCD
+        crop.Canopy10Pct = crop.Canopy10PctCD
+        crop.MaxRooting = crop.MaxRootingCD
+        crop.Senescence = crop.SenescenceCD
+        crop.Maturity = crop.MaturityCD
+        crop.MaxCanopy = crop.MaxCanopyCD
+        crop.CanopyDevEnd = crop.CanopyDevEndCD
+        crop.HIstart = crop.HIstartCD
+        crop.HIend = crop.HIendCD
+        crop.YldForm = crop.YldFormCD
         if crop.CropType == 3:
-            crop.FloweringEnd = crop.HIstart + crop.Flowering
-            crop.FloweringEndCD = crop.FloweringEnd
-            crop.FloweringCD = crop.Flowering
+            crop.FloweringEndCD = crop.HIstartCD + crop.FloweringCD
+            # crop.FloweringEndCD = crop.FloweringEnd
+            # crop.FloweringCD = crop.Flowering
         else:
             crop.FloweringEnd = -999
             crop.FloweringEndCD = -999
@@ -776,13 +777,13 @@ def compute_crop_calander(crop, ClockStruct, weather_df):
                 crop.Flowering = crop.FloweringEnd - crop.HIstart
 
             # Convert CGC to GDD mode
-            crop.CGC_CD = crop.CGC
+            # crop.CGC_CD = crop.CGC
             crop.CGC = (
                 np.log((((0.98 * crop.CCx) - crop.CCx) * crop.CC0) / (-0.25 * (crop.CCx ** 2)))
             ) / (-(crop.MaxCanopy - crop.Emergence))
 
             # Convert CDC to GDD mode
-            crop.CDC_CD = crop.CDC
+            # crop.CDC_CD = crop.CDC
             tCD = crop.MaturityCD - crop.SenescenceCD
             if tCD <= 0:
                 tCD = 1
@@ -799,6 +800,12 @@ def compute_crop_calander(crop, ClockStruct, weather_df):
             # Set calendar type to GDD mode
             crop.CalendarType = 2
 
+        else:
+            crop.CDC = crop.CDC_CD
+            crop.CGC = crop.CGC_CD
+            
+
+        # print(crop.__dict__)
     elif Mode == 2:
         # Growth in growing degree days
         # Time from sowing to end of vegatative growth period

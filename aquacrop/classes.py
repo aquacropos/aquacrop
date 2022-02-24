@@ -49,6 +49,11 @@ from numba import float64, int64, boolean, types
 # from collections import namedtuple
 import typing
 
+try:
+    from .crops.crop_params import crop_params
+except:
+    from crops.crop_params import crop_params
+
 
 # Cell
 class ClockStructClass:
@@ -715,7 +720,7 @@ class CropClass:
 
     def __init__(self, c_name, PlantingDate, HarvestDate=None, **kwargs):
 
-        self.Name = ""
+        self.Name = c_name
 
         # Assign default program properties (should not be changed without expert knowledge)
 
@@ -740,316 +745,24 @@ class CropClass:
         self.bsted = 0.000138  # WP co2 adjustment parameter given by Steduto et al. 2007
         self.bface = 0.001165  # WP co2 adjustment parameter given by FACE experiments
 
-        if c_name == "Maize":
+        if c_name == "custom":
 
-            self.Name = "Maize"
-
-            # added in Read_Model_Paramaters
-            self.CropType = 3  # Crop Type (1 = Leafy vegetable, 2 = Root/tuber, 3 = Fruit/grain)
-            self.PlantMethod = 1  # Planting method (0 = Transplanted, 1 =  Sown)
-            self.CalendarType = 2  # Calendar Type (1 = Calendar days, 2 = Growing degree days)
-            self.SwitchGDD = 0  # Convert calendar to GDD mode if inputs are given in calendar days (0 = No; 1 = Yes)
-
-            self.PlantingDate = PlantingDate  # Planting Date (mm/dd)
-            self.HarvestDate = HarvestDate  # Latest Harvest Date (mm/dd)
-
-            self.Emergence = (
-                80  # Growing degree/Calendar days from sowing to emergence/transplant recovery
-            )
-            self.MaxRooting = 1420  # Growing degree/Calendar days from sowing to maximum rooting
-            self.Senescence = 1420  # Growing degree/Calendar days from sowing to senescence
-            self.Maturity = 1670  # Growing degree/Calendar days from sowing to maturity
-            self.HIstart = (
-                850  # Growing degree/Calendar days from sowing to start of yield formation
-            )
-            self.Flowering = 190  # Duration of flowering in growing degree/calendar days (-999 for non-fruit/grain crops)
-            self.YldForm = 775  # Duration of yield formation in growing degree/calendar days
-            self.GDDmethod = 2  # Growing degree day calculation method
-            self.Tbase = 8  # Base temperature (degC) below which growth does not progress
-            self.Tupp = (
-                30  # Upper temperature (degC) above which crop development no longer increases
-            )
-            self.PolHeatStress = 1  # Pollination affected by heat stress (0 = No, 1 = Yes)
-            self.Tmax_up = (
-                40  # Maximum air temperature (degC) above which pollination begins to fail
-            )
-            self.Tmax_lo = (
-                45  # Maximum air temperature (degC) at which pollination completely fails
-            )
-            self.PolColdStress = 1  # Pollination affected by cold stress (0 = No, 1 = Yes)
-            self.Tmin_up = (
-                10  # Minimum air temperature (degC) below which pollination begins to fail
-            )
-            self.Tmin_lo = 5  # Minimum air temperature (degC) at which pollination completely fails
-            self.TrColdStress = (
-                1  # Transpiration affected by cold temperature stress (0 = No, 1 = Yes)
-            )
-            self.GDD_up = 12  # Minimum growing degree days (degC/day) required for full crop transpiration potential
-            self.GDD_lo = 0  # Growing degree days (degC/day) at which no crop transpiration occurs
-            self.Zmin = 0.3  # Minimum effective rooting depth (m)
-            self.Zmax = 1.7  # Maximum rooting depth (m)
-            self.fshape_r = 1.3  # Shape factor describing root expansion
-            self.SxTopQ = (
-                0.0480  # Maximum root water extraction at top of the root zone (m3/m3/day)
-            )
-            self.SxBotQ = (
-                0.0117  # Maximum root water extraction at the bottom of the root zone (m3/m3/day)
-            )
-            self.SeedSize = (
-                6.5  # Soil surface area (cm2) covered by an individual seedling at 90% emergence
-            )
-            self.PlantPop = 75_000  # Number of plants per hectare
-            self.CCx = 0.96  # Maximum canopy cover (fraction of soil cover)
-            self.CDC = 0.01  # Canopy decline coefficient (fraction per GDD/calendar day)
-            self.CGC = 0.0125  # Canopy growth coefficient (fraction per GDD)
-            self.Kcb = (
-                1.05  # Crop coefficient when canopy growth is complete but prior to senescence
-            )
-            self.fage = 0.3  #  Decline of crop coefficient due to ageing (%/day)
-            self.WP = 33.7  # Water productivity normalized for ET0 and C02 (g/m2)
-            self.WPy = 100  # Adjustment of water productivity in yield formation stage (% of WP)
-            self.fsink = (
-                0.5  # Crop performance under elevated atmospheric CO2 concentration (%/100)
-            )
-            self.HI0 = 0.48  # Reference harvest index
-            self.dHI_pre = (
-                0  # Possible increase of harvest index due to water stress before flowering (%)
-            )
-            self.a_HI = 7  # Coefficient describing positive impact on harvest index of restricted vegetative growth during yield formation
-            self.b_HI = 3  # Coefficient describing negative impact on harvest index of stomatal closure during yield formation
-            self.dHI0 = 15  # Maximum allowable increase of harvest index above reference value
-            self.Determinant = 1  # Crop Determinancy (0 = Indeterminant, 1 = Determinant)
-            self.exc = 50  # Excess of potential fruits
-            self.p_up1 = 0.14  # Upper soil water depletion threshold for water stress effects on affect canopy expansion
-            self.p_up2 = 0.69  # Upper soil water depletion threshold for water stress effects on canopy stomatal control
-            self.p_up3 = 0.69  # Upper soil water depletion threshold for water stress effects on canopy senescence
-            self.p_up4 = 0.8  # Upper soil water depletion threshold for water stress effects on canopy pollination
-            self.p_lo1 = 0.72  # Lower soil water depletion threshold for water stress effects on canopy expansion
-            self.p_lo2 = 1  # Lower soil water depletion threshold for water stress effects on canopy stomatal control
-            self.p_lo3 = 1  #  Lower soil water depletion threshold for water stress effects on canopy senescence
-            self.p_lo4 = 1  # Lower soil water depletion threshold for water stress effects on canopy pollination
-            self.fshape_w1 = 2.9  # Shape factor describing water stress effects on canopy expansion
-            self.fshape_w2 = 6  # Shape factor describing water stress effects on stomatal control
-            self.fshape_w3 = (
-                2.7  # Shape factor describing water stress effects on canopy senescence
-            )
-            self.fshape_w4 = 1  # Shape factor describing water stress effects on pollination
-
-        elif c_name == "Wheat":
-
-            self.Name = "Wheat"
-
-            self.CropType = 3
-            self.PlantMethod = 1
-            self.CalendarType = 2
-            self.SwitchGDD = 0
-            self.PlantingDate = PlantingDate  # Planting Date (mm/dd)
-            self.HarvestDate = HarvestDate  # Latest Harvest Date (mm/dd)
-            # self.PlantingDate= '10/15'; self.HarvestDate= '05/30'
-
-            self.Emergence = 150
-            self.MaxRooting = 864
-            self.Senescence = 1700
-            self.Maturity = 2400
-            self.HIstart = 1250
-            self.Flowering = 200
-            self.YldForm = 1100
-            self.GDDmethod = 3
-            self.Tbase = 0
-            self.Tupp = 26
-            self.PolHeatStress = 1
-            self.Tmax_up = 35
-            self.Tmax_lo = 40
-            self.PolColdStress = 1
-            self.Tmin_up = 5
-            self.Tmin_lo = 0
-            self.TrColdStress = 1
-            self.GDD_up = 14
-            self.GDD_lo = 0
-            self.Zmin = 0.3
-            self.Zmax = 1.5
-            self.fshape_r = 1.5
-            self.SxTopQ = 0.0480
-            self.SxBotQ = 0.012
-            self.SeedSize = 1.5
-            self.PlantPop = 4_500_000
-            self.CCx = 0.96
-            self.CDC = 0.004
-            self.CGC = 0.005001
-            self.Kcb = 1.1
-            self.fage = 0.15
-            self.WP = 15
-            self.WPy = 100
-            self.fsink = 0.5
-            self.HI0 = 0.48
-            self.dHI_pre = 5
-            self.a_HI = 10
-            self.b_HI = 7
-            self.dHI0 = 15
-            self.Determinant = 1
-            self.exc = 100
-            self.p_up1 = 0.2
-            self.p_up2 = 0.65
-            self.p_up3 = 0.7
-            self.p_up4 = 0.85
-            self.p_lo1 = 0.65
-            self.p_lo2 = 1
-            self.p_lo3 = 1
-            self.p_lo4 = 1
-            self.fshape_w1 = 5.0
-            self.fshape_w2 = 2.5
-            self.fshape_w3 = 2.5
-            self.fshape_w4 = 1.0
-
-        elif c_name == "Potato":
-
-            self.Name = "Potato"
-
-            self.CropType = 2
-            self.PlantMethod = 0
-            self.CalendarType = 1
-            self.SwitchGDD = 0
-            self.PlantingDate = PlantingDate  # Planting Date (mm/dd)
-            self.HarvestDate = HarvestDate  # Latest Harvest Date (mm/dd)
-            # self.PlantingDate= '04/25'; self.HarvestDate= '08/30'
-
-            self.Emergence = 15
-            self.MaxRooting = 50
-            self.Senescence = 105
-            self.Maturity = 125
-            self.HIstart = 46
-            self.Flowering = -999
-            self.YldForm = 77
-            self.GDDmethod = 3
-            self.Tbase = 2
-            self.Tupp = 26
-            self.PolHeatStress = 0
-            self.Tmax_up = -999
-            self.Tmax_lo = -999
-            self.PolColdStress = 0
-            self.Tmin_up = -999
-            self.Tmin_lo = -999
-            self.TrColdStress = 1
-            self.GDD_up = 7
-            self.GDD_lo = 0
-            self.Zmin = 0.3
-            self.Zmax = 0.6
-            self.fshape_r = 1.5
-            self.SxTopQ = 0.0480
-            self.SxBotQ = 0.012
-            self.SeedSize = 15
-            self.PlantPop = 40_000
-            self.CCx = 0.92
-            self.CDC = 0.01884
-            self.CGC = 0.126
-            self.Kcb = 1.1
-            self.fage = 0.15
-            self.WP = 18
-            self.WPy = 100
-            self.fsink = 0.5
-            self.HI0 = 0.85
-            self.dHI_pre = 2
-            self.a_HI = 0
-            self.b_HI = 10
-            self.dHI0 = 5
-            self.Determinant = 0
-            self.exc = 0
-            self.p_up1 = 0.2
-            self.p_up2 = 0.6
-            self.p_up3 = 0.7
-            self.p_up4 = 0.8
-            self.p_lo1 = 0.6
-            self.p_lo2 = 1
-            self.p_lo3 = 1
-            self.p_lo4 = 1
-            self.fshape_w1 = 3.0
-            self.fshape_w2 = 3
-            self.fshape_w3 = 3
-            self.fshape_w4 = 0
-
-        elif c_name == "Rice":
-
-            self.Name = "Rice"
-
-            self.CropType = 3
-            self.PlantMethod = 0
-            self.CalendarType = 2
-            self.SwitchGDD = 0
-            self.PlantingDate = PlantingDate  # Planting Date (mm/dd)
-            self.HarvestDate = HarvestDate  # Latest Harvest Date (mm/dd)
-            # self.PlantingDate= '08/01'; self.HarvestDate= '11/30'
-
-            self.Emergence = 102
-            self.MaxRooting = 381
-            self.Senescence = 1450
-            self.Maturity = 1707
-            self.HIstart = 1088
-            self.Flowering = 318
-            self.YldForm = 577
-            self.GDDmethod = 3
-            self.Tbase = 8
-            self.Tupp = 30
-            self.PolHeatStress = 1
-            self.Tmax_up = 35
-            self.Tmax_lo = 40
-            self.PolColdStress = 1
-            self.Tmin_up = 8
-            self.Tmin_lo = 3
-            self.TrColdStress = 1
-            self.GDD_up = 10
-            self.GDD_lo = 0
-            self.Zmin = 0.3
-            self.Zmax = 0.5
-            self.fshape_r = 2.5
-            self.SxTopQ = 0.0480
-            self.SxBotQ = 0.012
-            self.SeedSize = 6
-            self.PlantPop = 1_000_000
-            self.CCx = 0.95
-            self.CDC = 0.006172
-            self.CGC = 0.006163
-            self.Kcb = 1.1
-            self.fage = 0.15
-            self.WP = 19
-            self.WPy = 100
-            self.fsink = 0.5
-            self.HI0 = 0.43
-            self.dHI_pre = 0
-            self.a_HI = 10
-            self.b_HI = 7
-            self.dHI0 = 15
-            self.Determinant = 1
-            self.exc = 100
-            self.p_up1 = 0
-            self.p_up2 = 0.5
-            self.p_up3 = 0.55
-            self.p_up4 = 0.75
-            self.p_lo1 = 0.4
-            self.p_lo2 = 1
-            self.p_lo3 = 1
-            self.p_lo4 = 1
-            self.fshape_w1 = 3.0
-            self.fshape_w2 = 3
-            self.fshape_w3 = 3
-            self.fshape_w4 = 2.7
-
-            # no aeration stress for rice
-            self.Aer = -1e10
-            self.LagAer = 1e10
-
-        elif c_name == "custom":
-            # temporary solution for new crops
-            # if using this ensure that all paramaters in 'allowed_keys'
-            # are passed in as arguments at initialization
-
-            self.PlantingDate = PlantingDate  # Planting Date (mm/dd)
-            self.HarvestDate = HarvestDate  # Latest Harvest Date (mm/dd)
             self.Name = "custom"
+            self.PlantingDate = PlantingDate  # Planting Date (mm/dd)
+            self.HarvestDate = HarvestDate  # Latest Harvest Date (mm/dd)
+
+        
+        elif c_name in crop_params.keys():
+            self.__dict__.update((k, v) for k, v in crop_params[c_name].items())
+            self.PlantingDate = PlantingDate  # Planting Date (mm/dd)
+            self.HarvestDate = HarvestDate  # Latest Harvest Date (mm/dd)
 
         else:
-            assert 1 == 2, "wrong crop name"
+            assert c_name in crop_params.keys(), f"Crop name not defined in crop_params dictionary, \
+        if defining a custom crop please use crop name 'custom'. Otherwise use one of the \
+        pre-defined crops: {crop_params.keys()}"
 
-        # set any paramaters specified by user
+        # overide any pre-defined paramater with any passed by the user
         allowed_keys = {
             "fshape_b",
             "PctZmin",
@@ -1065,6 +778,7 @@ class CropClass:
             "HIini",
             "bsted",
             "bface",
+            "Name",
             "CropType",
             "PlantMethod",
             "CalendarType",
@@ -1077,7 +791,7 @@ class CropClass:
             "Maturity",
             "HIstart",
             "Flowering",
-            "YldForm",
+            "YldForm",            
             "GDDmethod",
             "Tbase",
             "Tupp",
@@ -1124,6 +838,16 @@ class CropClass:
             "fshape_w2",
             "fshape_w3",
             "fshape_w4",
+            "CGC_CD",
+            "CDC_CD",
+            "EmergenceCD",
+            "MaxRootingCD",
+            "SenescenceCD",
+            "MaturityCD",
+            "HIstartCD",
+            "FloweringCD",
+            "YldFormCD",
+
         }
 
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in allowed_keys)
@@ -1507,6 +1231,8 @@ crop_spec = [
     ("CCx", float64),
     ("CDC", float64),
     ("CGC", float64),
+    ("CDC_CD", float64),
+    ("CGC_CD", float64),
     ("Kcb", float64),
     ("fage", float64),
     ("WP", float64),
@@ -1633,6 +1359,8 @@ class CropStruct(object):
         self.CCx = 0.96  # Maximum canopy cover (fraction of soil cover)
         self.CDC = 0.01  # Canopy decline coefficient (fraction per GDD/calendar day)
         self.CGC = 0.0125  # Canopy growth coefficient (fraction per GDD)
+        self.CDC_CD = 0.01  # Canopy decline coefficient (fraction per GDD/calendar day)
+        self.CGC_CD = 0.0125  # Canopy growth coefficient (fraction per GDD)
         self.Kcb = 1.05  # Crop coefficient when canopy growth is complete but prior to senescence
         self.fage = 0.3  #  Decline of crop coefficient due to ageing (%/day)
         self.WP = 33.7  # Water productivity normalized for ET0 and C02 (g/m2)
