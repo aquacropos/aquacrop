@@ -18,6 +18,7 @@ nav:
     - Estimating Irrigation Demand: notebooks/AquaCrop_OSPy_Notebook_2.ipynb
     - Optimizing Irrigation: notebooks/AquaCrop_OSPy_Notebook_3.ipynb
     - Climate Change Impacts: notebooks/AquaCrop_OSPy_Notebook_4.ipynb
+    - Comparison with AquaCrop Windows: notebooks/05_comparison.ipynb
   - API:
     - Core: core.md
     - Classes: classes.md
