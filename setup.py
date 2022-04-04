@@ -54,7 +54,7 @@ py_versions = "3.4 3.5 3.6 3.7 3.8".split()
 
 requirements = [
     "numba==0.55.0",
-    "numpy>=1.18.0,<=1.22.3",
+    "numpy>=1.18.0,<1.22",
     "pandas>=1.4.0",
     "matplotlib",
     "seaborn",
