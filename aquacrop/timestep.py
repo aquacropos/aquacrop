@@ -387,6 +387,11 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
     #     Soil.Profile, NewCond.Zroot, NewCond.th, Soil.zTop, float(Crop.Zmin), Crop.Aer
     # )
 
+    #calculation of wrsto and wrsen
+    p_sto, p_sen = water_stressp(Crop,NewCond,_Dr.Rz,_TAW.Rz,Et0,Crop.beta)
+    Wrsto=(Wr+_Dr.Rz)-_TAW.Rz*p_sto
+    Wrsen =(Wr+_Dr.Rz)- _TAW.Rz * p_sen
+
     # 20. Update net irrigation to add any pre irrigation
     IrrNet = IrrNet + PreIrr
     NewCond.IrrNetCum = NewCond.IrrNetCum + PreIrr
@@ -435,6 +440,8 @@ def solution(InitCond, ParamStruct, ClockStruct, weather_step, Outputs):
         EsPot,
         Tr,
         P,
+        Wrsto,
+        Wrsen
     ]
 
     # Crop growth
@@ -837,6 +844,8 @@ def update_time(ClockStruct, InitCond, ParamStruct, Outputs, weather):
                 "EsPot",
                 "Tr",
                 "P",
+                "Wrsto",
+                "Wrsen"
             ],
         )
 

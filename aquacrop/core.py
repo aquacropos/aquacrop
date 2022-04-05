@@ -176,7 +176,7 @@ class AquaCropModel:
 
         Outputs = OutputClass()
         Outputs.Water = np.zeros((len(self.ClockStruct.TimeSpan), 3 + len(self.InitCond.th)))
-        Outputs.Flux = np.zeros((len(self.ClockStruct.TimeSpan), 16))
+        Outputs.Flux = np.zeros((len(self.ClockStruct.TimeSpan), 18))
         Outputs.Growth = np.zeros((len(self.ClockStruct.TimeSpan), 13))
         Outputs.Final = pd.DataFrame(
             columns=[
