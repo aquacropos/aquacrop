@@ -7,4 +7,5 @@ include aquacrop/data/*.dat
 include aquacrop/data/*.st
 include aquacrop/data/*.OUT
 include aquacrop/data/*.csv
+include aquacrop/scripts/*
 recursive-exclude * __pycache__
