@@ -1,3 +1,0 @@
-# initialize
-
-::: aquacrop.initialize

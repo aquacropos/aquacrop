@@ -1,3 +1,0 @@
-# timestep
-
-::: aquacrop.timestep
