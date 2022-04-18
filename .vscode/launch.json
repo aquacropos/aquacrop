@@ -1,0 +1,44 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: AQUACROP MODEL",
+      "python": "${workspaceFolder}/venv/bin/python3",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/aquarasp.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Python Test: AQUACROP MODEL",
+      "python": "${workspaceFolder}/venv/bin/python3",
+      "type": "python",
+      "request": "launch",
+      "module": "unittest",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "DEVELOPMENT": "TRUE"
+      }
+    },
+    {
+      "name": "Python Speed Test: AQUACROP MODEL",
+      "python": "${workspaceFolder}/venv/bin/python3",
+      "type": "python",
+      "request": "launch",
+      "module": "unittest",
+      "args": [
+        "${workspaceFolder}/test/test_speed.py",
+       ],
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "DEVELOPMENT": "TRUE"
+      }
+    }
+  ]
+}
