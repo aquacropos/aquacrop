@@ -5,15 +5,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: AQUACROP MODEL",
-      "python": "${workspaceFolder}/venv/bin/python3",
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/src/aquarasp.py",
-      "console": "integratedTerminal",
-      "justMyCode": true
-    },
-    {
       "name": "Python Test: AQUACROP MODEL",
       "python": "${workspaceFolder}/venv/bin/python3",
       "type": "python",
