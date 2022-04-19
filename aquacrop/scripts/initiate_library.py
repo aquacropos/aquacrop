@@ -1,14 +1,13 @@
 from subprocess import call
 
-
 call(["python", "-m", "aquacrop.solution.water_stress"])
 call(["python", "-m", "aquacrop.solution.evap_layer_water_content"])
 call(["python", "-m", "aquacrop.solution.root_zone_water"])
 call(["python", "-m", "aquacrop.solution.cc_development"])
-call(["python" ,"-m", "aquacrop.solution.update_CCx_CDC"])
-call(["python" ,"-m", "aquacrop.solution.cc_required_time"])
-call(["python" ,"-m", "aquacrop.solution.aeration_stress"])
-call(["python" ,"-m", "aquacrop.solution.HIadj_pre_anthesis"])
+call(["python", "-m", "aquacrop.solution.update_CCx_CDC"])
+call(["python", "-m", "aquacrop.solution.cc_required_time"])
+call(["python", "-m", "aquacrop.solution.aeration_stress"])
+call(["python", "-m", "aquacrop.solution.HIadj_pre_anthesis"])
 call(["python", "-m", "aquacrop.solution.HIadj_post_anthesis"])
 call(["python", "-m", "aquacrop.solution.HIadj_pollination"])
 call(["python", "-m", "aquacrop.solution.growing_degree_day"])

@@ -7,13 +7,13 @@ import numpy as np
 import pandas as pd
 
 
-from .scripts.checkIfPackageIsCompiled import compileLibrary
+from .scripts.checkIfPackageIsCompiled import compile_all_AOT_files
 
 # Important: This code is necessary to check if the AOT files are compiled.
 if os.getenv("DEVELOPMENT"):
     print("Running the simulation in development mode.")
 else:
-    compileLibrary()
+    compile_all_AOT_files()
 
 # pylint: disable=wrong-import-position
 
