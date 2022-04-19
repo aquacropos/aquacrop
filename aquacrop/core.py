@@ -1,3 +1,6 @@
+"""
+This file contains the AquacropModel class that runs the simulation.
+"""
 import os
 
 import numpy as np
@@ -11,6 +14,8 @@ if os.getenv("DEVELOPMENT"):
     print("Running the simulation in development mode.")
 else:
     compileLibrary()
+
+# pylint: disable=wrong-import-position
 
 from . import data
 from .entities.fieldManagement import FieldMngt
@@ -65,12 +70,7 @@ def prepare_weather(weather_file_path):
     the weather data
 
     *Arguments:*\n
-
-    `FileLocations` : `FileLocationsClass`:  input File Locations
-
     `weather_file_path` : `str` :  file location of weather data
-
-
 
     *Returns:*
 
@@ -105,7 +105,21 @@ class AquaCropModel:
 
     This is the main class of the AquaCrop model.
     It is in charge of executing all the operations.
-
+    
+    *Arguments:*\n
+    `sim_start_time` : `date YYYY/MM/DD` : Simulation start date
+    `sim_end_time` : `date YYYY/MM/DD` : Simulation end date
+    `weather_df`: `pandas.DataFrame` : Weather data (TODO: SPECIFY DATA TYPE)
+    `soil`: `Soil Object `: Soil object contains paramaters and variables of the soil used in the simulation
+    `crop`: `Crop Object`: Crop object contains Paramaters and variables of the crop used in the simulation
+    `initial_water_content`: `InitialWaterContent Object` : Defines water content at start of sim
+    `irrigation_management`: `IrrigationManagement Object`: Defines irrigation strategy
+    `field_management`: `FieldMngt Obj : Defines field management options`
+    `fallow_field_management`: TODO: Define it.
+    `groundwater`: `GroundWater object`: Stores information on water table params
+    `planting_dates`: TODO: This is not used.
+    `harvest_dates`:  TODO: This is not used.
+    `co2_concentration`: `CO2 object`: Defines CO2 concentrations
     """
 
     def __init__(
@@ -157,15 +171,11 @@ class AquaCropModel:
         self.outputs = None
         self.weather = None
 
-        # if initial_water_content == None:  self.initial_water_content = InitWCClass();
-
     def _initialize(
         self,
     ):
         """
-        Initialize variables
-
-
+        Initialise all model variables
         """
 
         # define model runtime
@@ -209,33 +219,24 @@ class AquaCropModel:
 
         self.param_struct = create_soil_profile(self.param_struct)
 
-        # self.init_cond.param_struct = self.param_struct
-
-        outputs = Output()
-        outputs.water_storage = np.zeros(
-            (len(self.clock_struct.time_span), 3 + len(self.init_cond.th))
-        )
-        outputs.water_flux = np.zeros((len(self.clock_struct.time_span), 16))
-        outputs.crop_growth = np.zeros((len(self.clock_struct.time_span), 13))
-        outputs.final_stats = pd.DataFrame(
-            columns=[
-                "Season",
-                "crop Type",
-                "Harvest Date (YYYY/MM/DD)",
-                "Harvest Date (Step)",
-                "Yield (tonne/ha)",
-                "Seasonal irrigation (mm)",
-            ]
-        )
-
-        self.outputs = outputs
-
+        # Outputs results (water_flux, crop_growth, final_stats)
+        self.outputs = Output(self.clock_struct.time_span, self.init_cond.th)
+        
         # save model weather to init_cond
         self.weather = self.weather_df.values
 
     def run_model(self, num_steps=1, till_termination=False):
         """
-        This function run all time steps until the termination
+        This function is responsible for executing the model.
+        
+        *Arguments:*\n
+        `num_steps`: `int` : Number of stepts (Days) to be executed.
+        `till_termination`: `boolean` : Run the simulation to completion
+        
+        *Returns:*
+        Dictionary:
+        `finished`: `boolean`: Informs if the simulation is finished
+        `results`: `Output object`: All results of the simulation
         """
 
         self._initialize()
