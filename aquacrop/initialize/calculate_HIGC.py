@@ -1,7 +1,11 @@
 import numpy as np
 
 
-def calculate_HIGC(crop):
+def calculate_HIGC(
+    crop_YldFormCD,
+    crop_HI0,
+    crop_HIini,
+):
     """
     Function to calculate harvest index growth coefficient
 
@@ -18,19 +22,19 @@ def calculate_HIGC(crop):
     """
     # Determine HIGC
     # Total yield formation days
-    tHI = crop.YldFormCD
+    tHI = crop_YldFormCD
     # Iteratively estimate HIGC
     HIGC = 0.001
     HIest = 0
-    while HIest <= (0.98 * crop.HI0):
+    while HIest <= (0.98 * crop_HI0):
         HIGC = HIGC + 0.001
-        HIest = (crop.HIini * crop.HI0) / (
-            crop.HIini + (crop.HI0 - crop.HIini) * np.exp(-HIGC * tHI)
+        HIest = (crop_HIini * crop_HI0) / (
+            crop_HIini + (crop_HI0 - crop_HIini) * np.exp(-HIGC * tHI)
         )
 
-    if HIest >= crop.HI0:
+    if HIest >= crop_HI0:
         HIGC = HIGC - 0.001
 
-    crop.HIGC = HIGC
+    crop_HIGC = HIGC
 
-    return crop
+    return crop_HIGC

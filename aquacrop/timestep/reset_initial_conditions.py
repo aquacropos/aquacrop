@@ -217,12 +217,16 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
             crop.FloweringCD = -999
 
         # Update harvest index growth coefficient
-        crop = calculate_HIGC(crop)
+        crop.HIGC = calculate_HIGC(
+            crop.YldFormCD,
+            crop.HI0,
+            crop.HIini,
+        )
 
         # Update day to switch to linear HI build-up
         if crop.CropType == 3:
             # Determine linear switch point and HIGC rate for fruit/grain crops
-           crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
+            crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
                 crop.YldFormCD, crop.HIini, crop.HI0, crop.HIGC
             )
 

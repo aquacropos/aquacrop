@@ -82,7 +82,11 @@ def compute_variables(
         crop = compute_crop_calendar(crop, clock_struct, weather_df)
 
         # Harvest index param_struct.Seasonal_Crop_List[clock_struct.season_counter].Paramsgrowth coefficient
-        crop = calculate_HIGC(crop)
+        crop.HIGC = calculate_HIGC(
+            crop.YldFormCD,
+            crop.HI0,
+            crop.HIini,
+        )
 
         # Days to linear HI switch point
         if crop.CropType == 3:
