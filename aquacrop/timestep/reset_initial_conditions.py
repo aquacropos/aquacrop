@@ -34,7 +34,7 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
 
     # Extract structures for updating
     Soil = ParamStruct.Soil
-    Crop = ParamStruct.Seasonal_Crop_List[ClockStruct.season_counter]
+    crop = ParamStruct.Seasonal_Crop_List[ClockStruct.season_counter]
     FieldMngt = ParamStruct.FieldMngt
     CO2 = ParamStruct.CO2
     CO2_data = ParamStruct.CO2data
@@ -127,23 +127,23 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
         1
         + (CO2conc - CO2ref)
         * (
-            (1 - fw) * Crop.bsted
-            + fw * ((Crop.bsted * Crop.fsink) + (Crop.bface * (1 - Crop.fsink)))
+            (1 - fw) * crop.bsted
+            + fw * ((crop.bsted * crop.fsink) + (crop.bface * (1 - crop.fsink)))
         )
     )
 
     # Consider crop type
-    if Crop.WP >= 40:
+    if crop.WP >= 40:
         # No correction for C4 crops
         ftype = 0
-    elif Crop.WP <= 20:
+    elif crop.WP <= 20:
         # Full correction for C3 crops
         ftype = 1
     else:
-        ftype = (40 - Crop.WP) / (40 - 20)
+        ftype = (40 - crop.WP) / (40 - 20)
 
     # Total adjustment
-    Crop.fCO2 = 1 + ftype * (fCO2 - 1)
+    crop.fCO2 = 1 + ftype * (fCO2 - 1)
 
     # Reset soil water conditions (if not running off-season)
     if ClockStruct.sim_off_season is False:
@@ -158,7 +158,7 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
             InitCond.SurfaceStorage = 0
 
     # Update crop parameters (if in GDD mode)
-    if Crop.CalendarType == 2:
+    if crop.CalendarType == 2:
         # Extract weather data for upcoming growing season
         weather_df = weather[
             weather[:, 4] >= ClockStruct.planting_dates[ClockStruct.season_counter]
@@ -168,69 +168,71 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
         Tmax = weather_df[:, 1]
 
         # Calculate GDD's
-        if Crop.GDDmethod == 1:
+        if crop.GDDmethod == 1:
             Tmean = (Tmax + Tmin) / 2
-            Tmean[Tmean > Crop.Tupp] = Crop.Tupp
-            Tmean[Tmean < Crop.Tbase] = Crop.Tbase
-            GDD = Tmean - Crop.Tbase
-        elif Crop.GDDmethod == 2:
-            Tmax[Tmax > Crop.Tupp] = Crop.Tupp
-            Tmax[Tmax < Crop.Tbase] = Crop.Tbase
-            Tmin[Tmin > Crop.Tupp] = Crop.Tupp
-            Tmin[Tmin < Crop.Tbase] = Crop.Tbase
+            Tmean[Tmean > crop.Tupp] = crop.Tupp
+            Tmean[Tmean < crop.Tbase] = crop.Tbase
+            GDD = Tmean - crop.Tbase
+        elif crop.GDDmethod == 2:
+            Tmax[Tmax > crop.Tupp] = crop.Tupp
+            Tmax[Tmax < crop.Tbase] = crop.Tbase
+            Tmin[Tmin > crop.Tupp] = crop.Tupp
+            Tmin[Tmin < crop.Tbase] = crop.Tbase
             Tmean = (Tmax + Tmin) / 2
-            GDD = Tmean - Crop.Tbase
-        elif Crop.GDDmethod == 3:
-            Tmax[Tmax > Crop.Tupp] = Crop.Tupp
-            Tmax[Tmax < Crop.Tbase] = Crop.Tbase
-            Tmin[Tmin > Crop.Tupp] = Crop.Tupp
+            GDD = Tmean - crop.Tbase
+        elif crop.GDDmethod == 3:
+            Tmax[Tmax > crop.Tupp] = crop.Tupp
+            Tmax[Tmax < crop.Tbase] = crop.Tbase
+            Tmin[Tmin > crop.Tupp] = crop.Tupp
             Tmean = (Tmax + Tmin) / 2
-            Tmean[Tmean < Crop.Tbase] = Crop.Tbase
-            GDD = Tmean - Crop.Tbase
+            Tmean[Tmean < crop.Tbase] = crop.Tbase
+            GDD = Tmean - crop.Tbase
 
         GDDcum = np.cumsum(GDD)
 
         assert (
-            GDDcum[-1] > Crop.Maturity
-        ), f"not enough growing degree days in simulation ({GDDcum[-1]}) to reach maturity ({Crop.Maturity})"
+            GDDcum[-1] > crop.Maturity
+        ), f"not enough growing degree days in simulation ({GDDcum[-1]}) to reach maturity ({crop.Maturity})"
 
-        Crop.MaturityCD = np.argmax((GDDcum > Crop.Maturity)) + 1
+        crop.MaturityCD = np.argmax((GDDcum > crop.Maturity)) + 1
 
-        assert Crop.MaturityCD < 365, "crop will take longer than 1 year to mature"
+        assert crop.MaturityCD < 365, "crop will take longer than 1 year to mature"
 
         # 1. GDD's from sowing to maximum canopy cover
-        Crop.MaxCanopyCD = (GDDcum > Crop.MaxCanopy).argmax() + 1
+        crop.MaxCanopyCD = (GDDcum > crop.MaxCanopy).argmax() + 1
         # 2. GDD's from sowing to end of vegetative growth
-        Crop.CanopyDevEndCD = (GDDcum > Crop.CanopyDevEnd).argmax() + 1
+        crop.CanopyDevEndCD = (GDDcum > crop.CanopyDevEnd).argmax() + 1
         # 3. Calendar days from sowing to start of yield formation
-        Crop.HIstartCD = (GDDcum > Crop.HIstart).argmax() + 1
+        crop.HIstartCD = (GDDcum > crop.HIstart).argmax() + 1
         # 4. Calendar days from sowing to end of yield formation
-        Crop.HIendCD = (GDDcum > Crop.HIend).argmax() + 1
+        crop.HIendCD = (GDDcum > crop.HIend).argmax() + 1
         # 5. Duration of yield formation in calendar days
-        Crop.YldFormCD = Crop.HIendCD - Crop.HIstartCD
-        if Crop.CropType == 3:
+        crop.YldFormCD = crop.HIendCD - crop.HIstartCD
+        if crop.CropType == 3:
             # 1. Calendar days from sowing to end of flowering
-            FloweringEnd = (GDDcum > Crop.FloweringEnd).argmax() + 1
+            FloweringEnd = (GDDcum > crop.FloweringEnd).argmax() + 1
             # 2. Duration of flowering in calendar days
-            Crop.FloweringCD = FloweringEnd - Crop.HIstartCD
+            crop.FloweringCD = FloweringEnd - crop.HIstartCD
         else:
-            Crop.FloweringCD = -999
+            crop.FloweringCD = -999
 
         # Update harvest index growth coefficient
-        Crop = calculate_HIGC(Crop)
+        crop = calculate_HIGC(crop)
 
         # Update day to switch to linear HI build-up
-        if Crop.CropType == 3:
+        if crop.CropType == 3:
             # Determine linear switch point and HIGC rate for fruit/grain crops
-            Crop = calculate_HI_linear(Crop)
+           crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
+                crop.YldFormCD, crop.HIini, crop.HI0, crop.HIGC
+            )
 
         else:
             # No linear switch for leafy vegetable or root/tiber crops
-            Crop.tLinSwitch = 0
-            Crop.dHILinear = 0.0
+            crop.tLinSwitch = 0
+            crop.dHILinear = 0.0
 
     # Update global variables
-    ParamStruct.Seasonal_Crop_List[ClockStruct.season_counter] = Crop
+    ParamStruct.Seasonal_Crop_List[ClockStruct.season_counter] = crop
     ParamStruct.CO2 = CO2
 
     return InitCond, ParamStruct

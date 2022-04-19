@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+
 # import pathlib
 # import os
 from .compute_crop_calendar import compute_crop_calendar
@@ -9,7 +10,9 @@ from ..entities.co2 import CO2Class
 from ..entities.crop import CropStruct
 from copy import deepcopy
 from os.path import dirname, abspath
+
 # print("dirname = ", dirname(dirname(abspath(__file__))))
+
 
 def compute_variables(
     param_struct,
@@ -47,7 +50,10 @@ def compute_variables(
         param_struct.Soil.REW = round(
             (
                 1000
-                * (param_struct.Soil.profile.th_fc.iloc[0] - param_struct.Soil.profile.th_dry.iloc[0])
+                * (
+                    param_struct.Soil.profile.th_fc.iloc[0]
+                    - param_struct.Soil.profile.th_dry.iloc[0]
+                )
                 * param_struct.Soil.EvapZsurf
             ),
             2,
@@ -81,7 +87,9 @@ def compute_variables(
         # Days to linear HI switch point
         if crop.CropType == 3:
             # Determine linear switch point and HIGC rate for fruit/grain crops
-            crop = calculate_HI_linear(crop)
+            crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
+                crop.YldFormCD, crop.HIini, crop.HI0, crop.HIGC
+            )
         else:
             # No linear switch for leafy vegetable or root/tiber crops
             crop.tLinSwitch = 0
@@ -92,7 +100,10 @@ def compute_variables(
     ## Calculate WP adjustment factor for elevation in CO2 concentration ##
     # Load CO2 data
     co2Data = pd.read_csv(
-       f'{acfp}/data/MaunaLoaCO2.txt', header=1, delim_whitespace=True, names=["year", "ppm"]
+        f"{acfp}/data/MaunaLoaCO2.txt",
+        header=1,
+        delim_whitespace=True,
+        names=["year", "ppm"],
     )
 
     # Years
@@ -158,7 +169,10 @@ def compute_variables(
 
     # change this later
     if param_struct.NCrops == 1:
-        crop_list = [deepcopy(param_struct.CropList[0]) for i in range(len(param_struct.CropChoices))]
+        crop_list = [
+            deepcopy(param_struct.CropList[0])
+            for i in range(len(param_struct.CropChoices))
+        ]
         # param_struct.Seasonal_Crop_List = [deepcopy(param_struct.CropList[0]) for i in range(len(param_struct.CropChoices))]
 
     else:
