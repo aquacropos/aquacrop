@@ -79,7 +79,13 @@ def compute_variables(
         # crop.calculate_additional_params()
 
         # Crop calander
-        crop = compute_crop_calendar(crop, clock_struct, weather_df)
+        crop = compute_crop_calendar(
+            crop,
+            clock_struct.planting_dates,
+            clock_struct.simulation_start_date,
+            clock_struct.time_span,
+            weather_df,
+        )
 
         # Harvest index param_struct.Seasonal_Crop_List[clock_struct.season_counter].Paramsgrowth coefficient
         crop.HIGC = calculate_HIGC(
@@ -101,7 +107,7 @@ def compute_variables(
 
         param_struct.CropList[i] = crop
 
-    ## Calculate WP adjustment factor for elevation in CO2 concentration ##
+    # Calculate WP adjustment factor for elevation in CO2 concentration
     # Load CO2 data
     co2Data = pd.read_csv(
         f"{acfp}/data/MaunaLoaCO2.txt",

@@ -4,21 +4,19 @@ from ..entities.paramStruct import ParamStructClass
 from .compute_crop_calendar import compute_crop_calendar
 
 
-
-
-def read_model_parameters(ClockStruct, Soil, Crop, weather_df):
+def read_model_parameters(clock_struct, soil, crop, weather_df):
     """
     Finalise soil and crop paramaters including planting and harvest dates
-    save to new object ParamStruct
+    save to new object param_struct
 
 
     *Arguments:*\n
 
-    `ClockStruct` : `ClockStructClass`:  time params
+    `clock_struct` : `ClockStructClass`:  time params
 
-    `Soil` : `SoilClass` :  soil object
+    `soil` : `SoilClass` :  soil object
 
-    `Crop` : `CropClass` :  crop object
+    `crop` : `CropClass` :  crop object
 
     `planting_dates` : `list` :  list of datetimes
 
@@ -26,26 +24,27 @@ def read_model_parameters(ClockStruct, Soil, Crop, weather_df):
 
     *Returns:*
 
-    `ClockStruct` : `ClockStructClass` : updated time paramaters
+    `clock_struct` : `ClockStructClass` : updated time paramaters
 
-    `ParamStruct` : `ParamStructClass` :  Contains model crop and soil paramaters
+    `param_struct` : `ParamStructClass` :  Contains model crop and soil paramaters
 
     """
-    # create ParamStruct object
-    ParamStruct = ParamStructClass()
+    # create param_struct object
+    param_struct = ParamStructClass()
 
-    Soil.fill_nan()
+    soil.fill_nan()
 
-    # Assign Soil object to ParamStruct
-    ParamStruct.Soil = Soil
+    # Assign soil object to param_struct
+    param_struct.Soil = soil
 
-    while Soil.zSoil < Crop.Zmax + 0.1:
-        for i in Soil.profile.index[::-1]:
-            if Soil.profile.loc[i, "dz"] < 0.25:
-                Soil.profile.loc[i, "dz"] += 0.1
-                Soil.fill_nan()
+    while soil.zSoil < crop.Zmax + 0.1:
+        for i in soil.profile.index[::-1]:
+            if soil.profile.loc[i, "dz"] < 0.25:
+                soil.profile.loc[i, "dz"] += 0.1
+                soil.fill_nan()
                 break
 
+    # TODO: Why all these commented lines? The model does not allow rotations now?
     ###########
     # crop
     ###########
@@ -87,32 +86,40 @@ def read_model_parameters(ClockStruct, Soil, Crop, weather_df):
     # elif paramStruct.nCrops == 1:
     # Only one crop type considered during simulation - i.e. no rotations
     # either within or between years
-    CropList = [Crop]
-    ParamStruct.CropList = CropList
-    ParamStruct.NCrops = 1
+    crop_list = [crop]
+    param_struct.CropList = crop_list
+    param_struct.NCrops = 1
 
     # Get start and end years for full simulation
-    SimStartDate = ClockStruct.simulation_start_date
-    SimEndDate = ClockStruct.simulation_end_date
+    sim_start_date = clock_struct.simulation_start_date
+    sim_end_date = clock_struct.simulation_end_date
 
     # extract the years and months of these dates
-    start_end_years = pd.DatetimeIndex([SimStartDate, SimEndDate]).year
-    start_end_months = pd.DatetimeIndex([SimStartDate, SimEndDate]).month
+    # pylint: disable=no-member
+    start_end_years = pd.DatetimeIndex([sim_start_date, sim_end_date]).year
+    # TODO: start_end_months is necessary?
+    # start_end_months = pd.DatetimeIndex([sim_start_date, sim_end_date]).month
 
-    if Crop.harvest_date == None:
-        Crop = compute_crop_calendar(Crop, ClockStruct, weather_df)
-        mature = int(Crop.MaturityCD + 30)
-        plant = pd.to_datetime("1990/" + Crop.planting_date)
+    if crop.harvest_date is None:
+        crop = compute_crop_calendar(
+            crop,
+            clock_struct.planting_dates,
+            clock_struct.simulation_start_date,
+            clock_struct.time_span,
+            weather_df,
+        )
+        mature = int(crop.MaturityCD + 30)
+        plant = pd.to_datetime("1990/" + crop.planting_date)
         harv = plant + np.timedelta64(mature, "D")
         new_harvest_date = str(harv.month) + "/" + str(harv.day)
-        Crop.harvest_date = new_harvest_date
+        crop.harvest_date = new_harvest_date
 
     # check if crop growing season runs over calander year
     # Planting and harvest dates are in days/months format so just add arbitrary year
-    singleYear = pd.to_datetime("1990/" + Crop.planting_date) < pd.to_datetime(
-        "1990/" + Crop.harvest_date
+    single_year = pd.to_datetime("1990/" + crop.planting_date) < pd.to_datetime(
+        "1990/" + crop.harvest_date
     )
-    if singleYear:
+    if single_year:
         # if normal year
 
         # specify the planting and harvest years as normal
@@ -122,7 +129,10 @@ def read_model_parameters(ClockStruct, Soil, Crop, weather_df):
         # if it takes over a year then the plant year finishes 1 year before end of sim
         # and harvest year starts 1 year after sim start
 
-        if pd.to_datetime(str(start_end_years[1] + 2) + "/" + Crop.harvest_date) < SimEndDate:
+        if (
+            pd.to_datetime(str(start_end_years[1] + 2) + "/" + crop.harvest_date)
+            < sim_end_date
+        ):
 
             # specify shifted planting and harvest years
             plant_years = list(range(start_end_years[0], start_end_years[1] + 1))
@@ -135,8 +145,8 @@ def read_model_parameters(ClockStruct, Soil, Crop, weather_df):
     # Correct for partial first growing season (may occur when simulating
     # off-season soil water balance)
     if (
-        pd.to_datetime(str(plant_years[0]) + "/" + Crop.planting_date)
-        < ClockStruct.simulation_start_date
+        pd.to_datetime(str(plant_years[0]) + "/" + crop.planting_date)
+        < clock_struct.simulation_start_date
     ):
         # shift everything by 1 year
         plant_years = plant_years[1:]
@@ -148,104 +158,31 @@ def read_model_parameters(ClockStruct, Soil, Crop, weather_df):
     # create lists to hold variables
     planting_dates = []
     harvest_dates = []
-    CropChoices = []
+    crop_choices = []
 
     # save full harvest/planting dates and crop choices to lists
-    for i in range(len(plant_years)):
-        planting_dates.append(str(plant_years[i]) + "/" + ParamStruct.CropList[0].planting_date)
-        harvest_dates.append(str(harvest_years[i]) + "/" + ParamStruct.CropList[0].harvest_date)
-        CropChoices.append(ParamStruct.CropList[0].Name)
+    for i, _ in enumerate(plant_years):
+        planting_dates.append(
+            str(plant_years[i]) + "/" + param_struct.CropList[0].planting_date
+        )
+        harvest_dates.append(
+            str(harvest_years[i]) + "/" + param_struct.CropList[0].harvest_date
+        )
+        crop_choices.append(param_struct.CropList[0].Name)
 
     # save crop choices
-    ParamStruct.CropChoices = list(CropChoices)
+    param_struct.CropChoices = list(crop_choices)
 
     # save clock paramaters
-    ClockStruct.planting_dates = pd.to_datetime(planting_dates)
-    ClockStruct.harvest_dates = pd.to_datetime(harvest_dates)
-    ClockStruct.n_seasons = len(planting_dates)
+    clock_struct.planting_dates = pd.to_datetime(planting_dates)
+    clock_struct.harvest_dates = pd.to_datetime(harvest_dates)
+    clock_struct.n_seasons = len(planting_dates)
 
     # Initialise growing season counter
-    if pd.to_datetime(ClockStruct.step_start_time) == ClockStruct.planting_dates[0]:
-        ClockStruct.season_counter = 0
+    if pd.to_datetime(clock_struct.step_start_time) == clock_struct.planting_dates[0]:
+        clock_struct.season_counter = 0
     else:
-        ClockStruct.season_counter = -1
+        clock_struct.season_counter = -1
 
     # return the FileLocations object as i have added some elements
-    return ClockStruct, ParamStruct
-
-
-
-# def changeThicknessSoilCompartmentToReachMaxRootDepth(soil, crop):
-#     # -+-+- Change soil thikness -+-+-+-
-#     # This loop go to the last soil index and added 0.1 meter if
-#     # the soil is less than 0.25m until the max crop soil is reached
-#     while soil.zSoil < crop.zMax + 0.1:
-#         for i in soil.profile.index[::-1]:
-#             # print(soil.profile.loc[i, "dz"])
-#             # print(soil.profile.loc[i])
-
-#             if soil.profile.loc[i, "dz"] < 0.25:
-#                 soil.profile.loc[i, "dz"] += 0.1
-#                 soil.fill_nan()
-#                 break
-#     return soil
-
-
-# def cropgrowingSeasonOccursInTheSameYear(crop):
-#     # check if crop growing season runs over calendar year
-#     # Planting and harvest dates are in days/months format so just add arbitrary year
-#     if(pd.to_datetime("1990/" + crop.plantingDate) < pd.to_datetime(
-#         "1990/" + crop.harvestDate
-#     )):
-#         return True
-#     return False
-
-
-# def plantAndHarvestYearsForSingleYearCrop(start_end_years):
-#     plant_harvest_years = list(
-#         range(start_end_years[0], start_end_years[1] + 1))
-#     return plant_harvest_years
-
-
-# def plantAndHarvestYearsForMultiplesYearCrop(harvestDate, SimEndDate, start_end_years):
-#     # if it takes over a year then the plant year finishes 1 year before end of sim
-#     # and harvest year starts 1 year after sim start
-#     if pd.to_datetime(str(start_end_years[1] + 2) + "/" + harvestDate) < SimEndDate:
-
-#         # specify shifted planting and harvest years
-#         plant_years = list(
-#             range(start_end_years[0], start_end_years[1] + 1))
-#         harvest_years = list(
-#             range(start_end_years[0] + 1, start_end_years[1] + 2))
-#     else:
-#         plant_years = list(range(start_end_years[0], start_end_years[1]))
-#         harvest_years = list(
-#             range(start_end_years[0] + 1, start_end_years[1] + 1))
-
-#     return plant_years, harvest_years
-
-
-# def CorrectForPartialFirstgrowingSeason(plantingDate, simulationStartDate, plant_years, harvest_years):
-#     if (
-#         pd.to_datetime(str(plant_years[0]) + "/" + plantingDate)
-#         < simulationStartDate
-#     ):
-#         # shift everything by 1 year
-#         plant_years = plant_years[1:]
-#         harvest_years = harvest_years[1:]
-#     return plant_years, harvest_years
-
-# def createListsToHoldVariables(plant_years, harvest_years, plantingDate, harvestDate, CropName):
-#  # create lists to hold variables
-#     plantingDates = []
-#     harvestDates = []
-#     cropChoices = []
-
-#     # save full harvest/planting dates and crop choices to lists
-#     for i in range(len(plant_years)):
-#         plantingDates.append(
-#             str(plant_years[i]) + "/" + plantingDate)
-#         harvestDates.append(
-#             str(harvest_years[i]) + "/" + harvestDate)
-#         cropChoices.append(CropName)
-#     return plantingDates, harvestDates, cropChoices
+    return clock_struct, param_struct

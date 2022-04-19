@@ -2,7 +2,13 @@ import numpy as np
 import pandas as pd
 
 
-def compute_crop_calendar(crop, ClockStruct, weather_df):
+def compute_crop_calendar(
+    crop,
+    clock_struct_planting_dates,
+    clock_struct_simulation_start_date,
+    clock_struct_time_span,
+    weather_df,
+):
     """
     Function to compute additional parameters needed to define crop phenological calendar
 
@@ -12,7 +18,7 @@ def compute_crop_calendar(crop, ClockStruct, weather_df):
 
     `crop` : `CropClass` :  Crop object containing crop paramaters
 
-    `ClockStruct` : `ClockStructClass` :  model time paramaters
+    `clock_struct` : `ClockStructClass` :  model time paramaters
 
     `weather_df`: `pandas.DataFrame` :  weather data for simulation period
 
@@ -25,17 +31,17 @@ def compute_crop_calendar(crop, ClockStruct, weather_df):
 
     """
 
-    if len(ClockStruct.planting_dates) == 0:
-        plant_year = pd.DatetimeIndex([ClockStruct.simulation_start_date]).year[0]
+    if len(clock_struct_planting_dates) == 0:
+        plant_year = pd.DatetimeIndex([clock_struct_simulation_start_date]).year[0]
         if (
             pd.to_datetime(str(plant_year) + "/" + crop.planting_date)
-            < ClockStruct.simulation_start_date
+            < clock_struct_simulation_start_date
         ):
             pl_date = str(plant_year + 1) + "/" + crop.planting_date
         else:
             pl_date = str(plant_year) + "/" + crop.planting_date
     else:
-        pl_date = ClockStruct.planting_dates[0]
+        pl_date = clock_struct_planting_dates[0]
 
     # Define crop calendar mode
     Mode = crop.CalendarType
@@ -50,13 +56,18 @@ def compute_crop_calendar(crop, ClockStruct, weather_df):
             crop.CanopyDevEndCD = crop.SenescenceCD
 
         # Time from sowing to 10% canopy cover (non-stressed conditions)
-        crop.Canopy10PctCD = round(crop.EmergenceCD + (np.log(0.1 / crop.CC0) / crop.CGC_CD))
+        crop.Canopy10PctCD = round(
+            crop.EmergenceCD + (np.log(0.1 / crop.CC0) / crop.CGC_CD)
+        )
 
         # Time from sowing to maximum canopy cover (non-stressed conditions)
         crop.MaxCanopyCD = round(
             crop.EmergenceCD
             + (
-                np.log((0.25 * crop.CCx * crop.CCx / crop.CC0) / (crop.CCx - (0.98 * crop.CCx)))
+                np.log(
+                    (0.25 * crop.CCx * crop.CCx / crop.CC0)
+                    / (crop.CCx - (0.98 * crop.CCx))
+                )
                 / crop.CGC_CD
             )
         )
@@ -64,7 +75,8 @@ def compute_crop_calendar(crop, ClockStruct, weather_df):
         # Time from sowing to end of yield formation
         crop.HIendCD = crop.HIstartCD + crop.YldFormCD
 
-        # Duplicate calendar values (needed to minimise if statements when switching between GDD and CD runs)
+        # Duplicate calendar values (needed to minimise if 
+        # statements when switching between GDD and CD runs)
         crop.Emergence = crop.EmergenceCD
         crop.Canopy10Pct = crop.Canopy10PctCD
         crop.MaxRooting = crop.MaxRootingCD
@@ -95,7 +107,7 @@ def compute_crop_calendar(crop, ClockStruct, weather_df):
             #                     idx = -1
             #             assert idx > -1
 
-            date_range = pd.date_range(pl_date, ClockStruct.time_span[-1])
+            date_range = pd.date_range(pl_date, clock_struct_time_span[-1])
             weather_df = weather_df.copy()
             weather_df.index = weather_df.Date
             weather_df = weather_df.loc[date_range]
@@ -157,7 +169,10 @@ def compute_crop_calendar(crop, ClockStruct, weather_df):
             # Convert CGC to GDD mode
             # crop.CGC_CD = crop.CGC
             crop.CGC = (
-                np.log((((0.98 * crop.CCx) - crop.CCx) * crop.CC0) / (-0.25 * (crop.CCx ** 2)))
+                np.log(
+                    (((0.98 * crop.CCx) - crop.CCx) * crop.CC0)
+                    / (-0.25 * (crop.CCx**2))
+                )
             ) / (-(crop.MaxCanopy - crop.Emergence))
 
             # Convert CDC to GDD mode
@@ -181,7 +196,6 @@ def compute_crop_calendar(crop, ClockStruct, weather_df):
         else:
             crop.CDC = crop.CDC_CD
             crop.CGC = crop.CGC_CD
-            
 
         # print(crop.__dict__)
     elif Mode == 2:
@@ -199,7 +213,10 @@ def compute_crop_calendar(crop, ClockStruct, weather_df):
         crop.MaxCanopy = round(
             crop.Emergence
             + (
-                np.log((0.25 * crop.CCx * crop.CCx / crop.CC0) / (crop.CCx - (0.98 * crop.CCx)))
+                np.log(
+                    (0.25 * crop.CCx * crop.CCx / crop.CC0)
+                    / (crop.CCx - (0.98 * crop.CCx))
+                )
                 / crop.CGC
             )
         )
@@ -219,7 +236,7 @@ def compute_crop_calendar(crop, ClockStruct, weather_df):
         #             else:
         #                 idx = -1
         #         assert idx> -1
-        date_range = pd.date_range(pl_date, ClockStruct.time_span[-1])
+        date_range = pd.date_range(pl_date, clock_struct_time_span[-1])
         weather_df = weather_df.copy()
         weather_df.index = weather_df.Date
 
