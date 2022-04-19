@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 
@@ -29,17 +28,18 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
 
     """
 
-    ## Extract crop type ##
+    # Extract crop type
+    # TODO: This is necessary?
     CropType = ParamStruct.CropChoices[ClockStruct.season_counter]
 
-    ## Extract structures for updating ##
+    # Extract structures for updating
     Soil = ParamStruct.Soil
     Crop = ParamStruct.Seasonal_Crop_List[ClockStruct.season_counter]
     FieldMngt = ParamStruct.FieldMngt
     CO2 = ParamStruct.CO2
     CO2_data = ParamStruct.CO2data
 
-    ## Reset counters ##
+    # Reset counters
     InitCond.AgeDays = 0
     InitCond.AgeDays_NS = 0
     InitCond.AerDays = 0
@@ -55,7 +55,7 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
 
     InitCond.AerDaysComp = np.zeros(int(Soil.nComp))
 
-    ## Reset states ##
+    # Reset states
     # States
     InitCond.PreAdj = False
     InitCond.CropMature = False
@@ -103,10 +103,10 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
     InitCond.CCprev = 0
     InitCond.ProtectedSeed = 0
 
-    ## Update CO2 concentration ##
+    # Update CO2 concentration ##
     # Get CO2 concentration
 
-    if ParamStruct.CO2concAdj != None:
+    if ParamStruct.CO2concAdj is not None:
         CO2.current_concentration = ParamStruct.CO2concAdj
     else:
         Yri = pd.DatetimeIndex([ClockStruct.step_start_time]).year[0]
@@ -145,8 +145,8 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
     # Total adjustment
     Crop.fCO2 = 1 + ftype * (fCO2 - 1)
 
-    ## Reset soil water conditions (if not running off-season) ##
-    if ClockStruct.sim_off_season == False:
+    # Reset soil water conditions (if not running off-season)
+    if ClockStruct.sim_off_season is False:
         # Reset water content to starting conditions
         InitCond.th = InitCond.thini
         # Reset surface storage
@@ -157,11 +157,13 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
             # No surface bunds
             InitCond.SurfaceStorage = 0
 
-    ## Update crop parameters (if in GDD mode) ##
+    # Update crop parameters (if in GDD mode)
     if Crop.CalendarType == 2:
         # Extract weather data for upcoming growing season
-        weather_df = weather[weather[:, 4] >= ClockStruct.planting_dates[ClockStruct.season_counter]]
-        # weather_df = weather_df[weather_df[:,4]<=ClockStruct.harvest_dates[ClockStruct.season_counter]]
+        weather_df = weather[
+            weather[:, 4] >= ClockStruct.planting_dates[ClockStruct.season_counter]
+        ]
+
         Tmin = weather_df[:, 0]
         Tmax = weather_df[:, 1]
 
@@ -227,9 +229,8 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
             Crop.tLinSwitch = 0
             Crop.dHILinear = 0.0
 
-    ## Update global variables ##
+    # Update global variables
     ParamStruct.Seasonal_Crop_List[ClockStruct.season_counter] = Crop
     ParamStruct.CO2 = CO2
 
     return InitCond, ParamStruct
-
