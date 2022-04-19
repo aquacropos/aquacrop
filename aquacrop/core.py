@@ -105,14 +105,17 @@ class AquaCropModel:
 
     This is the main class of the AquaCrop model.
     It is in charge of executing all the operations.
-    
+
     *Arguments:*\n
     `sim_start_time` : `date YYYY/MM/DD` : Simulation start date
     `sim_end_time` : `date YYYY/MM/DD` : Simulation end date
     `weather_df`: `pandas.DataFrame` : Weather data (TODO: SPECIFY DATA TYPE)
-    `soil`: `Soil Object `: Soil object contains paramaters and variables of the soil used in the simulation
-    `crop`: `Crop Object`: Crop object contains Paramaters and variables of the crop used in the simulation
-    `initial_water_content`: `InitialWaterContent Object` : Defines water content at start of sim
+    `soil`: `Soil Object `: Soil object contains paramaters and variables of the soil
+        used in the simulation
+    `crop`: `Crop Object`: Crop object contains Paramaters and variables of the crop used
+        in the simulation
+    `initial_water_content`: `InitialWaterContent Object` : Defines water content at start
+        of simulation
     `irrigation_management`: `IrrigationManagement Object`: Defines irrigation strategy
     `field_management`: `FieldMngt Obj : Defines field management options`
     `fallow_field_management`: TODO: Define it.
@@ -221,18 +224,18 @@ class AquaCropModel:
 
         # Outputs results (water_flux, crop_growth, final_stats)
         self.outputs = Output(self.clock_struct.time_span, self.init_cond.th)
-        
+
         # save model weather to init_cond
         self.weather = self.weather_df.values
 
     def run_model(self, num_steps=1, till_termination=False):
         """
         This function is responsible for executing the model.
-        
+
         *Arguments:*\n
         `num_steps`: `int` : Number of stepts (Days) to be executed.
         `till_termination`: `boolean` : Run the simulation to completion
-        
+
         *Returns:*
         Dictionary:
         `finished`: `boolean`: Informs if the simulation is finished
