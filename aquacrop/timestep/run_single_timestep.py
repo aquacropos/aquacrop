@@ -94,8 +94,8 @@ def solution_single_time_step(
         if (
             (planting_date <= CurrentDate)
             and (harvest_date >= CurrentDate)
-            and (NewCond.CropMature == False)
-            and (NewCond.CropDead == False)
+            and (NewCond.CropMature is False)
+            and (NewCond.CropDead is False)
         ):
             GrowingSeason = True
         else:
@@ -106,7 +106,7 @@ def solution_single_time_step(
         Crop_Name = param_struct.CropChoices[clock_struct.season_counter]
         IrrMngt = param_struct.IrrMngt
 
-        if GrowingSeason == True:
+        if GrowingSeason is True:
             FieldMngt = param_struct.FieldMngt
         else:
             FieldMngt = param_struct.FallowFieldMngt
@@ -125,7 +125,7 @@ def solution_single_time_step(
         FieldMngt = param_struct.FallowFieldMngt
 
     # Increment time counters %%
-    if GrowingSeason == True:
+    if GrowingSeason is True:
         # Calendar days after planting
         NewCond.DAP = NewCond.DAP + 1
         # Growing degree days after planting
@@ -253,7 +253,7 @@ def solution_single_time_step(
         NewCond.th,
         NewCond.SurfaceStorage,
         DeepPerc,
-        RunoffTot,
+        Runoff,
         Infl,
         FluxOut,
     ) = infiltration(
@@ -404,7 +404,7 @@ def solution_single_time_step(
     )
 
     # 18. Crop yield
-    if GrowingSeason == True:
+    if GrowingSeason is True:
         # Calculate crop yield (tonne/ha)
         NewCond.Y = (NewCond.B / 100) * NewCond.HIadj
         # print( clock_struct.time_step_counter,(NewCond.B/100),NewCond.HIadj)
@@ -415,7 +415,7 @@ def solution_single_time_step(
             # Crop has reached maturity
             NewCond.CropMature = True
 
-    elif GrowingSeason == False:
+    elif GrowingSeason is False:
         # Crop yield is zero outside of growing season
         NewCond.Y = 0
 
@@ -433,10 +433,6 @@ def solution_single_time_step(
         Crop.Aer,
     )
 
-    # Wr, _Dr, _TAW, _thRZ = root_zone_water(
-    #     Soil.Profile, NewCond.Zroot, NewCond.th, Soil.zTop, float(Crop.Zmin), Crop.Aer
-    # )
-
     # 20. Update net irrigation to add any pre irrigation
     IrrNet = IrrNet + PreIrr
     NewCond.IrrNetCum = NewCond.IrrNetCum + PreIrr
@@ -446,7 +442,7 @@ def solution_single_time_step(
     row_gs = clock_struct.season_counter
 
     # Irrigation
-    if GrowingSeason == True:
+    if GrowingSeason is True:
         if IrrMngt.IrrMethod == 4:
             # Net irrigation
             IrrDay = IrrNet
@@ -486,7 +482,7 @@ def solution_single_time_step(
         Es,
         EsPot,
         Tr,
-        P,
+        TrPot
     ]
 
     # Crop growth
@@ -509,16 +505,16 @@ def solution_single_time_step(
     # Final output (if at end of growing season)
     if clock_struct.season_counter > -1:
         if (
-            (NewCond.CropMature == True)
-            or (NewCond.CropDead == True)
+            (NewCond.CropMature is True)
+            or (NewCond.CropDead is True)
             or (
                 clock_struct.harvest_dates[clock_struct.season_counter]
                 == clock_struct.step_end_time
             )
-        ) and (NewCond.HarvestFlag == False):
+        ) and (NewCond.HarvestFlag is False):
 
             # Store final outputs
-            outputs.final_stats.loc[clock_struct.season_counter] = [
+            outputs.final_stats.loc[row_gs] = [
                 clock_struct.season_counter,
                 Crop_Name,
                 clock_struct.step_end_time,
