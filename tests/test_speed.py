@@ -8,7 +8,13 @@ from aquacrop.entities.inititalWaterContent import InitialWaterContent
 
 
 class TestAquacropOs(unittest.TestCase):
-    def test_model_Os(self):
+    '''
+    Speed tests of the aquacrop model
+    '''
+    def test_model_os(self):
+        '''
+        Speed test normal aquacrop model
+        '''
 
         weather_file_path = get_filepath("tunis_climate.txt")
 

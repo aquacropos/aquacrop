@@ -9,6 +9,9 @@ from aquacrop.entities.irrigationManagement import IrrMngtClass
 
 
 class TestIrrigation(unittest.TestCase):
+    """
+    Tests of different irrigation methodologies in AquaCrop.
+    """
 
     _sim_start = "1982/05/01"
     _sim_end = "2018/10/30"
@@ -22,6 +25,9 @@ class TestIrrigation(unittest.TestCase):
     _initial_water_content = InitialWaterContent(value=["FC"])
 
     def test_rainfed_strategy(self):
+        """
+        Rainfed methodology
+        """
         irrigation = IrrMngtClass(IrrMethod=0)
 
         model_os = AquaCropModel(
@@ -49,7 +55,9 @@ class TestIrrigation(unittest.TestCase):
         self.assertEqual(yield10, yied_10_result)
 
     def test_threshold4_irrigate_strategy(self):
-
+        """
+        Threshold methodology
+        """
         irrigation = IrrMngtClass(IrrMethod=1, SMT=[40, 60, 70, 30] * 4)
 
         model_os = AquaCropModel(
@@ -75,6 +83,9 @@ class TestIrrigation(unittest.TestCase):
         self.assertEqual(yield10, yied_10_result)
 
     def test_interval_7days__strategy(self):
+        """
+        7 days interval methodology
+        """
 
         irrigation = IrrMngtClass(IrrMethod=2, IrrInterval=7)
 
@@ -91,22 +102,24 @@ class TestIrrigation(unittest.TestCase):
         model_results = model_os.run_model(till_termination=True)["results"]
         final_statistics = model_results.final_stats.head(10)
 
-        yied_1_result = 12.646543675646381
+        yield_1_result = 12.646543675646381
         yield1 = final_statistics["Yield (tonne/ha)"][0]
 
-        yied_10_result = 14.018772249158092
+        yield_10_result = 14.018772249158092
         yield10 = final_statistics["Yield (tonne/ha)"][9]
 
-        self.assertEqual(yield1, yied_1_result)
-        self.assertEqual(yield10, yied_10_result)
+        self.assertEqual(yield1, yield_1_result)
+        self.assertEqual(yield10, yield_10_result)
 
     def test_predefined_schedule_strategy(self):
-
-        irrigationSchedule = createPandasIrrigationSchedule(
+        """
+        Predefined schedule methodology
+        """
+        irrigation_schedule_df = create_pandas_irrigation_schedule(
             self._sim_start, self._sim_end
         )
         # print(irrigationSchedule)
-        irrigate_schedule = IrrMngtClass(IrrMethod=3, Schedule=irrigationSchedule)
+        irrigate_schedule = IrrMngtClass(IrrMethod=3, Schedule=irrigation_schedule_df)
 
         model_os = AquaCropModel(
             sim_start_time=self._sim_start,
@@ -122,17 +135,19 @@ class TestIrrigation(unittest.TestCase):
         model_results = model_os.run_model(till_termination=True)["results"]
         final_statistics = model_results.final_stats.head(10)
 
-        yied_1_result = 12.128998898669153
+        yield_1_result = 12.128998898669153
         yield1 = final_statistics["Yield (tonne/ha)"][0]
 
-        yied_10_result = 11.997890714696235
+        yield_10_result = 11.997890714696235
         yield10 = final_statistics["Yield (tonne/ha)"][9]
 
-        self.assertEqual(yield1, yied_1_result)
-        self.assertEqual(yield10, yied_10_result)
+        self.assertEqual(yield1, yield_1_result)
+        self.assertEqual(yield10, yield_10_result)
 
     def test_net_irrigation_strategy(self):
-
+        """
+        Net methodology
+        """
         irrigation = IrrMngtClass(IrrMethod=4, NetIrrSMT=70)
 
         model_os = AquaCropModel(
@@ -149,17 +164,20 @@ class TestIrrigation(unittest.TestCase):
         model_results = model_os.run_model(till_termination=True)["results"]
         final_statistics = model_results.final_stats.head(10)
 
-        yied_1_result = 12.657670494485089
+        yield_1_result = 12.657670494485089
         yield1 = final_statistics["Yield (tonne/ha)"][0]
 
-        yied_10_result = 13.981859189056273
+        yield_10_result = 13.981859189056273
         yield10 = final_statistics["Yield (tonne/ha)"][9]
 
-        self.assertEqual(yield1, yied_1_result)
-        self.assertEqual(yield10, yied_10_result)
+        self.assertEqual(yield1, yield_1_result)
+        self.assertEqual(yield10, yield_10_result)
 
 
-def createPandasIrrigationSchedule(sim_start, sim_end):
+def create_pandas_irrigation_schedule(sim_start, sim_end):
+    """
+    This function create a irrigation schedule
+    """
     all_days = pd.date_range(
         sim_start, sim_end
     )  # list of all dates in simulation period

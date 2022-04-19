@@ -7,8 +7,15 @@ from aquacrop.entities.inititalWaterContent import InitialWaterContent
 
 
 class TestAquacropOs(unittest.TestCase):
+    """
+    Simple test of AquacropModel
+    """
+
     def test_model_till_termination(self):
-    
+        """
+        Test till termination
+        """
+
         weather_file_path = get_filepath("tunis_climate.txt")
 
         weather_data = prepare_weather(weather_file_path)
@@ -28,7 +35,6 @@ class TestAquacropOs(unittest.TestCase):
         model_results = model_os.run_model(till_termination=True)["results"]
         final_statistics = model_results.final_stats.head()
         print(final_statistics)
-        # print(model_os.outputs.water_storage)
 
         yied_1_result = 8.940139992051638
         yield1 = final_statistics["Yield (tonne/ha)"][0]
@@ -40,7 +46,9 @@ class TestAquacropOs(unittest.TestCase):
         self.assertEqual(yield5, yied_5_result)
 
     def test_model_stepts(self):
-
+        """
+        Test unfinished step model
+        """
         weather_file_path = get_filepath("tunis_climate.txt")
 
         weather_data = prepare_weather(weather_file_path)
@@ -58,13 +66,9 @@ class TestAquacropOs(unittest.TestCase):
         )
         # run model till termination
         model_results = model_os.run_model(num_steps=2)["results"]
-        # final_statistics = model_results.final_stats.head(10)
-        # print(final_statistics.values)
-        # np.set_printoptions(threshold=np.inf)
         gdd_result = model_results.crop_growth["GDD"].iloc[0]
 
         self.assertEqual(21.5, gdd_result)
-
 
 
 if __name__ == "__main__":
