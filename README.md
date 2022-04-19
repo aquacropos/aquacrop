@@ -2,9 +2,9 @@
 
 Soil-Crop-Water model based on AquaCrop-OS.
 
-![checks](https://badgen.net/github/checks/pacs27/aq_test)
-![release](https://badgen.net/github/release/pacs27/aq_test)
-![last-commit](https://badgen.net/github/last-commit/pacs27/aq_test)
+![checks](https://badgen.net/github/checks/aquacropos/aquacrop)
+![release](https://badgen.net/github/release/aquacropos/aquacrop)
+![last-commit](https://badgen.net/github/last-commit/aquacropos/aquacrop)
 ![license](https://badgen.net/pypi/license/aquacrop)
 ![python-version](https://badgen.net/pypi/python/aquacrop)
 
