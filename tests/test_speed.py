@@ -1,5 +1,4 @@
 import unittest
-import pandas as pd
 import time
 
 from aquacrop.core import AquaCropModel, get_filepath, prepare_weather
