@@ -262,6 +262,10 @@ class AquaCropModel:
             self.__has_model_finished = True
             return True
         else:
+            if(num_steps<1):
+                raise ValueError(
+                "num_steps must be equal to or greater than 1."
+                )
             self.__start_model_execution = time.time()
             for i in range(num_steps):
 
