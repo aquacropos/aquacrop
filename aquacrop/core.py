@@ -2,10 +2,10 @@
 This file contains the AquacropModel class that runs the simulation.
 """
 import os
+import time
 
 import numpy as np
 import pandas as pd
-
 
 from .scripts.checkIfPackageIsCompiled import compile_all_AOT_files
 
@@ -66,15 +66,15 @@ def get_data(filename, **kwargs):
 
 def prepare_weather(weather_file_path):
     """
-    function to read in weather data and return a dataframe containing
-    the weather data
+    function to read in _weather data and return a dataframe containing
+    the _weather data
 
     *Arguments:*\n
-    `weather_file_path` : `str` :  file location of weather data
+    `weather_file_path` : `str` :  file location of _weather data
 
     *Returns:*
 
-    `weather_df`: `pandas.DataFrame` :  weather data for simulation period
+    `weather_df`: `pandas.DataFrame` :  _weather data for simulation period
 
     """
 
@@ -87,7 +87,7 @@ def prepare_weather(weather_file_path):
         "Day Month Year MinTemp MaxTemp Precipitation ReferenceET"
     ).split()
 
-    # put the weather dates into datetime format
+    # put the _weather dates into datetime format
     weather_df["Date"] = pd.to_datetime(weather_df[["Year", "Month", "Day"]])
 
     # drop the day month year columns
@@ -156,7 +156,6 @@ class AquaCropModel:
         self.field_management = field_management
         self.fallow_field_management = fallow_field_management
         self.groundwater = groundwater
-        self.steps_are_finished = False
 
         if irrigation_management is None:
             self.irrigation_management = IrrigationManagement(IrrMethod=0)
@@ -167,66 +166,70 @@ class AquaCropModel:
         if groundwater is None:
             self.groundwater = GroundWater()
 
+        # Model parameters
+        self.__steps_are_finished = False
+        self.__has_model_executed = False  # Determines if the model has been run
+        self.__has_model_finished = False  # Determines if the model is finished
+        self.__start_model_execution = None  # Time when the execution start
+        self.__end_model_execution = None  # Time when the execution end
         # Attributes initialised later
-        self.clock_struct = None
-        self.param_struct = None
-        self.init_cond = None
-        self.outputs = None
-        self.weather = None
+        self._clock_struct = None
+        self._param_struct = None
+        self._init_cond = None
+        self._outputs = None
+        self._weather = None
 
-    def _initialize(
-        self,
-    ):
+    def _initialize(self):
         """
         Initialise all model variables
         """
 
         # define model runtime
-        self.clock_struct = read_clock_paramaters(
+        self._clock_struct = read_clock_paramaters(
             self.sim_start_time, self.sim_end_time
         )
 
-        # get weather data
-        self.weather_df = read_weather_inputs(self.clock_struct, self.weather_df)
+        # get _weather data
+        self.weather_df = read_weather_inputs(self._clock_struct, self.weather_df)
 
         # read model params
-        self.clock_struct, self.param_struct = read_model_parameters(
-            self.clock_struct, self.soil, self.crop, self.weather_df
+        self._clock_struct, self._param_struct = read_model_parameters(
+            self._clock_struct, self.soil, self.crop, self.weather_df
         )
 
         # read irrigation management
-        self.param_struct = read_irrigation_management(
-            self.param_struct, self.irrigation_management, self.clock_struct
+        self._param_struct = read_irrigation_management(
+            self._param_struct, self.irrigation_management, self._clock_struct
         )
 
         # read field management
-        self.param_struct = read_field_management(
-            self.param_struct, self.field_management, self.fallow_field_management
+        self._param_struct = read_field_management(
+            self._param_struct, self.field_management, self.fallow_field_management
         )
 
         # read groundwater table
-        self.param_struct = read_groundwater_table(
-            self.param_struct, self.groundwater, self.clock_struct
+        self._param_struct = read_groundwater_table(
+            self._param_struct, self.groundwater, self._clock_struct
         )
 
         # Compute additional variables
-        self.param_struct.CO2concAdj = self.co2_concentration
-        self.param_struct = compute_variables(
-            self.param_struct, self.weather_df, self.clock_struct
+        self._param_struct.CO2concAdj = self.co2_concentration
+        self._param_struct = compute_variables(
+            self._param_struct, self.weather_df, self._clock_struct
         )
 
         # read, calculate inital conditions
-        self.param_struct, self.init_cond = read_model_initial_conditions(
-            self.param_struct, self.clock_struct, self.initial_water_content
+        self._param_struct, self._init_cond = read_model_initial_conditions(
+            self._param_struct, self._clock_struct, self.initial_water_content
         )
 
-        self.param_struct = create_soil_profile(self.param_struct)
+        self._param_struct = create_soil_profile(self._param_struct)
 
         # Outputs results (water_flux, crop_growth, final_stats)
-        self.outputs = Output(self.clock_struct.time_span, self.init_cond.th)
+        self._outputs = Output(self._clock_struct.time_span, self._init_cond.th)
 
-        # save model weather to init_cond
-        self.weather = self.weather_df.values
+        # save model _weather to _init_cond
+        self._weather = self.weather_df.values
 
     def run_model(self, num_steps=1, till_termination=False):
         """
@@ -245,90 +248,169 @@ class AquaCropModel:
         self._initialize()
 
         if till_termination:
-
-            while self.clock_struct.model_is_finished is False:
+            self.__start_model_execution = time.time()
+            while self._clock_struct.model_is_finished is False:
 
                 (
-                    self.clock_struct,
-                    self.init_cond,
-                    self.param_struct,
-                    self.outputs,
-                ) = self.perform_timestep()
-
-            return {"finished": True, "results": self.outputs}
+                    self._clock_struct,
+                    self._init_cond,
+                    self._param_struct,
+                    self._outputs,
+                ) = self._perform_timestep()
+            self.__end_model_execution = time.time()
+            self.__has_model_executed = True
+            self.__has_model_finished = True
+            return True
         else:
-
+            self.__start_model_execution = time.time()
             for i in range(num_steps):
 
                 if i == range(num_steps)[-1]:
-                    self.steps_are_finished = True
+                    self.__steps_are_finished = True
                 (
-                    self.clock_struct,
-                    self.init_cond,
-                    self.param_struct,
-                    self.outputs,
-                ) = self.perform_timestep()
+                    self._clock_struct,
+                    self._init_cond,
+                    self._param_struct,
+                    self._outputs,
+                ) = self._perform_timestep()
 
-                if self.clock_struct.model_is_finished:
-                    return {"finished": True, "results": self.outputs}
+                if self._clock_struct.model_is_finished:
+                    self.__end_model_execution = time.time()
+                    self.__has_model_executed = True
+                    self.__has_model_finished = True
+                    return True
 
-            return {"finished": False, "results": self.outputs}
+            self.__end_model_execution = time.time()
+            self.__has_model_executed = True
+            self.__has_model_finished = False
+            return True
 
-    def perform_timestep(self):
+    def _perform_timestep(self):
 
         """
         Function to run a single time-step (day) calculation of AquaCrop-OS
 
         """
 
-        # extract weather data for current timestep
-        weather_step = weather_data_current_timestep(
-            self.weather, self.clock_struct.time_step_counter
+        # extract _weather data for current timestep
+        weather_step = _weather_data_current_timestep(
+            self._weather, self._clock_struct.time_step_counter
         )
 
         # Get model solution_single_time_step
         new_cond, param_struct, outputs = solution_single_time_step(
-            self.init_cond,
-            self.param_struct,
-            self.clock_struct,
+            self._init_cond,
+            self._param_struct,
+            self._clock_struct,
             weather_step,
-            self.outputs,
+            self._outputs,
         )
 
         # Check model termination
-        clock_struct = self.clock_struct
+        clock_struct = self._clock_struct
         clock_struct.model_is_finished = check_model_is_finished(
-            self.clock_struct.step_end_time,
-            self.clock_struct.simulation_end_date,
-            self.clock_struct.model_is_finished,
-            self.clock_struct.season_counter,
-            self.clock_struct.n_seasons,
+            self._clock_struct.step_end_time,
+            self._clock_struct.simulation_end_date,
+            self._clock_struct.model_is_finished,
+            self._clock_struct.season_counter,
+            self._clock_struct.n_seasons,
             new_cond.HarvestFlag,
         )
 
         # Update time step
-        clock_struct, init_cond, param_struct = update_time(
-            clock_struct, new_cond, param_struct, self.weather
+        clock_struct, _init_cond, param_struct = update_time(
+            clock_struct, new_cond, param_struct, self._weather
         )
 
-        # Create  outputs dataframes when model is finished
-        (
-            outputs.water_flux,
-            outputs.water_storage,
-            outputs.crop_growth,
-        ) = outputs_when_model_is_finished(
+        # Create  _outputsdataframes when model is finished
+        final_water_flux_growth_outputs = outputs_when_model_is_finished(
             clock_struct.model_is_finished,
             outputs.water_flux,
             outputs.water_storage,
             outputs.crop_growth,
-            self.steps_are_finished,
+            self.__steps_are_finished,
         )
 
-        return clock_struct, init_cond, param_struct, outputs
+        if final_water_flux_growth_outputs is not False:
+            (
+                outputs.water_flux,
+                outputs.water_storage,
+                outputs.crop_growth,
+            ) = final_water_flux_growth_outputs
+
+        return clock_struct, _init_cond, param_struct, outputs
+
+    def get_final_statistics(self):
+        """
+        Return all the simulation results
+        """
+        if self.__has_model_executed:
+            if self.__has_model_finished:
+                return self._outputs.final_stats
+            else:
+                return False  # If the model is not finished, the results are not generated.
+        else:
+            raise ValueError(
+                "You cannot get results without running the model. Please execute the run_model() method."
+            )
+
+    def get_water_storage(self):
+        """
+        Return water storage in soil results
+        """
+        if self.__has_model_executed:
+            return self._outputs.water_storage
+        else:
+            raise ValueError(
+                "You cannot get results without running the model. Please execute the run_model() method."
+            )
+
+    def get_water_flux(self):
+        """
+        Return water flux results
+        """
+        if self.__has_model_executed:
+            return self._outputs.water_flux
+        else:
+            raise ValueError(
+                "You cannot get results without running the model. Please execute the run_model() method."
+            )
+
+    def get_crop_growth(self):
+        """
+        Return crop growth results
+        """
+        if self.__has_model_executed:
+            return self._outputs.crop_growth
+        else:
+            raise ValueError(
+                "You cannot get results without running the model. Please execute the run_model() method."
+            )
+
+    def get_additional_information(self):
+        """
+        Additional model information.
+
+           Returns:
+               dict:
+                   has_model_finished (boolean): Determines if the model is finished
+                   execution_time : Time taken for the model to run
+
+        """
+        if self.__has_model_executed:
+            return {
+                "has_model_finished": self.__has_model_finished,
+                "execution_time": self.__end_model_execution
+                - self.__start_model_execution,
+            }
+        else:
+            raise ValueError(
+                "You cannot get results without running the model. Please execute the run_model() method."
+            )
 
 
-def weather_data_current_timestep(weather, time_step_counter):
+def _weather_data_current_timestep(_weather, time_step_counter):
     """
-    Extract weather data for current timestep
+    Extract _weather data for current timestep
     """
-    return weather[time_step_counter]
+    return _weather[time_step_counter]

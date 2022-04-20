@@ -1,6 +1,8 @@
-from numba import float64, int64, boolean, types
 import pandas as pd
 import numpy as np
+
+from .modelConstants import ModelConstants
+
 
 class Soil:
     """
@@ -19,7 +21,7 @@ class Soil:
 
     A number of float attributes specified in the initialisation of the class
 
-        """
+    """
 
     def __init__(
         self,
@@ -29,7 +31,7 @@ class Soil:
         REW=9.0,
         CalcCN=0,
         CN=61.0,
-        zRes=-999,
+        zRes=ModelConstants.NO_VALUE,
         EvapZsurf=0.04,
         EvapZmin=0.15,
         EvapZmax=0.30,
@@ -56,20 +58,26 @@ class Soil:
         self.zRes = zRes  # Depth of restrictive soil layer (set to negative value if not present)
 
         # Assign default program properties (should not be changed without expert knowledge)
-        self.EvapZsurf = EvapZsurf  # Thickness of soil surface skin evaporation layer (m)
-        self.EvapZmin = EvapZmin  # Minimum thickness of full soil surface evaporation layer (m)
-        self.EvapZmax = EvapZmax  # Maximum thickness of full soil surface evaporation layer (m)
-        self.Kex = Kex  # Maximum soil evaporation coefficient
-        self.fevap = fevap  # Shape factor describing reduction in soil evaporation in stage 2.
-        self.fWrelExp = (
-            fWrelExp  # Proportional value of Wrel at which soil evaporation layer expands
+        self.EvapZsurf = (
+            EvapZsurf  # Thickness of soil surface skin evaporation layer (m)
         )
+        self.EvapZmin = (
+            EvapZmin  # Minimum thickness of full soil surface evaporation layer (m)
+        )
+        self.EvapZmax = (
+            EvapZmax  # Maximum thickness of full soil surface evaporation layer (m)
+        )
+        self.Kex = Kex  # Maximum soil evaporation coefficient
+        self.fevap = (
+            fevap  # Shape factor describing reduction in soil evaporation in stage 2.
+        )
+        self.fWrelExp = fWrelExp  # Proportional value of Wrel at which soil evaporation layer expands
         self.fwcc = fwcc  # Maximum coefficient for soil evaporation reduction due to sheltering effect of withered canopy
         self.zCN = zCN  # Thickness of soil surface (m) used to calculate water content to adjust curve number
-        self.zGerm = (
-            zGerm  # Thickness of soil surface (m) used to calculate water content for germination
+        self.zGerm = zGerm  # Thickness of soil surface (m) used to calculate water content for germination
+        self.AdjCN = (
+            AdjCN  # Adjust curve number for antecedent moisture content (0: No, 1: Yes)
         )
-        self.AdjCN = AdjCN  # Adjust curve number for antecedent moisture content (0: No, 1: Yes)
         self.fshape_cr = fshape_cr  # Capillary rise shape factor
         self.zTop = max(
             zTop, dz[0]
@@ -306,41 +314,44 @@ class Soil:
         else:
             last = self.profile[self.profile.Layer == new_layer - 1].dzsum.values[-1]
             self.profile.loc[
-                (thickness + last >= self.profile.dzsum) & (self.profile.Layer.isna()), "Layer"
+                (thickness + last >= self.profile.dzsum) & (self.profile.Layer.isna()),
+                "Layer",
             ] = new_layer
 
-        self.profile.loc[self.profile.Layer == new_layer, "th_dry"] = self.profile.Layer.map(
-            {new_layer: thWP / 2}
-        )
-        self.profile.loc[self.profile.Layer == new_layer, "th_wp"] = self.profile.Layer.map(
-            {new_layer: thWP}
-        )
-        self.profile.loc[self.profile.Layer == new_layer, "th_fc"] = self.profile.Layer.map(
-            {new_layer: thFC}
-        )
-        self.profile.loc[self.profile.Layer == new_layer, "th_s"] = self.profile.Layer.map(
-            {new_layer: thS}
-        )
-        self.profile.loc[self.profile.Layer == new_layer, "Ksat"] = self.profile.Layer.map(
-            {new_layer: Ksat}
-        )
-        self.profile.loc[self.profile.Layer == new_layer, "penetrability"] = self.profile.Layer.map(
-            {new_layer: penetrability}
-        )
+        self.profile.loc[
+            self.profile.Layer == new_layer, "th_dry"
+        ] = self.profile.Layer.map({new_layer: thWP / 2})
+        self.profile.loc[
+            self.profile.Layer == new_layer, "th_wp"
+        ] = self.profile.Layer.map({new_layer: thWP})
+        self.profile.loc[
+            self.profile.Layer == new_layer, "th_fc"
+        ] = self.profile.Layer.map({new_layer: thFC})
+        self.profile.loc[
+            self.profile.Layer == new_layer, "th_s"
+        ] = self.profile.Layer.map({new_layer: thS})
+        self.profile.loc[
+            self.profile.Layer == new_layer, "Ksat"
+        ] = self.profile.Layer.map({new_layer: Ksat})
+        self.profile.loc[
+            self.profile.Layer == new_layer, "penetrability"
+        ] = self.profile.Layer.map({new_layer: penetrability})
 
         # Calculate drainage characteristic (tau)
         # Calculations use equation given by Raes et al. 2012
-        tau = round(0.0866 * (Ksat ** 0.35), 2)
+        tau = round(0.0866 * (Ksat**0.35), 2)
         if tau > 1:
             tau = 1
         elif tau < 0:
             tau = 0
 
-        self.profile.loc[self.profile.Layer == new_layer, "tau"] = self.profile.Layer.map(
-            {new_layer: tau}
-        )
+        self.profile.loc[
+            self.profile.Layer == new_layer, "tau"
+        ] = self.profile.Layer.map({new_layer: tau})
 
-    def fill_nan(self,):
+    def fill_nan(
+        self,
+    ):
 
         self.profile = self.profile.fillna(method="ffill")
 
@@ -354,7 +365,9 @@ class Soil:
 
         self.profile.Layer = self.profile.Layer.astype(int)
 
-    def add_capillary_rise_params(self,):
+    def add_capillary_rise_params(
+        self,
+    ):
         # Calculate capillary rise parameters for all soil layers
         # Only do calculation if water table is present. Calculations use equations
         # described in Raes et al. (2012)
@@ -465,5 +478,6 @@ class Soil:
             prof.loc[prof.Layer == layer, "bCR"] = prof.Layer.map({layer: bCR})
 
         self.profile = prof
+
 
 SoilClass = Soil

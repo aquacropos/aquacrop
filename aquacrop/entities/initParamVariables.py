@@ -1,6 +1,7 @@
 import numpy as np
 from numba import float64, int64, boolean, types
 
+from ..entities.modelConstants import ModelConstants
 
 InitCond_spec = [
     ("AgeDays", float64),
@@ -80,7 +81,7 @@ InitCond_spec = [
 
 
 
-class InitialCondition:
+class InitialCondition():
     """
     The InitCond Class contains all Paramaters and variables used in the simulation
 
@@ -163,7 +164,7 @@ class InitialCondition:
         self.Zroot = 0.
         self.CC0adj = 0
         self.SurfaceStorage = 0
-        self.zGW = -999
+        self.zGW = ModelConstants.NO_VALUE
 
         self.th_fc_Adj = np.zeros(num_comp)
         self.th = np.zeros(num_comp)

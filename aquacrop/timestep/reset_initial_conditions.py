@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+from ..entities.modelConstants import ModelConstants
 from ..initialize.calculate_HI_linear import calculate_HI_linear
 from ..initialize.calculate_HIGC import calculate_HIGC
 
@@ -214,7 +215,7 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
             # 2. Duration of flowering in calendar days
             crop.FloweringCD = FloweringEnd - crop.HIstartCD
         else:
-            crop.FloweringCD = -999
+            crop.FloweringCD = ModelConstants.NO_VALUE
 
         # Update harvest index growth coefficient
         crop.HIGC = calculate_HIGC(

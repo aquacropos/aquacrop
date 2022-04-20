@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+from ..entities.modelConstants import ModelConstants
+
 
 def compute_crop_calendar(
     crop,
@@ -75,7 +77,7 @@ def compute_crop_calendar(
         # Time from sowing to end of yield formation
         crop.HIendCD = crop.HIstartCD + crop.YldFormCD
 
-        # Duplicate calendar values (needed to minimise if 
+        # Duplicate calendar values (needed to minimise if
         # statements when switching between GDD and CD runs)
         crop.Emergence = crop.EmergenceCD
         crop.Canopy10Pct = crop.Canopy10PctCD
@@ -92,9 +94,9 @@ def compute_crop_calendar(
             # crop.FloweringEndCD = crop.FloweringEnd
             # crop.FloweringCD = crop.Flowering
         else:
-            crop.FloweringEnd = -999
-            crop.FloweringEndCD = -999
-            crop.FloweringCD = -999
+            crop.FloweringEnd = ModelConstants.NO_VALUE
+            crop.FloweringEndCD = ModelConstants.NO_VALUE
+            crop.FloweringCD = ModelConstants.NO_VALUE
 
         # Check if converting crop calendar to GDD mode
         if crop.SwitchGDD == 1:
@@ -292,6 +294,6 @@ def compute_crop_calendar(
             # 2. Duration of flowering in calendar days
             crop.FloweringCD = FloweringEnd - crop.HIstartCD
         else:
-            crop.FloweringCD = -999
+            crop.FloweringCD = ModelConstants.NO_VALUE
 
     return crop

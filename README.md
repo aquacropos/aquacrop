@@ -24,7 +24,8 @@ modelOs = AquaCropModel(
             crop=Crop('Wheat', planting_date='10/01'),
             initial_water_content=InitialWaterContent(value=['FC']),
         )
-model_results = model_os.run_model(till_termination=True)["results"]
+model_os.run_model(till_termination=True)
+model_results = model_os.get_results()
 final_statistics = model_results.final_stats.head()
 print(final_statistics)
 ```

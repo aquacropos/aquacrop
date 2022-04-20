@@ -28,7 +28,7 @@ def outputs_when_model_is_finished(
                 "Es",
                 "EsPot",
                 "Tr",
-                "P",
+                "TrPot",
             ],
         )
 
@@ -59,4 +59,4 @@ def outputs_when_model_is_finished(
 
         return flux_output_df, water_output_df, growth_outputs_df
 
-    return flux_output, water_output, growth_outputs
+    return False

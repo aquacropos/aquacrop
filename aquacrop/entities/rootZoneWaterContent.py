@@ -1,4 +1,4 @@
-from numba import float64, int64, boolean, types
+from numba import float64, types
 import typing
 
 

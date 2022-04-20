@@ -2,7 +2,7 @@ import numpy as np
 
 
 from ..entities.initParamVariables import InitCondClass
-
+from ..entities.modelConstants import ModelConstants
 
 
 def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
@@ -84,7 +84,7 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
     # Check for presence of groundwater table
     if ParamStruct.WaterTable == 0:  # No water table present
         # Set initial groundwater level to dummy value
-        InitCond.zGW = -999
+        InitCond.zGW = ModelConstants.NO_VALUE
         InitCond.WTinSoil = False
         # Set adjusted field capacity to default field capacity
         InitCond.th_fc_Adj = profile.th_fc.values

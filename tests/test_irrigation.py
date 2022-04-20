@@ -40,8 +40,10 @@ class TestIrrigation(unittest.TestCase):
             irrigation_management=irrigation,
         )
         # run model till termination
-        model_results = model_os.run_model(till_termination=True)["results"]
-        final_statistics = model_results.final_stats.head(10)
+        model_os.run_model(till_termination=True)
+        
+        final_statistics = model_os.get_final_statistics().head(10)
+        print(final_statistics)
 
         print(final_statistics)
 
@@ -70,8 +72,10 @@ class TestIrrigation(unittest.TestCase):
             irrigation_management=irrigation,
         )
         # run model till termination
-        model_results = model_os.run_model(till_termination=True)["results"]
-        final_statistics = model_results.final_stats.head(10)
+        model_os.run_model(till_termination=True)
+        
+        final_statistics = model_os.get_final_statistics().head(10)
+        print(final_statistics)
         print(final_statistics)
         yied_1_result = 12.650076726957787
         yield1 = final_statistics["Yield (tonne/ha)"][0]
@@ -99,8 +103,10 @@ class TestIrrigation(unittest.TestCase):
             irrigation_management=irrigation,
         )
         # run model till termination
-        model_results = model_os.run_model(till_termination=True)["results"]
-        final_statistics = model_results.final_stats.head(10)
+        model_os.run_model(till_termination=True)
+        
+        final_statistics = model_os.get_final_statistics().head(10)
+        print(final_statistics)
 
         yield_1_result = 12.646543675646381
         yield1 = final_statistics["Yield (tonne/ha)"][0]
@@ -132,8 +138,10 @@ class TestIrrigation(unittest.TestCase):
         )
 
         # run model till termination
-        model_results = model_os.run_model(till_termination=True)["results"]
-        final_statistics = model_results.final_stats.head(10)
+        model_os.run_model(till_termination=True)
+        
+        final_statistics = model_os.get_final_statistics().head(10)
+        print(final_statistics)
 
         yield_1_result = 12.128998898669153
         yield1 = final_statistics["Yield (tonne/ha)"][0]
@@ -161,8 +169,10 @@ class TestIrrigation(unittest.TestCase):
         )
 
         # run model till termination
-        model_results = model_os.run_model(till_termination=True)["results"]
-        final_statistics = model_results.final_stats.head(10)
+        model_os.run_model(till_termination=True)
+        
+        final_statistics = model_os.get_final_statistics().head(10)
+        print(final_statistics)
 
         yield_1_result = 12.657670494485089
         yield1 = final_statistics["Yield (tonne/ha)"][0]
