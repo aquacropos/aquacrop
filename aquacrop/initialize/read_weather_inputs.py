@@ -1,27 +1,39 @@
+"""
+Initialize weather data
+"""
 
 
-def read_weather_inputs(ClockStruct, weather_df):
+def read_weather_inputs(clock_sctruct, weather_df):
     """
-    clip weather to start and end simulation dates
+    Clip weather to start and end simulation dates
 
-    *Arguments:*\n
+    Arguments:
 
-    `ClockStruct` : `ClockStructClass` : time paramaters
+    clock_sctruct : ClockStruct object
 
-    `weather_df` : `pd.DataFrame` :  weather data
+    weather_df : pd.DataFrame
+        weather dataframe
 
-    *Returns:*
+    Returns:
 
-    `weather_df` : `pd.DataFrame`: clipped weather data
+        weather_df : pd.DataFrame
+            clipped weather data
 
     """
 
     # get the start and end dates of simulation
-    start_date = ClockStruct.simulation_start_date
-    end_date = ClockStruct.simulation_end_date
+    start_date = clock_sctruct.simulation_start_date
+    end_date = clock_sctruct.simulation_end_date
 
-    assert weather_df.Date.iloc[0] <= start_date
-    assert weather_df.Date.iloc[-1] >= end_date
+    if weather_df.Date.iloc[0] >= start_date:
+        raise ValueError(
+            "The first date of the climate data cannot be longer than the start date of the model."
+        )
+
+    if weather_df.Date.iloc[-1] <= end_date:
+        raise ValueError(
+            "The model end date cannot be longer than the last date of climate data."
+        )
 
     # remove weather data outside of simulation dates
     weather_df = weather_df[weather_df.Date >= start_date]

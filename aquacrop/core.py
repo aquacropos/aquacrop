@@ -4,12 +4,17 @@ This file contains the AquacropModel class that runs the simulation.
 import os
 import time
 import datetime
+import logging
+
 
 from .scripts.checkIfPackageIsCompiled import compile_all_AOT_files
 
+
 # Important: This code is necessary to check if the AOT files are compiled.
 if os.getenv("DEVELOPMENT"):
-    print("Running the simulation in development mode.")
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    logging.info("Running the simulation in development mode.")
 else:
     compile_all_AOT_files()
 
@@ -200,14 +205,7 @@ class AquaCropModel:
         Check if weather dataframe is in a correct format.
         """
         weather_df_columns = "Date MinTemp MaxTemp Precipitation ReferenceET".split(" ")
-        if all([column in value for column in weather_df_columns]):
-            _check_weather_df_dates(
-                value["Date"].iloc[-1],
-                self.sim_end_time,
-                value["Date"].iloc[0],
-                self.sim_start_time,
-            )
-        else:
+        if not all([column in value for column in weather_df_columns]):
             raise ValueError(
                 "Error in weather_df format. Check if all the following columns exist "
                 + "(Date MinTemp MaxTemp Precipitation ReferenceET)."
@@ -220,13 +218,7 @@ class AquaCropModel:
         Initialise all model variables
         """
 
-        _check_weather_df_dates(
-            self.weather_df["Date"].iloc[-1],
-            self.sim_end_time,
-            self.weather_df["Date"].iloc[0],
-            self.sim_start_time,
-        )
-        # define model runtime
+        # Initialize ClockStruct object
         self._clock_struct = read_clock_paramaters(
             self.sim_start_time, self.sim_end_time
         )
@@ -467,32 +459,6 @@ class AquaCropModel:
             )
 
 
-def _check_weather_df_dates(
-    last_date_weather_df, sim_end_time, start_date_weather_df, sim_start_time
-):
-    """
-    This function generates an error if the dates in the weather data frame are not correct.
-    """
-
-    weather_first_date_timestamp = time.mktime(start_date_weather_df.timetuple())
-    weather_last_date_timestamp = time.mktime(last_date_weather_df.timetuple())
-    sim_end_time_timestamp = time.mktime(
-        datetime.datetime.strptime(sim_end_time, "%Y/%m/%d").timetuple()
-    )
-    sim_start_time_timestamp = time.mktime(
-        datetime.datetime.strptime(sim_start_time, "%Y/%m/%d").timetuple()
-    )
-
-    if sim_start_time_timestamp < weather_first_date_timestamp:
-        raise ValueError(
-            "The first date of the climate data cannot be longer than the start date of the model."
-        )
-    if sim_end_time_timestamp > weather_last_date_timestamp:
-        raise ValueError(
-            "The model end date cannot be longer than the last date of climate data."
-        )
-
-
 def _sim_date_format_is_correct(date):
     """
     This function checks if the start or end date of the simulation is in the correct format.
@@ -503,9 +469,9 @@ def _sim_date_format_is_correct(date):
     Return:
         boolean: True if the date is correct.
     """
-    FORMAT_DATES_STR = "%Y/%m/%d"
+    format_dates_string = "%Y/%m/%d"
     try:
-        datetime.datetime.strptime(date, FORMAT_DATES_STR)
+        datetime.datetime.strptime(date, format_dates_string)
         return True
     except ValueError:
         return False

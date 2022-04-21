@@ -1,3 +1,6 @@
+'''
+Test exeptions in the model.
+'''
 import unittest
 
 from aquacrop.utils.data import get_filepath
@@ -70,6 +73,15 @@ class TestModelExceptions(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             self._model_os.sim_start_time = f"{1979}/10/01"
             self._model_os.sim_end_time = f"{2900}/10/01"
+            self._model_os.run_model()
+
+        self.assertTrue(
+            "Simulation period must be less than 580 years." in str(context.exception)
+        )
+
+        with self.assertRaises(Exception) as context:
+            self._model_os.sim_start_time = f"{1979}/10/01"
+            self._model_os.sim_end_time = f"{2100}/10/01"
             self._model_os.run_model()
 
         self.assertTrue(

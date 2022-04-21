@@ -9,39 +9,40 @@ def read_clock_paramaters(sim_start_time, sim_end_time, off_season=False):
     """
     Function to read in start and end simulaiton time and return a ClockStruct object
 
-    Arguments:
+        Arguments:
 
-        sim_start_time : `str`
-                simulation start date
+            sim_start_time : `str`
+                    simulation start date
 
-        sim_end_time : `str`
-                simulation start date
+            sim_end_time : `str`
+                    simulation start date
 
-        off_season : `bool`
-                simulate off season true, false
+            off_season : `bool`
+                    simulate off season true, false
 
-    Returns:
+        Returns:
 
-        clock_sctruct : ClockStruct object
-                time paramaters
+            clock_sctruct : ClockStruct object
+                    time paramaters
 
 
     """
+    check_max_simulation_days(sim_start_time, sim_end_time)
 
     # Extract data and put into pandas datetime format
-    sim_start_time = pd.to_datetime(sim_start_time)
-    sim_end_time = pd.to_datetime(sim_end_time)
+    pandas_sim_start_time = pd.to_datetime(sim_start_time)
+    pandas_sim_end_time = pd.to_datetime(sim_end_time)
 
     # create ClockStruct object
     clock_sctruct = ClockStructClass()
 
     # Add variables
-    clock_sctruct.simulation_start_date = sim_start_time
-    clock_sctruct.simulation_end_date = sim_end_time
-    
-    clock_sctruct.n_steps = (sim_end_time - sim_start_time).days + 1
+    clock_sctruct.simulation_start_date = pandas_sim_start_time
+    clock_sctruct.simulation_end_date = pandas_sim_end_time
+
+    clock_sctruct.n_steps = (pandas_sim_end_time - pandas_sim_start_time).days + 1
     clock_sctruct.time_span = pd.date_range(
-        freq="D", start=sim_start_time, end=sim_end_time
+        freq="D", start=pandas_sim_start_time, end=pandas_sim_end_time
     )
 
     clock_sctruct.step_start_time = clock_sctruct.time_span[0]
@@ -50,3 +51,14 @@ def read_clock_paramaters(sim_start_time, sim_end_time, off_season=False):
     clock_sctruct.sim_off_season = off_season
 
     return clock_sctruct
+
+
+def check_max_simulation_days(sim_start_time, sim_end_time):
+    """
+    Check that the date range of the simulation is less than 580 years.
+    In pandas this cannot happen due to the size of the variable
+    """
+    start_year = int(sim_start_time.split("/")[0])
+    end_year = int(sim_end_time.split("/")[0])
+    if (end_year - start_year) > 580:
+        raise ValueError("Simulation period must be less than 580 years.")
