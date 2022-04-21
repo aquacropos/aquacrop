@@ -1,45 +1,52 @@
+"""
+Inititalize clocks parameters
+"""
 import pandas as pd
 from ..entities.clockStruct import ClockStructClass
 
 
-def read_clock_paramaters(SimStartTime, SimEndTime, OffSeason=False):
+def read_clock_paramaters(sim_start_time, sim_end_time, off_season=False):
     """
-    function to read in start and end simulaiton time and return a `ClockStructClass` object
+    Function to read in start and end simulaiton time and return a ClockStruct object
 
-    *Arguments:*\n
+    Arguments:
 
-    `SimStartTime` : `str`:  simulation start date
+        sim_start_time : `str`
+                simulation start date
 
-    `SimEndTime` : `str` :  simulation start date
+        sim_end_time : `str`
+                simulation start date
 
-    `OffSeason` : `bool` :  simulate off season true, false
+        off_season : `bool`
+                simulate off season true, false
 
-    *Returns:*
+    Returns:
 
-
-    `ClockStruct` : `ClockStructClass` : time paramaters
+        clock_sctruct : ClockStruct object
+                time paramaters
 
 
     """
 
-    # extract data and put into numpy datetime format
-    SimStartTime = pd.to_datetime(SimStartTime)
-    SimEndTime = pd.to_datetime(SimEndTime)
+    # Extract data and put into pandas datetime format
+    sim_start_time = pd.to_datetime(sim_start_time)
+    sim_end_time = pd.to_datetime(sim_end_time)
 
-    # create object
-    ClockStruct = ClockStructClass()
+    # create ClockStruct object
+    clock_sctruct = ClockStructClass()
 
-    # add variables
-    ClockStruct.simulation_start_date = SimStartTime
-    ClockStruct.simulation_end_date = SimEndTime
+    # Add variables
+    clock_sctruct.simulation_start_date = sim_start_time
+    clock_sctruct.simulation_end_date = sim_end_time
+    
+    clock_sctruct.n_steps = (sim_end_time - sim_start_time).days + 1
+    clock_sctruct.time_span = pd.date_range(
+        freq="D", start=sim_start_time, end=sim_end_time
+    )
 
-    ClockStruct.n_steps = (SimEndTime - SimStartTime).days + 1
-    ClockStruct.time_span = pd.date_range(freq="D", start=SimStartTime, end=SimEndTime)
+    clock_sctruct.step_start_time = clock_sctruct.time_span[0]
+    clock_sctruct.step_end_time = clock_sctruct.time_span[1]
 
-    ClockStruct.step_start_time = ClockStruct.time_span[0]
-    ClockStruct.step_end_time = ClockStruct.time_span[1]
+    clock_sctruct.sim_off_season = off_season
 
-    ClockStruct.sim_off_season = OffSeason
-
-    return ClockStruct
-
+    return clock_sctruct

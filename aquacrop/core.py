@@ -470,6 +470,9 @@ class AquaCropModel:
 def _check_weather_df_dates(
     last_date_weather_df, sim_end_time, start_date_weather_df, sim_start_time
 ):
+    """
+    This function generates an error if the dates in the weather data frame are not correct.
+    """
 
     weather_first_date_timestamp = time.mktime(start_date_weather_df.timetuple())
     weather_last_date_timestamp = time.mktime(last_date_weather_df.timetuple())
@@ -491,9 +494,18 @@ def _check_weather_df_dates(
 
 
 def _sim_date_format_is_correct(date):
-    format_str = "%Y/%m/%d"
+    """
+    This function checks if the start or end date of the simulation is in the correct format.
+
+    Arguments:
+        date
+
+    Return:
+        boolean: True if the date is correct.
+    """
+    FORMAT_DATES_STR = "%Y/%m/%d"
     try:
-        datetime.datetime.strptime(date, format_str)
+        datetime.datetime.strptime(date, FORMAT_DATES_STR)
         return True
     except ValueError:
         return False
