@@ -63,6 +63,8 @@ class TestModelExceptions(unittest.TestCase):
             self._model_os.sim_start_time = f"{1900}/10/01"
             self._model_os.sim_end_time = f"{1985}/05/30"
             self._model_os.run_model()
+        
+        print(str(context.exception))
             
 
         self.assertTrue(
