@@ -1,7 +1,9 @@
 import unittest
 import pandas as pd
 
-from aquacrop.core import AquaCropModel, get_filepath, prepare_weather
+from aquacrop.utils.data import get_filepath
+from aquacrop.core import AquaCropModel
+from aquacrop.utils.prepare_weather import prepare_weather
 from aquacrop.entities.soil import SoilClass
 from aquacrop.entities.crop import CropClass
 from aquacrop.entities.inititalWaterContent import InitialWaterContent

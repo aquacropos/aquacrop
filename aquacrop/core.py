@@ -3,9 +3,7 @@ This file contains the AquacropModel class that runs the simulation.
 """
 import os
 import time
-
-import numpy as np
-import pandas as pd
+import datetime
 
 from .scripts.checkIfPackageIsCompiled import compile_all_AOT_files
 
@@ -17,7 +15,6 @@ else:
 
 # pylint: disable=wrong-import-position
 
-from . import data
 from .entities.fieldManagement import FieldMngt
 from .entities.groundWater import GroundWater
 from .entities.irrigationManagement import IrrigationManagement
@@ -35,68 +32,6 @@ from .timestep.check_if_model_is_finished import check_model_is_finished
 from .timestep.run_single_timestep import solution_single_time_step
 from .timestep.update_time import update_time
 from .timestep.outputs_when_model_is_finished import outputs_when_model_is_finished
-
-
-def list_data():
-    """
-    lists all built-in data files
-    """
-    path = data.__path__[0]
-
-    return os.listdir(path)
-
-
-def get_filepath(filename):
-    """
-    get selected data file
-    """
-    filepath = os.path.join(data.__path__[0], filename)
-
-    return filepath
-
-
-def get_data(filename, **kwargs):
-    """
-    get selected data file
-    """
-    filepath = os.path.join(data.__path__[0], filename)
-
-    return np.genfromtxt(filepath, **kwargs)
-
-
-def prepare_weather(weather_file_path):
-    """
-    function to read in _weather data and return a dataframe containing
-    the _weather data
-
-    *Arguments:*\n
-    `weather_file_path` : `str` :  file location of _weather data
-
-    *Returns:*
-
-    `weather_df`: `pandas.DataFrame` :  _weather data for simulation period
-
-    """
-
-    weather_df = pd.read_csv(weather_file_path, header=0, delim_whitespace=True)
-
-    assert len(weather_df.columns) == 7
-
-    # rename the columns
-    weather_df.columns = str(
-        "Day Month Year MinTemp MaxTemp Precipitation ReferenceET"
-    ).split()
-
-    # put the _weather dates into datetime format
-    weather_df["Date"] = pd.to_datetime(weather_df[["Year", "Month", "Day"]])
-
-    # drop the day month year columns
-    weather_df = weather_df.drop(["Day", "Month", "Year"], axis=1)
-
-    # set limit on ET0 to avoid divide by zero errors
-    weather_df.ReferenceET.clip(lower=0.1, inplace=True)
-
-    return weather_df
 
 
 class AquaCropModel:
@@ -124,6 +59,19 @@ class AquaCropModel:
     `harvest_dates`:  TODO: This is not used.
     `co2_concentration`: `CO2 object`: Defines CO2 concentrations
     """
+
+    # Model parameters
+    __steps_are_finished = False
+    __has_model_executed = False  # Determines if the model has been run
+    __has_model_finished = False  # Determines if the model is finished
+    __start_model_execution = None  # Time when the execution start
+    __end_model_execution = None  # Time when the execution end
+    # Attributes initialised later
+    _clock_struct = None
+    _param_struct = None
+    _init_cond = None
+    _outputs = None
+    _weather = None
 
     def __init__(
         self,
@@ -166,24 +114,79 @@ class AquaCropModel:
         if groundwater is None:
             self.groundwater = GroundWater()
 
-        # Model parameters
-        self.__steps_are_finished = False
-        self.__has_model_executed = False  # Determines if the model has been run
-        self.__has_model_finished = False  # Determines if the model is finished
-        self.__start_model_execution = None  # Time when the execution start
-        self.__end_model_execution = None  # Time when the execution end
-        # Attributes initialised later
-        self._clock_struct = None
-        self._param_struct = None
-        self._init_cond = None
-        self._outputs = None
-        self._weather = None
+    @property
+    def sim_start_time(self):
+        """
+        Return sim start date
+        """
+        return self._sim_start_time
+
+    @sim_start_time.setter
+    def sim_start_time(self, value):
+        '''
+        Check if sim start date is in a correct format.
+        '''
+        
+        if _sim_date_format_is_correct(value) is not False:
+            self._sim_start_time = value
+        else:
+            raise ValueError("sim_start_time format must be 'YYYY/MM/DD'")
+
+    @property
+    def sim_end_time(self):
+        """
+        Return sim end date
+        """
+        return self._sim_end_time
+
+    @sim_end_time.setter
+    def sim_end_time(self, value):
+        '''
+        Check if sim end date is in a correct format.
+        '''
+        if _sim_date_format_is_correct(value) is not False:
+            self._sim_end_time = value
+        else:
+            raise ValueError("sim_end_time format must be 'YYYY/MM/DD'")
+
+    @property
+    def weather_df(self):
+        """
+        Return weather dataframe
+        """
+        return self._weather_df
+
+    @weather_df.setter
+    def weather_df(self, value):
+        """
+        Check if weather dataframe is in a correct format.
+        """
+        weather_df_columns = "Date MinTemp MaxTemp Precipitation ReferenceET".split(" ")
+        if all([column in value for column in weather_df_columns]):
+            _check_weather_df_dates(
+                value["Date"].iloc[-1],
+                self.sim_end_time,
+                value["Date"].iloc[0],
+                self.sim_start_time,
+            )
+        else:
+            raise ValueError(
+                "Error in weather_df format. Check if all the following columns exist (Date MinTemp MaxTemp Precipitation ReferenceET)."
+            )
+
+        self._weather_df = value
 
     def _initialize(self):
         """
         Initialise all model variables
         """
 
+        _check_weather_df_dates(
+            self.weather_df["Date"].iloc[-1],
+            self.sim_end_time,
+            self.weather_df["Date"].iloc[0],
+            self.sim_start_time,
+        )
         # define model runtime
         self._clock_struct = read_clock_paramaters(
             self.sim_start_time, self.sim_end_time
@@ -262,10 +265,8 @@ class AquaCropModel:
             self.__has_model_finished = True
             return True
         else:
-            if(num_steps<1):
-                raise ValueError(
-                "num_steps must be equal to or greater than 1."
-                )
+            if num_steps < 1:
+                raise ValueError("num_steps must be equal to or greater than 1.")
             self.__start_model_execution = time.time()
             for i in range(num_steps):
 
@@ -411,6 +412,38 @@ class AquaCropModel:
             raise ValueError(
                 "You cannot get results without running the model. Please execute the run_model() method."
             )
+
+
+def _check_weather_df_dates(
+    last_date_weather_df, sim_end_time, start_date_weather_df, sim_start_time
+):
+
+    weather_first_date_timestamp = time.mktime(start_date_weather_df.timetuple())
+    weather_last_date_timestamp = time.mktime(last_date_weather_df.timetuple())
+    sim_end_time_timestamp = time.mktime(
+        datetime.datetime.strptime(sim_end_time, "%Y/%m/%d").timetuple()
+    )
+    sim_start_time_timestamp = time.mktime(
+        datetime.datetime.strptime(sim_start_time, "%Y/%m/%d").timetuple()
+    )
+
+    if sim_start_time_timestamp < weather_first_date_timestamp:
+        raise ValueError(
+            "The first date of the climate data cannot be longer than the start date of the model."
+        )
+    if sim_end_time_timestamp > weather_last_date_timestamp:
+        raise ValueError(
+            "The model end date cannot be longer than the last date of climate data."
+        )
+
+
+def _sim_date_format_is_correct(date):
+    format_str = "%Y/%m/%d"
+    try:
+        datetime.datetime.strptime(date, format_str)
+        return True
+    except ValueError:
+        return False
 
 
 def _weather_data_current_timestep(_weather, time_step_counter):

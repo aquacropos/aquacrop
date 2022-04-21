@@ -1,6 +1,8 @@
 import unittest
 
-from aquacrop.core import AquaCropModel, get_filepath, prepare_weather
+from aquacrop.utils.prepare_weather import prepare_weather
+from aquacrop.utils.data import get_filepath
+from aquacrop.core import AquaCropModel
 from aquacrop.entities.soil import Soil
 from aquacrop.entities.crop import Crop
 from aquacrop.entities.inititalWaterContent import InitialWaterContent
@@ -20,7 +22,7 @@ class TestModelByStepNotFinished(unittest.TestCase):
     _initial_water_content = InitialWaterContent(value=["FC"])
     _model_os = AquaCropModel(
         sim_start_time=f"{1979}/10/01",
-        sim_end_time=f"{1985}/05/30",
+        sim_end_time=f"{1986}/05/30",
         weather_df=_weather_data,
         soil=_sandy_loam,
         crop=_wheat,
@@ -34,6 +36,9 @@ class TestModelByStepNotFinished(unittest.TestCase):
         """
         final_statistics_returned = self._model_os.get_final_statistics()
         final_statistics_expected = False
+        
+        
+        print(self._model_os.weather_df)
 
         self.assertEqual(final_statistics_expected, final_statistics_returned)
 
