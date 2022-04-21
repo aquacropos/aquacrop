@@ -34,7 +34,7 @@ class TestModelByStepNotFinished(unittest.TestCase):
         """
         Test Final Statistics. It should be False
         """
-        final_statistics_returned = self._model_os.get_final_statistics()
+        final_statistics_returned = self._model_os.get_simulation_results()
         final_statistics_expected = False
         
         

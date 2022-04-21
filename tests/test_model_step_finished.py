@@ -34,7 +34,7 @@ class TestModelByStepNotFinished(unittest.TestCase):
         """
         Test final statistics
         """
-        final_statistics = self._model_os.get_final_statistics().head()
+        final_statistics = self._model_os.get_simulation_results().head()
         yied_1_result = 8.940139992051638
         yield1 = final_statistics["Yield (tonne/ha)"][0]
 

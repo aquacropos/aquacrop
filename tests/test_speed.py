@@ -38,7 +38,7 @@ class TestAquacropOs(unittest.TestCase):
         # run model till termination
         model_os.run_model(till_termination=True)
         
-        final_statistics = model_os.get_final_statistics().head(10)
+        final_statistics = model_os.get_simulation_results().head(10)
         print(final_statistics)
         end_function_execution = time.time()
         print(

@@ -37,7 +37,6 @@ class TestModelExceptions(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             self._model_os.sim_start_time = f"{1979}-10/01"
 
-
         self.assertTrue(
             "sim_start_time format must be 'YYYY/MM/DD'" in str(context.exception)
         )
@@ -48,8 +47,7 @@ class TestModelExceptions(unittest.TestCase):
         """
         with self.assertRaises(Exception) as context:
             self._model_os.sim_end_time = f"{1979}/13-01"
-            
-            
+
         self.assertTrue(
             "sim_end_time format must be 'YYYY/MM/DD'" in str(context.exception)
         )
@@ -63,8 +61,6 @@ class TestModelExceptions(unittest.TestCase):
             self._model_os.sim_start_time = f"{1970}/10/01"
             self._model_os.sim_end_time = f"{1985}/05/30"
             self._model_os.run_model()
-        
-            
 
         self.assertTrue(
             "The first date of the climate data cannot be longer than the start date of the model."
@@ -75,7 +71,6 @@ class TestModelExceptions(unittest.TestCase):
             self._model_os.sim_start_time = f"{1979}/10/01"
             self._model_os.sim_end_time = f"{2900}/10/01"
             self._model_os.run_model()
-
 
         self.assertTrue(
             "The model end date cannot be longer than the last date of climate data."

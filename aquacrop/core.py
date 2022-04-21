@@ -36,32 +36,70 @@ from .timestep.outputs_when_model_is_finished import outputs_when_model_is_finis
 
 class AquaCropModel:
     """
-    AquaCrop model class.
-
-    This is the main class of the AquaCrop model.
+    This is the main class of the AquaCrop-OSPy model.
     It is in charge of executing all the operations.
 
-    *Arguments:*\n
-    `sim_start_time` : `date YYYY/MM/DD` : Simulation start date
-    `sim_end_time` : `date YYYY/MM/DD` : Simulation end date
-    `weather_df`: `pandas.DataFrame` : Weather data (TODO: SPECIFY DATA TYPE)
-    `soil`: `Soil Object `: Soil object contains paramaters and variables of the soil
-        used in the simulation
-    `crop`: `Crop Object`: Crop object contains Paramaters and variables of the crop used
-        in the simulation
-    `initial_water_content`: `InitialWaterContent Object` : Defines water content at start
-        of simulation
-    `irrigation_management`: `IrrigationManagement Object`: Defines irrigation strategy
-    `field_management`: `FieldMngt Obj : Defines field management options`
-    `fallow_field_management`: TODO: Define it.
-    `groundwater`: `GroundWater object`: Stores information on water table params
-    `planting_dates`: TODO: This is not used.
-    `harvest_dates`:  TODO: This is not used.
-    `co2_concentration`: `CO2 object`: Defines CO2 concentrations
+    Arguments:
+
+    sim_start_time : date YYYY/MM/DD
+            Simulation start date
+
+    sim_end_time : date YYYY/MM/DD
+            Simulation end date
+
+    weather_df: pandas.DataFrame
+            Weather data (TODO: SPECIFY DATA TYPE)
+
+    soil: Soil Object
+            Soil object contains paramaters and variables of the soil
+            used in the simulation
+
+    crop: Crop Object
+            Crop object contains Paramaters and variables of the crop used
+            in the simulation
+
+    initial_water_content: InitialWaterContent Object
+            Defines water content at start of simulation
+
+    irrigation_management: IrrigationManagement Object
+            Defines irrigation strategy
+
+    field_management: FieldMngt Obj
+            Defines field management options`
+
+    fallow_field_management:
+            TODO: Define it.
+
+    groundwater: GroundWater object
+            Stores information on water table params
+
+    planting_dates:
+            TODO: This is not used.
+
+    harvest_dates:
+            TODO: This is not used.
+
+    co2_concentration: CO2 object
+            Defines CO2 concentrations
+
+    METHODS:
+
+    run_model(): Run the model.
+
+    get_simulation_results(): Get the final results.
+
+    get_water_storage(): Get the water storage values.
+
+    get_water_flux(): Get the water flux values.
+
+    get_crop_growth(): Get the crop growth values.
+
+    get_additional_information(): Get additional information of the model.
+
     """
 
     # Model parameters
-    __steps_are_finished = False
+    __steps_are_finished = False  # True if all steps of the simulation are done.
     __has_model_executed = False  # Determines if the model has been run
     __has_model_finished = False  # Determines if the model is finished
     __start_model_execution = None  # Time when the execution start
@@ -123,10 +161,10 @@ class AquaCropModel:
 
     @sim_start_time.setter
     def sim_start_time(self, value):
-        '''
+        """
         Check if sim start date is in a correct format.
-        '''
-        
+        """
+
         if _sim_date_format_is_correct(value) is not False:
             self._sim_start_time = value
         else:
@@ -141,9 +179,9 @@ class AquaCropModel:
 
     @sim_end_time.setter
     def sim_end_time(self, value):
-        '''
+        """
         Check if sim end date is in a correct format.
-        '''
+        """
         if _sim_date_format_is_correct(value) is not False:
             self._sim_end_time = value
         else:
@@ -171,7 +209,8 @@ class AquaCropModel:
             )
         else:
             raise ValueError(
-                "Error in weather_df format. Check if all the following columns exist (Date MinTemp MaxTemp Precipitation ReferenceET)."
+                "Error in weather_df format. Check if all the following columns exist "
+                + "(Date MinTemp MaxTemp Precipitation ReferenceET)."
             )
 
         self._weather_df = value
@@ -238,14 +277,22 @@ class AquaCropModel:
         """
         This function is responsible for executing the model.
 
-        *Arguments:*\n
-        `num_steps`: `int` : Number of stepts (Days) to be executed.
-        `till_termination`: `boolean` : Run the simulation to completion
+        Arguments:
 
-        *Returns:*
-        Dictionary:
-        `finished`: `boolean`: Informs if the simulation is finished
-        `results`: `Output object`: All results of the simulation
+            num_steps: int
+                    Number of stepts (Days) to be executed.
+
+            till_termination: boolean
+                    Run the simulation to completion
+
+        Returns:
+            Dictionary:
+
+                finished: boolean:
+                        Informs if the simulation is finished
+
+                results: Output object:
+                        All results of the simulation
         """
 
         self._initialize()
@@ -294,7 +341,6 @@ class AquaCropModel:
 
         """
         Function to run a single time-step (day) calculation of AquaCrop-OS
-
         """
 
         # extract _weather data for current timestep
@@ -345,7 +391,7 @@ class AquaCropModel:
 
         return clock_struct, _init_cond, param_struct, outputs
 
-    def get_final_statistics(self):
+    def get_simulation_results(self):
         """
         Return all the simulation results
         """
@@ -356,7 +402,8 @@ class AquaCropModel:
                 return False  # If the model is not finished, the results are not generated.
         else:
             raise ValueError(
-                "You cannot get results without running the model. Please execute the run_model() method."
+                "You cannot get results without running the model. "
+                + "Please execute the run_model() method."
             )
 
     def get_water_storage(self):
@@ -367,7 +414,8 @@ class AquaCropModel:
             return self._outputs.water_storage
         else:
             raise ValueError(
-                "You cannot get results without running the model. Please execute the run_model() method."
+                "You cannot get results without running the model. "
+                + "Please execute the run_model() method."
             )
 
     def get_water_flux(self):
@@ -378,7 +426,8 @@ class AquaCropModel:
             return self._outputs.water_flux
         else:
             raise ValueError(
-                "You cannot get results without running the model. Please execute the run_model() method."
+                "You cannot get results without running the model. "
+                + "Please execute the run_model() method."
             )
 
     def get_crop_growth(self):
@@ -389,7 +438,8 @@ class AquaCropModel:
             return self._outputs.crop_growth
         else:
             raise ValueError(
-                "You cannot get results without running the model. Please execute the run_model() method."
+                "You cannot get results without running the model. "
+                + "Please execute the run_model() method."
             )
 
     def get_additional_information(self):
@@ -398,7 +448,9 @@ class AquaCropModel:
 
            Returns:
                dict:
+
                    has_model_finished (boolean): Determines if the model is finished
+
                    execution_time : Time taken for the model to run
 
         """
@@ -410,7 +462,8 @@ class AquaCropModel:
             }
         else:
             raise ValueError(
-                "You cannot get results without running the model. Please execute the run_model() method."
+                "You cannot get results without running the model. "
+                + "Please execute the run_model() method."
             )
 
 

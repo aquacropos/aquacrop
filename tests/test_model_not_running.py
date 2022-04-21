@@ -35,7 +35,7 @@ class TestModelByStepNotFinished(unittest.TestCase):
         """
 
         with self.assertRaises(Exception) as context:
-            self._model_os.get_final_statistics()
+            self._model_os.get_simulation_results()
 
         self.assertTrue(
             "You cannot get results without running the model. Please execute the run_model() method."
