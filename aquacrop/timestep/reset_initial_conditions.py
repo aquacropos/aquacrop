@@ -151,9 +151,9 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
         # Reset water content to starting conditions
         InitCond.th = InitCond.thini
         # Reset surface storage
-        if (FieldMngt.Bunds) and (FieldMngt.zBund > 0.001):
+        if (FieldMngt.bunds) and (FieldMngt.z_bund > 0.001):
             # Get initial storage between surface bunds
-            InitCond.SurfaceStorage = min(FieldMngt.BundWater, FieldMngt.zBund)
+            InitCond.SurfaceStorage = min(FieldMngt.bund_water, FieldMngt.z_bund)
         else:
             # No surface bunds
             InitCond.SurfaceStorage = 0

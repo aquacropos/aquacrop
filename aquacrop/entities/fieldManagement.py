@@ -9,64 +9,64 @@ class FieldMngt:
     **Attributes:**\n
 
 
-    `Mulches` : `bool` :  Soil surface covered by mulches (Y or N)
+    `mulches` : `bool` :  Soil surface covered by mulches (Y or N)
 
-    `Bunds` : `bool` :  Surface bunds present (Y or N)
+    `bunds` : `bool` :  Surface bunds present (Y or N)
 
-    `CNadj` : `bool` : Field conditions affect curve number (Y or N)
+    `curve_number_adj` : `bool` : Field conditions affect curve number (Y or N)
 
-    `SRinhb` : `bool` : Management practices fully inhibit surface runoff (Y or N)
+    `sr_inhb` : `bool` : Management practices fully inhibit surface runoff (Y or N)
 
 
 
-    `MulchPct` : `float` :  Area of soil surface covered by mulches (%)
+    `mulch_pct` : `float` :  Area of soil surface covered by mulches (%)
 
-    `fMulch` : `float` : Soil evaporation adjustment factor due to effect of mulches
+    `f_mulch` : `float` : Soil evaporation adjustment factor due to effect of mulches
 
-    `zBund` : `float` : Bund height (m)
+    `z_bund` : `float` : Bund height (m)
 
-    `BundWater` : `float` : Initial water height in surface bunds (mm)
+    `bund_water` : `float` : Initial water height in surface bunds (mm)
 
-    `CNadjPct` : `float` : Percentage change in curve number (positive or negative)
+    `curve_number_adj_pct` : `float` : Percentage change in curve number (positive or negative)
 
     """
 
     def __init__(
         self,
-        Mulches=False,
-        Bunds=False,
-        CNadj=False,
-        SRinhb=False,
-        MulchPct=50,
-        fMulch=0.5,
-        zBund=0,
-        BundWater=0,
-        CNadjPct=0,
+        mulches=False,
+        bunds=False,
+        curve_number_adj=False,
+        sr_inhb=False,
+        mulch_pct=50,
+        f_mulch=0.5,
+        z_bund=0,
+        bund_water=0,
+        curve_number_adj_pct=0,
     ):
 
-        self.Mulches = Mulches  #  Soil surface covered by mulches (Y or N)
-        self.Bunds = Bunds  #  Surface bunds present (Y or N)
-        self.CNadj = CNadj  # Field conditions affect curve number (Y or N)
-        self.SRinhb = SRinhb  # Management practices fully inhibit surface runoff (Y or N)
+        self.mulches = mulches  #  Soil surface covered by mulches (Y or N)
+        self.bunds = bunds  #  Surface bunds present (Y or N)
+        self.curve_number_adj = curve_number_adj  # Field conditions affect curve number (Y or N)
+        self.sr_inhb = sr_inhb  # Management practices fully inhibit surface runoff (Y or N)
 
-        self.MulchPct = MulchPct  #  Area of soil surface covered by mulches (%)
-        self.fMulch = fMulch  # Soil evaporation adjustment factor due to effect of mulches
-        self.zBund = zBund  # Bund height (m)
-        self.BundWater = BundWater  # Initial water height in surface bunds (mm)
-        self.CNadjPct = CNadjPct  # Percentage change in curve number (positive or negative)
+        self.mulch_pct = mulch_pct  #  Area of soil surface covered by mulches (%)
+        self.f_mulch = f_mulch  # Soil evaporation adjustment factor due to effect of mulches
+        self.z_bund = z_bund  # Bund height (m)
+        self.bund_water = bund_water  # Initial water height in surface bunds (mm)
+        self.curve_number_adj_pct = curve_number_adj_pct  # Percentage change in curve number (positive or negative)
 
 
 
 spec = [
-    ("Mulches", boolean),
-    ("Bunds", boolean),
-    ("CNadj", boolean),
-    ("SRinhb", boolean),
-    ("MulchPct", float64),
-    ("fMulch", float64),
-    ("zBund", float64),
-    ("BundWater", float64),
-    ("CNadjPct", float64),
+    ("mulches", boolean),
+    ("bunds", boolean),
+    ("curve_number_adj", boolean),
+    ("sr_inhb", boolean),
+    ("mulch_pct", float64),
+    ("f_mulch", float64),
+    ("z_bund", float64),
+    ("bund_water", float64),
+    ("curve_number_adj_pct", float64),
 ]
 
 
@@ -80,15 +80,15 @@ class FieldMngtStruct:
     """
 
     def __init__(self):
-        self.Mulches = False
-        self.Bunds = False
-        self.CNadj = False
-        self.SRinhb = False
+        self.mulches = False
+        self.bunds = False
+        self.curve_number_adj = False
+        self.sr_inhb = False
 
-        self.MulchPct = 0.0
-        self.fMulch = 0.0
-        self.zBund = 0.0
-        self.BundWater = 0.0
-        self.CNadjPct = 0.0
+        self.mulch_pct = 0.0
+        self.f_mulch = 0.0
+        self.z_bund = 0.0
+        self.bund_water = 0.0
+        self.curve_number_adj_pct = 0.0
 
 FieldMngtClass = FieldMngt

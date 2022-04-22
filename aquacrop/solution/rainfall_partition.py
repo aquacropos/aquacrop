@@ -149,7 +149,7 @@ def rainfall_partition(
             Infl = P - Runoff
 
     else:
-        # Bunds on field, therefore no surface runoff
+        # bunds on field, therefore no surface runoff
         Runoff = 0
         Infl = P
 

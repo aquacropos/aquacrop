@@ -214,13 +214,13 @@ def soil_evaporation(
         EsPot = Soil_Kex * Et0
 
     ## Adjust potential soil evaporation for mulches and/or partial wetting ##
-    # Mulches
+    # mulches
     if NewCond_SurfaceStorage < 0.000001:
         if not FieldMngt_Mulches:
             # No mulches present
             EsPotMul = EsPot
         elif FieldMngt_Mulches:
-            # Mulches present
+            # mulches present
             EsPotMul = EsPot * (1 - FieldMngt_fMulch * (FieldMngt_MulchPct / 100))
 
     else:

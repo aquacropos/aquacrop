@@ -51,13 +51,13 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
     # Initial surface storage between any soil bunds
     if ClockStruct.season_counter == -1:
         # First day of simulation is in fallow period
-        if (ParamStruct.FallowFieldMngt.Bunds) and (
-            float(ParamStruct.FallowFieldMngt.zBund) > 0.001
+        if (ParamStruct.FallowFieldMngt.bunds) and (
+            float(ParamStruct.FallowFieldMngt.z_bund) > 0.001
         ):
             # Get initial storage between surface bunds
-            InitCond.SurfaceStorage = float(ParamStruct.FallowFieldMngt.BundWater)
-            if InitCond.SurfaceStorage > float(ParamStruct.FallowFieldMngt.zBund):
-                InitCond.SurfaceStorage = float(ParamStruct.FallowFieldMngt.zBund)
+            InitCond.SurfaceStorage = float(ParamStruct.FallowFieldMngt.bund_water)
+            if InitCond.SurfaceStorage > float(ParamStruct.FallowFieldMngt.z_bund):
+                InitCond.SurfaceStorage = float(ParamStruct.FallowFieldMngt.z_bund)
         else:
             # No surface bunds
             InitCond.SurfaceStorage = 0
@@ -66,11 +66,11 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
         # First day of simulation is in first growing season
         # Get relevant field management structure parameters
         FieldMngtTmp = ParamStruct.FieldMngt
-        if (FieldMngtTmp.Bunds) and (float(FieldMngtTmp.zBund) > 0.001):
+        if (FieldMngtTmp.bunds) and (float(FieldMngtTmp.z_bund) > 0.001):
             # Get initial storage between surface bunds
-            InitCond.SurfaceStorage = float(FieldMngtTmp.BundWater)
-            if InitCond.SurfaceStorage > float(FieldMngtTmp.zBund):
-                InitCond.SurfaceStorage = float(FieldMngtTmp.zBund)
+            InitCond.SurfaceStorage = float(FieldMngtTmp.bund_water)
+            if InitCond.SurfaceStorage > float(FieldMngtTmp.z_bund):
+                InitCond.SurfaceStorage = float(FieldMngtTmp.z_bund)
         else:
             # No surface bunds
             InitCond.SurfaceStorage = 0
