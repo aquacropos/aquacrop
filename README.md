@@ -28,9 +28,8 @@ modelOs = AquaCropModel(
             initial_water_content=InitialWaterContent(value=['FC']),
         )
 model_os.run_model(till_termination=True)
-model_results = model_os.get_results()
-final_statistics = model_results.final_stats.head()
-print(final_statistics)
+model_results = model_os.get_simulation_results().head()
+print(model_results)
 ```
 
 ## ABOUT
