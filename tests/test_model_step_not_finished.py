@@ -17,7 +17,7 @@ class TestModelByStepNotFinished(unittest.TestCase):
 
     _weather_data = prepare_weather(_weather_file_path)
 
-    _sandy_loam = Soil(soilType="SandyLoam")
+    _sandy_loam = Soil(soil_type="SandyLoam")
     _wheat = Crop("Wheat", planting_date="10/01")
     _initial_water_content = InitialWaterContent(value=["FC"])
     _model_os = AquaCropModel(

@@ -25,163 +25,163 @@ class Soil:
 
     def __init__(
         self,
-        soilType,
+        soil_type,
         dz=[0.1] * 12,
-        AdjREW=1,
-        REW=9.0,
-        CalcCN=0,
-        CN=61.0,
-        zRes=ModelConstants.NO_VALUE,
-        EvapZsurf=0.04,
-        EvapZmin=0.15,
-        EvapZmax=0.30,
-        Kex=1.1,
-        fevap=4,
-        fWrelExp=0.4,
+        adj_rew=1,
+        rew=9.0,
+        calc_cn=0,
+        cn=61.0,
+        z_res=ModelConstants.NO_VALUE,
+        evap_z_surf=0.04,
+        evap_z_min=0.15,
+        evap_z_max=0.30,
+        kex=1.1,
+        f_evap=4,
+        f_wrel_exp=0.4,
         fwcc=50,
-        zCN=0.3,
-        zGerm=0.3,
-        AdjCN=1,
+        z_cn=0.3,
+        z_germ=0.3,
+        adj_cn=1,
         fshape_cr=16,
-        zTop=0.1,
+        z_top=0.1,
     ):
 
-        self.Name = soilType
+        self.Name = soil_type
 
         self.zSoil = sum(dz)  # Total thickness of soil profile (m)
         self.nComp = len(dz)  # Total number of soil compartments
         self.nLayer = 0  # Total number of soil layers
-        self.AdjREW = AdjREW  # Adjust default value for readily evaporable water (0 = No, 1 = Yes)
-        self.REW = REW  # Readily evaporable water (mm) (only used if adjusting from default value)
-        self.CalcCN = CalcCN  # adjust Curve number based on Ksat
-        self.CN = CN  # Curve number  (0 = No, 1 = Yes)
-        self.zRes = zRes  # Depth of restrictive soil layer (set to negative value if not present)
+        self.adj_rew = adj_rew  # Adjust default value for readily evaporable water (0 = No, 1 = Yes)
+        self.rew = rew  # Readily evaporable water (mm) (only used if adjusting from default value)
+        self.calc_cn = calc_cn  # adjust Curve number based on Ksat
+        self.cn = cn  # Curve number  (0 = No, 1 = Yes)
+        self.z_res = z_res  # Depth of restrictive soil layer (set to negative value if not present)
 
         # Assign default program properties (should not be changed without expert knowledge)
-        self.EvapZsurf = (
-            EvapZsurf  # Thickness of soil surface skin evaporation layer (m)
+        self.evap_z_surf = (
+            evap_z_surf  # Thickness of soil surface skin evaporation layer (m)
         )
-        self.EvapZmin = (
-            EvapZmin  # Minimum thickness of full soil surface evaporation layer (m)
+        self.evap_z_min = (
+            evap_z_min  # Minimum thickness of full soil surface evaporation layer (m)
         )
-        self.EvapZmax = (
-            EvapZmax  # Maximum thickness of full soil surface evaporation layer (m)
+        self.evap_z_max = (
+            evap_z_max  # Maximum thickness of full soil surface evaporation layer (m)
         )
-        self.Kex = Kex  # Maximum soil evaporation coefficient
-        self.fevap = (
-            fevap  # Shape factor describing reduction in soil evaporation in stage 2.
+        self.kex = kex  # Maximum soil evaporation coefficient
+        self.f_evap = (
+            f_evap  # Shape factor describing reduction in soil evaporation in stage 2.
         )
-        self.fWrelExp = fWrelExp  # Proportional value of Wrel at which soil evaporation layer expands
+        self.f_wrel_exp = f_wrel_exp  # Proportional value of Wrel at which soil evaporation layer expands
         self.fwcc = fwcc  # Maximum coefficient for soil evaporation reduction due to sheltering effect of withered canopy
-        self.zCN = zCN  # Thickness of soil surface (m) used to calculate water content to adjust curve number
-        self.zGerm = zGerm  # Thickness of soil surface (m) used to calculate water content for germination
-        self.AdjCN = (
-            AdjCN  # Adjust curve number for antecedent moisture content (0: No, 1: Yes)
+        self.z_cn = z_cn  # Thickness of soil surface (m) used to calculate water content to adjust curve number
+        self.z_germ = z_germ  # Thickness of soil surface (m) used to calculate water content for germination
+        self.adj_cn = (
+            adj_cn  # Adjust curve number for antecedent moisture content (0: No, 1: Yes)
         )
         self.fshape_cr = fshape_cr  # Capillary rise shape factor
-        self.zTop = max(
-            zTop, dz[0]
+        self.z_top = max(
+            z_top, dz[0]
         )  # Thickness of soil surface layer for water stress comparisons (m)
 
-        if soilType == "custom":
+        if soil_type == "custom":
             self.create_df(dz)
 
-        elif soilType == "Clay":
-            self.CN = 77
-            self.CalcCN = 0
-            self.REW = 14
+        elif soil_type == "Clay":
+            self.cn = 77
+            self.calc_cn = 0
+            self.rew = 14
             self.create_df(dz)
             self.add_layer(sum(dz), 0.39, 0.54, 0.55, 35, 100)
 
-        elif soilType == "ClayLoam":
-            self.CN = 72
-            self.CalcCN = 0
-            self.REW = 11
+        elif soil_type == "ClayLoam":
+            self.cn = 72
+            self.calc_cn = 0
+            self.rew = 11
             self.create_df(dz)
             self.add_layer(sum(dz), 0.23, 0.39, 0.5, 125, 100)
 
-        elif soilType == "Loam":
-            self.CN = 61
-            self.CalcCN = 0
-            self.REW = 9
+        elif soil_type == "Loam":
+            self.cn = 61
+            self.calc_cn = 0
+            self.rew = 9
             self.create_df(dz)
             self.add_layer(sum(dz), 0.15, 0.31, 0.46, 500, 100)
 
-        elif soilType == "LoamySand":
-            self.CN = 46
-            self.CalcCN = 0
-            self.REW = 5
+        elif soil_type == "LoamySand":
+            self.cn = 46
+            self.calc_cn = 0
+            self.rew = 5
             self.create_df(dz)
             self.add_layer(sum(dz), 0.08, 0.16, 0.38, 2200, 100)
 
-        elif soilType == "Sand":
-            self.CN = 46
-            self.CalcCN = 0
-            self.REW = 4
+        elif soil_type == "Sand":
+            self.cn = 46
+            self.calc_cn = 0
+            self.rew = 4
             self.create_df(dz)
             self.add_layer(sum(dz), 0.06, 0.13, 0.36, 3000, 100)
 
-        elif soilType == "SandyClay":
-            self.CN = 77
-            self.CalcCN = 0
-            self.REW = 10
+        elif soil_type == "SandyClay":
+            self.cn = 77
+            self.calc_cn = 0
+            self.rew = 10
             self.create_df(dz)
             self.add_layer(sum(dz), 0.27, 0.39, 0.5, 35, 100)
 
-        elif soilType == "SandyClayLoam":
-            self.CN = 72
-            self.CalcCN = 0
-            self.REW = 9
+        elif soil_type == "SandyClayLoam":
+            self.cn = 72
+            self.calc_cn = 0
+            self.rew = 9
             self.create_df(dz)
             self.add_layer(sum(dz), 0.20, 0.32, 0.47, 225, 100)
 
-        elif soilType == "SandyLoam":
-            self.CN = 46
-            self.CalcCN = 0
-            self.REW = 7
+        elif soil_type == "SandyLoam":
+            self.cn = 46
+            self.calc_cn = 0
+            self.rew = 7
             self.create_df(dz)
             self.add_layer(sum(dz), 0.10, 0.22, 0.41, 1200, 100)
 
-        elif soilType == "Silt":
-            self.CN = 61
-            self.CalcCN = 0
-            self.REW = 11
+        elif soil_type == "Silt":
+            self.cn = 61
+            self.calc_cn = 0
+            self.rew = 11
             self.create_df(dz)
             self.add_layer(sum(dz), 0.09, 0.33, 0.43, 500, 100)
 
-        elif soilType == "SiltClayLoam":
-            self.CN = 72
-            self.CalcCN = 0
-            self.REW = 13
+        elif soil_type == "SiltClayLoam":
+            self.cn = 72
+            self.calc_cn = 0
+            self.rew = 13
             self.create_df(dz)
             self.add_layer(sum(dz), 0.23, 0.44, 0.52, 150, 100)
 
-        elif soilType == "SiltLoam":
-            self.CN = 61
-            self.CalcCN = 0
-            self.REW = 11
+        elif soil_type == "SiltLoam":
+            self.cn = 61
+            self.calc_cn = 0
+            self.rew = 11
             self.create_df(dz)
             self.add_layer(sum(dz), 0.13, 0.33, 0.46, 575, 100)
 
-        elif soilType == "SiltClay":
-            self.CN = 72
-            self.CalcCN = 0
-            self.REW = 14
+        elif soil_type == "SiltClay":
+            self.cn = 72
+            self.calc_cn = 0
+            self.rew = 14
             self.create_df(dz)
             self.add_layer(sum(dz), 0.32, 0.50, 0.54, 100, 100)
 
-        elif soilType == "Paddy":
-            self.CN = 77
-            self.CalcCN = 0
-            self.REW = 10
+        elif soil_type == "Paddy":
+            self.cn = 77
+            self.calc_cn = 0
+            self.rew = 10
             self.create_df(dz)
             self.add_layer(0.5, 0.32, 0.50, 0.54, 15, 100)
             self.add_layer(1.5, 0.39, 0.54, 0.55, 2, 100)
 
-        elif soilType == "ac_TunisLocal":
-            self.CN = 46
-            self.CalcCN = 0
-            self.REW = 7
+        elif soil_type == "ac_TunisLocal":
+            self.cn = 46
+            self.calc_cn = 0
+            self.rew = 7
             dz = [0.1] * 6 + [0.15] * 5 + [0.2]
             self.create_df(dz)
             self.add_layer(0.3, 0.24, 0.40, 0.50, 155, 100)
@@ -209,8 +209,8 @@ class Soil:
         self.profile.Layer = np.nan
 
         self.profile["zBot"] = self.profile.dzsum
-        self.profile["zTop"] = self.profile["zBot"] - self.profile.dz
-        self.profile["zMid"] = (self.profile["zTop"] + self.profile["zBot"]) / 2
+        self.profile["z_top"] = self.profile["zBot"] - self.profile.dz
+        self.profile["zMid"] = (self.profile["z_top"] + self.profile["zBot"]) / 2
 
     def calculate_soil_hydraulic_properties(self, Sand, Clay, OrgMat, DF=1):
 

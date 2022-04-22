@@ -26,7 +26,7 @@ def create_soil_profile(param_struct):
     profile.dz = pdf.dz.values
     profile.dzsum = pdf.dzsum.values
     profile.zBot = pdf.zBot.values
-    profile.zTop = pdf.zTop.values
+    profile.z_top = pdf.z_top.values
     profile.zMid = pdf.zMid.values
 
     profile.Comp = np.int64(pdf.Comp.values)
@@ -55,7 +55,7 @@ def create_soil_profile(param_struct):
         dz=profile.dz,
         dzsum=profile.dzsum,
         zBot=profile.zBot,
-        zTop=profile.zTop,
+        z_top=profile.z_top,
         zMid=profile.zMid,
         Comp=profile.Comp,
         Layer=profile.Layer,

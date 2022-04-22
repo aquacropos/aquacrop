@@ -23,7 +23,7 @@ modelOs = AquaCropModel(
             sim_start_time=f"{1979}/10/01",
             sim_end_time=f"{1985}/05/30",
             weather_df=prepare_weather(weather_file_path),
-            soil=Soil(soilType='SandyLoam'),
+            soil=Soil(soil_type='SandyLoam'),
             crop=Crop('Wheat', planting_date='10/01'),
             initial_water_content=InitialWaterContent(value=['FC']),
         )

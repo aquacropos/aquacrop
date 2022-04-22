@@ -215,16 +215,16 @@ def solution_single_time_step(
         FieldMngt.bunds,
         FieldMngt.z_bund,
         FieldMngt.curve_number_adj_pct,
-        Soil.CN,
-        Soil.AdjCN,
-        Soil.zCN,
+        Soil.cn,
+        Soil.adj_cn,
+        Soil.z_cn,
         Soil.nComp,
         Soil.Profile,
     )
 
     # 6. Irrigation
     NewCond.depletion, NewCond.taw, NewCond.irr_cum, Irr = irrigation(
-        IrrMngt.IrrMethod,
+        IrrMngt.irrigation_method,
         IrrMngt.SMT,
         IrrMngt.AppEff,
         IrrMngt.MaxIrr,
@@ -242,7 +242,7 @@ def solution_single_time_step(
         NewCond.time_step_counter,
         Crop,
         Soil.Profile,
-        Soil.zTop,
+        Soil.z_top,
         growing_season,
         precipitation,
         Runoff,
@@ -284,7 +284,7 @@ def solution_single_time_step(
     # 9. Check germination
     NewCond = germination(
         NewCond,
-        Soil.zGerm,
+        Soil.z_germ,
         Soil.Profile,
         Crop.GermThr,
         Crop.PlantMethod,
@@ -297,7 +297,7 @@ def solution_single_time_step(
 
     # 11. Canopy cover development
     NewCond = canopy_cover(
-        Crop, Soil.Profile, Soil.zTop, NewCond, gdd, et0, growing_season
+        Crop, Soil.Profile, Soil.z_top, NewCond, gdd, et0, growing_season
     )
 
     # 12. Soil evaporation
@@ -316,16 +316,16 @@ def solution_single_time_step(
         clock_struct.sim_off_season,
         clock_struct.time_step_counter,
         Soil.Profile,
-        Soil.EvapZmin,
-        Soil.EvapZmax,
-        Soil.REW,
-        Soil.Kex,
+        Soil.evap_z_min,
+        Soil.evap_z_max,
+        Soil.rew,
+        Soil.kex,
         Soil.fwcc,
-        Soil.fWrelExp,
-        Soil.fevap,
+        Soil.f_wrel_exp,
+        Soil.f_evap,
         Crop.CalendarType,
         Crop.Senescence,
-        IrrMngt.IrrMethod,
+        IrrMngt.irrigation_method,
         IrrMngt.WetSurf,
         FieldMngt.mulches,
         FieldMngt.f_mulch,
@@ -357,9 +357,9 @@ def solution_single_time_step(
     Tr, TrPot_NS, TrPot, NewCond, IrrNet = transpiration(
         Soil.Profile,
         Soil.nComp,
-        Soil.zTop,
+        Soil.z_top,
         Crop,
-        IrrMngt.IrrMethod,
+        IrrMngt.irrigation_method,
         IrrMngt.NetIrrSMT,
         NewCond,
         et0,
@@ -400,7 +400,7 @@ def solution_single_time_step(
 
     # 17. Harvest index
     NewCond = harvest_index(
-        Soil.Profile, Soil.zTop, Crop, NewCond, et0, temp_max, temp_min, growing_season
+        Soil.Profile, Soil.z_top, Crop, NewCond, et0, temp_max, temp_min, growing_season
     )
 
     # 18. Crop yield_
@@ -428,7 +428,7 @@ def solution_single_time_step(
         Soil.Profile,
         float(NewCond.z_root),
         NewCond.th,
-        Soil.zTop,
+        Soil.z_top,
         float(Crop.Zmin),
         Crop.Aer,
     )
@@ -443,7 +443,7 @@ def solution_single_time_step(
 
     # Irrigation
     if growing_season is True:
-        if IrrMngt.IrrMethod == 4:
+        if IrrMngt.irrigation_method == 4:
             # Net irrigation
             IrrDay = IrrNet
             IrrTot = NewCond.irr_net_cum

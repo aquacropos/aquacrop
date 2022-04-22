@@ -38,7 +38,7 @@ def pre_irrigation(prof, Crop, InitCond, growing_season, IrrMngt):
 
     ## Calculate pre-irrigation needs ##
     if growing_season == True:
-        if (IrrMngt.IrrMethod != 4) or (NewCond.dap != 1):
+        if (IrrMngt.irrigation_method != 4) or (NewCond.dap != 1):
             # No pre-irrigation as not in net irrigation mode or not on first day
             # of the growing season
             PreIrr = 0

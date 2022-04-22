@@ -22,7 +22,7 @@ class TestIrrigation(unittest.TestCase):
 
     _weather_data = prepare_weather(weather_file_path)
 
-    _sandy_loam = SoilClass(soilType="SandyLoam")
+    _sandy_loam = SoilClass(soil_type="SandyLoam")
     _wheat = CropClass("Maize", planting_date="05/01")
     _initial_water_content = InitialWaterContent(value=["FC"])
 
@@ -30,7 +30,7 @@ class TestIrrigation(unittest.TestCase):
         """
         Rainfed methodology
         """
-        irrigation = IrrMngtClass(IrrMethod=0)
+        irrigation = IrrMngtClass(irrigation_method=0)
 
         model_os = AquaCropModel(
             sim_start_time=self._sim_start,
@@ -62,7 +62,7 @@ class TestIrrigation(unittest.TestCase):
         """
         Threshold methodology
         """
-        irrigation = IrrMngtClass(IrrMethod=1, SMT=[40, 60, 70, 30] * 4)
+        irrigation = IrrMngtClass(irrigation_method=1, SMT=[40, 60, 70, 30] * 4)
 
         model_os = AquaCropModel(
             sim_start_time=self._sim_start,
@@ -93,7 +93,7 @@ class TestIrrigation(unittest.TestCase):
         7 days interval methodology
         """
 
-        irrigation = IrrMngtClass(IrrMethod=2, IrrInterval=7)
+        irrigation = IrrMngtClass(irrigation_method=2, IrrInterval=7)
 
         model_os = AquaCropModel(
             sim_start_time=self._sim_start,
@@ -127,7 +127,7 @@ class TestIrrigation(unittest.TestCase):
             self._sim_start, self._sim_end
         )
         # print(irrigationSchedule)
-        irrigate_schedule = IrrMngtClass(IrrMethod=3, Schedule=irrigation_schedule_df)
+        irrigate_schedule = IrrMngtClass(irrigation_method=3, Schedule=irrigation_schedule_df)
 
         model_os = AquaCropModel(
             sim_start_time=self._sim_start,
@@ -158,7 +158,7 @@ class TestIrrigation(unittest.TestCase):
         """
         Net methodology
         """
-        irrigation = IrrMngtClass(IrrMethod=4, NetIrrSMT=70)
+        irrigation = IrrMngtClass(irrigation_method=4, NetIrrSMT=70)
 
         model_os = AquaCropModel(
             sim_start_time=self._sim_start,

@@ -149,7 +149,7 @@ class AquaCropModel:
         self.groundwater = groundwater
 
         if irrigation_management is None:
-            self.irrigation_management = IrrigationManagement(IrrMethod=0)
+            self.irrigation_management = IrrigationManagement(irrigation_method=0)
         if field_management is None:
             self.field_management = FieldMngt()
         if fallow_field_management is None:

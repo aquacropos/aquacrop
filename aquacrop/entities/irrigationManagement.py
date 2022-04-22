@@ -13,7 +13,7 @@ class IrrigationManagement:
 
     `Name` : `str` :  name
 
-    `IrrMethod` : `int` :  Irrigation method {0: rainfed, 1: soil moisture targets, 2: set time interval,
+    `irrigation_method` : `int` :  Irrigation method {0: rainfed, 1: soil moisture targets, 2: set time interval,
                                               3: predifined schedule, 4: net irrigation, 5: constant depth }
 
     `WetSurf` : `int` : Soil surface wetted by irrigation (%)
@@ -28,14 +28,14 @@ class IrrigationManagement:
 
     `Schedule` : `pandas.DataFrame` : DataFrame containing dates and depths
 
-    `NetIrrSMT` : `float` : Net irrigation threshold moisture level (% of taw that will be maintained, for IrrMethod=4)
+    `NetIrrSMT` : `float` : Net irrigation threshold moisture level (% of taw that will be maintained, for irrigation_method=4)
 
     `Depth` : `float` : constant depth to apply on each day
 
     """
 
-    def __init__(self, IrrMethod, **kwargs):
-        self.IrrMethod = IrrMethod
+    def __init__(self, irrigation_method, **kwargs):
+        self.irrigation_method = irrigation_method
 
         self.WetSurf = 100.0
         self.AppEff = 100.0
@@ -47,13 +47,13 @@ class IrrigationManagement:
         self.NetIrrSMT = 80.0
         self.depth = 0.0
 
-        if IrrMethod == 1:
+        if irrigation_method == 1:
             self.SMT = [100] * 4
 
-        if IrrMethod == 2:
+        if irrigation_method == 2:
             self.IrrInterval = 3
 
-        if IrrMethod == 3:
+        if irrigation_method == 3:
             # wants a pandas dataframe with Date and Depth, pd.Datetime and float
             """
             dates = pd.DatetimeIndex(['20/10/1979','20/11/1979','20/12/1979'])
@@ -63,10 +63,10 @@ class IrrigationManagement:
             """
             self.Schedule = pd.DataFrame(columns=["Date", "Depth"])
 
-        if IrrMethod == 4:
+        if irrigation_method == 4:
             self.NetIrrSMT = 80
 
-        if IrrMethod == 5:
+        if irrigation_method == 5:
             self.depth = 0
 
         allowed_keys = {
@@ -87,7 +87,7 @@ class IrrigationManagement:
 IrrMngtClass = IrrigationManagement
 
 spec = [
-    ("IrrMethod", int64),
+    ("irrigation_method", int64),
     ("WetSurf", float64),
     ("AppEff", float64),
     ("MaxIrr", float64),
@@ -109,7 +109,7 @@ class IrrMngtStruct:
     """
 
     def __init__(self, sim_len):
-        self.IrrMethod = 0
+        self.irrigation_method = 0
 
         self.WetSurf = 100.0
         self.AppEff = 100.0

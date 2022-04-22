@@ -26,7 +26,7 @@ def read_irrigation_management(ParamStruct, IrrMngt, ClockStruct):
 
     """
     # If specified, read input irrigation time-series
-    if IrrMngt.IrrMethod == 3:
+    if IrrMngt.irrigation_method == 3:
 
         df = IrrMngt.Schedule.copy()
 

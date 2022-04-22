@@ -22,7 +22,7 @@ class TestAquacropOs(unittest.TestCase):
 
         weather_data = prepare_weather(weather_file_path)
 
-        sandy_loam = SoilClass(soilType="SandyLoam")
+        sandy_loam = SoilClass(soil_type="SandyLoam")
         wheat = CropClass("Wheat", planting_date="10/01")
         initial_water_content = InitialWaterContent(value=["FC"])
         start_function_execution = time.time()

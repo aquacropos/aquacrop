@@ -16,7 +16,7 @@ SoilProfileNT_spec = [
     ("th_dry", float64[:]),
     ("tau", float64[:]),
     ("zBot", float64[:]),
-    ("zTop", float64[:]),
+    ("z_top", float64[:]),
     ("zMid", float64[:]),
     ("th_fc_Adj", float64[:]),
     ("aCR", float64[:]),
@@ -40,7 +40,7 @@ class SoilProfile:
 
     `zBot` : `list` :
 
-    `zTop` : `list` :
+    `z_top` : `list` :
 
     `zMid` : `list` :
 
@@ -60,7 +60,7 @@ class SoilProfile:
         self.th_dry = np.zeros(length, dtype=np.float64)
         self.tau = np.zeros(length, dtype=np.float64)
         self.zBot = np.zeros(length, dtype=np.float64)
-        self.zTop = np.zeros(length, dtype=np.float64)
+        self.z_top = np.zeros(length, dtype=np.float64)
         self.zMid = np.zeros(length, dtype=np.float64)
         self.th_fc_Adj = np.zeros(length, dtype=np.float64)
         self.aCR = np.zeros(length, dtype=np.float64)

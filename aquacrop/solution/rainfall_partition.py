@@ -81,20 +81,20 @@ def rainfall_partition(
         # Reset submerged days
         NewCond_DaySubmerged = 0
         # Adjust curve number for field management practices
-        CN = Soil_CN * (1 + (FieldMngt_CNadjPct / 100))
-        if Soil_AdjCN == 1:  # Adjust CN for antecedent moisture
+        cn = Soil_CN * (1 + (FieldMngt_CNadjPct / 100))
+        if Soil_AdjCN == 1:  # Adjust cn for antecedent moisture
             # Calculate upper and lowe curve number bounds
             CNbot = round(
                 1.4 * (np.exp(-14 * np.log(10)))
-                + (0.507 * CN)
-                - (0.00374 * CN ** 2)
-                + (0.0000867 * CN ** 3)
+                + (0.507 * cn)
+                - (0.00374 * cn ** 2)
+                + (0.0000867 * cn ** 3)
             )
             CNtop = round(
                 5.6 * (np.exp(-14 * np.log(10)))
-                + (2.33 * CN)
-                - (0.0209 * CN ** 2)
-                + (0.000076 * CN ** 3)
+                + (2.33 * cn)
+                - (0.0209 * cn ** 2)
+                + (0.000076 * cn ** 3)
             )
             # Check which compartment cover depth of top soil used to adjust
             # curve number
@@ -136,10 +136,10 @@ def rainfall_partition(
             elif wet_top < 0:
                 wet_top = 0
 
-            CN = round(CNbot + (CNtop - CNbot) * wet_top)
+            cn = round(CNbot + (CNtop - CNbot) * wet_top)
 
         # Partition rainfall into runoff and infiltration (mm)
-        S = (25400 / CN) - 254
+        S = (25400 / cn) - 254
         term = precipitation - ((5 / 100) * S)
         if term <= 0:
             Runoff = 0

@@ -124,7 +124,7 @@ def soil_evaporation(
     ## Store initial conditions in new structure that will be updated ##
     # NewCond = InitCond
 
-    ## Prepare stage 2 evaporation (REW gone) ##
+    ## Prepare stage 2 evaporation (rew gone) ##
     # Only do this if it is first day of simulation, or if it is first day of
     # growing season and not simulating off-season
     if (ClockStruct_TimeStepCounter == 0) or (
@@ -157,7 +157,7 @@ def soil_evaporation(
             # Update storage in surface evaporation layer for incoming
             # infiltration
             NewCond_Wsurf = Infl
-            # Water stored in surface evaporation layer cannot exceed REW
+            # Water stored in surface evaporation layer cannot exceed rew
             if NewCond_Wsurf > Soil_REW:
                 NewCond_Wsurf = Soil_REW
 

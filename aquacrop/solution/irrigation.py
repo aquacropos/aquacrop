@@ -176,7 +176,7 @@ def irrigation(
             Irr = min(IrrMngt_MaxIrr, IrrMngt_depth)
 
         #         else:
-        #             assert 1 ==2, f'somethings gone wrong in irrigation method:{IrrMngt.IrrMethod}'
+        #             assert 1 ==2, f'somethings gone wrong in irrigation method:{IrrMngt.irrigation_method}'
 
         Irr = max(0, Irr)
 

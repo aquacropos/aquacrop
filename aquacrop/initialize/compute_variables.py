@@ -46,30 +46,30 @@ def compute_variables(
         param_struct.Soil.add_capillary_rise_params()
 
     # Calculate readily evaporable water in surface layer
-    if param_struct.Soil.AdjREW == 0:
-        param_struct.Soil.REW = round(
+    if param_struct.Soil.adj_rew == 0:
+        param_struct.Soil.rew = round(
             (
                 1000
                 * (
                     param_struct.Soil.profile.th_fc.iloc[0]
                     - param_struct.Soil.profile.th_dry.iloc[0]
                 )
-                * param_struct.Soil.EvapZsurf
+                * param_struct.Soil.evap_z_surf
             ),
             2,
         )
 
-    if param_struct.Soil.CalcCN == 1:
+    if param_struct.Soil.calc_cn == 1:
         # adjust curve number
         ksat = param_struct.Soil.profile.Ksat.iloc[0]
         if ksat > 864:
-            param_struct.Soil.CN = 46
+            param_struct.Soil.cn = 46
         elif ksat > 347:
-            param_struct.Soil.CN = 61
+            param_struct.Soil.cn = 61
         elif ksat > 36:
-            param_struct.Soil.CN = 72
+            param_struct.Soil.cn = 72
         elif ksat > 0:
-            param_struct.Soil.CN = 77
+            param_struct.Soil.cn = 77
 
         assert ksat > 0
 
