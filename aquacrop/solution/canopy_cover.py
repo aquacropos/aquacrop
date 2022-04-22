@@ -109,7 +109,7 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
         # Determine if water stress is occurring
         beta = True
         Ksw = KswClass()
-        Ksw.Exp, Ksw.Sto, Ksw.Sen, Ksw.Pol, Ksw.StoLin = water_stress(
+        Ksw.exp, Ksw.sto, Ksw.sen, Ksw.pol, Ksw.sto_lin = water_stress(
             Crop.p_up,
             Crop.p_lo,
             Crop.ETadj,
@@ -207,7 +207,7 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
                 if InitCond_CC < (0.9799 * Crop.CCx):
                     # Adjust canopy growth coefficient for leaf expansion water
                     # stress effects
-                    CGCadj = Crop.CGC * Ksw.Exp
+                    CGCadj = Crop.CGC * Ksw.exp
                     if CGCadj > 0:
 
                         # Adjust CCx for change in CGC
@@ -320,7 +320,7 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
             if (tCCadj < Crop.Senescence) or (InitCond_tEarlySen > 0):
                 # Check for early canopy senescence  due to severe water
                 # stress.
-                if (Ksw.Sen < 1) and (InitCond_ProtectedSeed == False):
+                if (Ksw.sen < 1) and (InitCond_ProtectedSeed == False):
 
                     # Early canopy senescence
                     NewCond.premat_senes = True
@@ -334,7 +334,7 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
                     beta = False
 
                     Ksw = KswClass()
-                    Ksw.Exp, Ksw.Sto, Ksw.Sen, Ksw.Pol, Ksw.StoLin = water_stress(
+                    Ksw.exp, Ksw.sto, Ksw.sen, Ksw.pol, Ksw.sto_lin = water_stress(
                         Crop.p_up,
                         Crop.p_lo,
                         Crop.ETadj,
@@ -348,10 +348,10 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
                     )
 
                     # Ksw = water_stress(Crop, NewCond, Dr, taw, et0, beta)
-                    if Ksw.Sen > 0.99999:
+                    if Ksw.sen > 0.99999:
                         CDCadj = 0.0001
                     else:
-                        CDCadj = (1 - (Ksw.Sen ** 8)) * Crop.CDC
+                        CDCadj = (1 - (Ksw.sen ** 8)) * Crop.CDC
 
                     # Get new canpy cover size after senescence
                     if NewCond.ccx_early_sen < 0.001:

@@ -16,6 +16,8 @@ thRZ_spec = [
 
 class RootZoneWater(object):
     """
+    TODO: This class is not used
+    
     root zone water content
 
     **Attributes:**\n

@@ -70,7 +70,7 @@ def HIadj_post_anthesis(
         and (NewCond_CC > 0.001)
         and (Crop.a_HI > 0)
     ):
-        dCor = 1 + (1 - Ksw.Exp) / Crop.a_HI
+        dCor = 1 + (1 - Ksw.exp) / Crop.a_HI
         NewCond_sCor1 = InitCond_sCor1 + (dCor / tmax1)
         DayCor = dap - 1 - Crop.HIstartCD
         NewCond_fpost_upp = (tmax1 / DayCor) * NewCond_sCor1
@@ -85,8 +85,8 @@ def HIadj_post_anthesis(
         and (NewCond_CC > 0.001)
         and (Crop.b_HI > 0)
     ):
-        # print(Ksw.Sto)
-        dCor = np.power(Ksw.Sto, 0.1) * (1 - (1 - Ksw.Sto) / Crop.b_HI)
+        # print(Ksw.sto)
+        dCor = np.power(Ksw.sto, 0.1) * (1 - (1 - Ksw.sto) / Crop.b_HI)
         NewCond_sCor2 = InitCond_sCor2 + (dCor / tmax2)
         DayCor = dap - 1 - Crop.HIstartCD
         NewCond_fpost_dwn = (tmax2 / DayCor) * NewCond_sCor2

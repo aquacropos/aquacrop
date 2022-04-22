@@ -13,6 +13,9 @@ Kst_spec = [
 class Kst(object):
 
     """
+    
+    TODO: THIS CLASS IS NOT USED
+    
     temperature stress coefficients
 
     **Attributes:**\n

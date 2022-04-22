@@ -268,7 +268,7 @@ def transpiration(
         # Calculate water stress coefficients
         beta = True
         Ksw = KswClass()
-        Ksw.Exp, Ksw.Sto, Ksw.Sen, Ksw.Pol, Ksw.StoLin = water_stress(
+        Ksw.exp, Ksw.sto, Ksw.sen, Ksw.pol, Ksw.sto_lin = water_stress(
             Crop.p_up,
             Crop.p_lo,
             Crop.ETadj,
@@ -285,7 +285,7 @@ def transpiration(
         # Calculate aeration stress coefficients
         Ksa_Aer, NewCond.aer_days = aeration_stress(NewCond.aer_days, Crop.LagAer, thRZ)
         # Maximum stress effect
-        Ks = min(Ksw.StoLin, Ksa_Aer)
+        Ks = min(Ksw.sto_lin, Ksa_Aer)
         # Update potential transpiration in root zone
         if IrrMngt_IrrMethod != 4:
             # No adjustment to TrPot for water stress when in net irrigation mode

@@ -18,6 +18,8 @@ spec = [
 
 class WaterEvaporation(object):
     """
+    TODO: THIS CLASS IS NOT USED
+    
     stores soil water contents in the evaporation layer
 
     **Attributes:**\n

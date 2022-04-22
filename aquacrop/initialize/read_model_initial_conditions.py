@@ -151,7 +151,7 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
     ###################
 
     typestr = InitWC.wc_type
-    methodstr = InitWC.Method
+    methodstr = InitWC.method
 
     depth_layer = InitWC.depth_layer
     datapoints = InitWC.value

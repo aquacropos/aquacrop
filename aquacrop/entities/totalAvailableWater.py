@@ -8,8 +8,9 @@ spec = [
 
 
 
-class taw:
+class TAW:
     """
+    TODO: THIS CLASS IS NOT USED
     **Attributes:**\n
 
 
@@ -27,4 +28,4 @@ class taw:
         self.Rz = 0.0
         self.Zt = 0.0
 
-TAWClass = taw
+TAWClass = TAW

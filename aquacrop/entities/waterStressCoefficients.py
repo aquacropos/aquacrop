@@ -3,11 +3,11 @@ import typing
 
 
 Ksw_spec = [
-    ("Exp", float64),
-    ("Sto", float64),
-    ("Sen", float64),
-    ("Pol", float64),
-    ("StoLin", float64),
+    ("exp", float64),
+    ("sto", float64),
+    ("sen", float64),
+    ("pol", float64),
+    ("sto_lin", float64),
 ]
 
 
@@ -20,26 +20,26 @@ class Ksw(object):
     **Attributes:**\n
 
 
-    `Exp` : `float` : .
+    `exp` : `float` : .
 
-    `Sto` : `float` : .
+    `sto` : `float` : .
 
-    `Sen` : `float` : .
+    `sen` : `float` : .
 
-    `Pol` : `float` : .
+    `pol` : `float` : .
 
-    `StoLin` : `float` : .
+    `sto_lin` : `float` : .
 
 
 
     """
 
     def __init__(self):
-        self.Exp = 1.0
-        self.Sto = 1.0
-        self.Sen = 1.0
-        self.Pol = 1.0
-        self.StoLin = 1.0
+        self.exp = 1.0
+        self.sto = 1.0
+        self.sen = 1.0
+        self.pol = 1.0
+        self.sto_lin = 1.0
 
 
 

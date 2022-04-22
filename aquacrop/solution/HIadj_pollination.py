@@ -106,7 +106,7 @@ def HIadj_pollination(
         # threshold
         dFpol = 0
     else:
-        Ks = min([Ksw.Pol, Kst.PolC, Kst.PolH])
+        Ks = min([Ksw.pol, Kst.PolC, Kst.PolH])
         dFpol = Ks * FracFlow * (1 + (Crop_exc / 100))
 
     # Calculate pollination adjustment to date
