@@ -31,7 +31,7 @@ def read_groundwater_table(ParamStruct, GwStruct, ClockStruct):
         ParamStruct.z_gw = 999 * np.ones(len(ClockStruct.time_span))
         ParamStruct.zGW_dates = ClockStruct.time_span
         ParamStruct.WTMethod = "None"
-    elif WT == "yield_":
+    elif WT == "Y":
         ParamStruct.water_table = 1
 
         df = pd.DataFrame([GwStruct.dates, GwStruct.values]).T

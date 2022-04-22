@@ -119,7 +119,7 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
                     Xmax = (np.exp(pF * np.log(10))) / 100
 
             if (InitCond.z_gw < 0) or ((InitCond.z_gw - zMid.iloc[compi]) >= Xmax):
-                for ii in range(compi):
+                for ii in range(compi+1):
                     compdfii = profile.loc[ii]
                     thfcAdj[ii] = compdfii.th_fc
 
