@@ -13,7 +13,7 @@ cc = CC("solution_temperature_stress")
 
 
 @cc.export("temperature_stress", (CropStructNT_type_sig,f8,f8))
-def temperature_stress(Crop, Tmax, Tmin):
+def temperature_stress(Crop, temp_max, temp_min):
     # Function to calculate temperature stress coefficients
     """
     Function to get irrigation depth for current day
@@ -28,9 +28,9 @@ def temperature_stress(Crop, Tmax, Tmin):
 
     `Crop`: `CropClass` : Crop object containing Crop paramaters
 
-    `Tmax`: `float` : max tempatature on current day (celcius)
+    `temp_max`: `float` : max tempatature on current day (celcius)
 
-    `Tmin`: `float` : min tempature on current day (celcius)
+    `temp_min`: `float` : min tempature on current day (celcius)
 
 
     *Returns:*
@@ -59,12 +59,12 @@ def temperature_stress(Crop, Tmax, Tmin):
         Kst_PolH = 1
     elif Crop.PolHeatStress == 1:
         # Pollination affected by heat stress
-        if Tmax <= Crop.Tmax_lo:
+        if temp_max <= Crop.Tmax_lo:
             Kst_PolH = 1
-        elif Tmax >= Crop.Tmax_up:
+        elif temp_max >= Crop.Tmax_up:
             Kst_PolH = 0
         else:
-            Trel = (Tmax - Crop.Tmax_lo) / (Crop.Tmax_up - Crop.Tmax_lo)
+            Trel = (temp_max - Crop.Tmax_lo) / (Crop.Tmax_up - Crop.Tmax_lo)
             Kst_PolH = (KsPol_up * KsPol_lo) / (
                 KsPol_lo + (KsPol_up - KsPol_lo) * np.exp(-Crop.fshape_b * (1 - Trel))
             )
@@ -75,12 +75,12 @@ def temperature_stress(Crop, Tmax, Tmin):
         Kst_PolC = 1
     elif Crop.PolColdStress == 1:
         # Pollination affected by cold stress
-        if Tmin >= Crop.Tmin_up:
+        if temp_min >= Crop.Tmin_up:
             Kst_PolC = 1
-        elif Tmin <= Crop.Tmin_lo:
+        elif temp_min <= Crop.Tmin_lo:
             Kst_PolC = 0
         else:
-            Trel = (Crop.Tmin_up - Tmin) / (Crop.Tmin_up - Crop.Tmin_lo)
+            Trel = (Crop.Tmin_up - temp_min) / (Crop.Tmin_up - Crop.Tmin_lo)
             Kst_PolC = (KsPol_up * KsPol_lo) / (
                 KsPol_lo + (KsPol_up - KsPol_lo) * np.exp(-Crop.fshape_b * (1 - Trel))
             )

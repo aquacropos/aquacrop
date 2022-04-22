@@ -9,13 +9,13 @@ class FieldMngt:
     **Attributes:**\n
 
 
-    `mulches` : `bool` :  Soil surface covered by mulches (Y or N)
+    `mulches` : `bool` :  Soil surface covered by mulches (yield_ or N)
 
-    `bunds` : `bool` :  Surface bunds present (Y or N)
+    `bunds` : `bool` :  Surface bunds present (yield_ or N)
 
-    `curve_number_adj` : `bool` : Field conditions affect curve number (Y or N)
+    `curve_number_adj` : `bool` : Field conditions affect curve number (yield_ or N)
 
-    `sr_inhb` : `bool` : Management practices fully inhibit surface runoff (Y or N)
+    `sr_inhb` : `bool` : Management practices fully inhibit surface runoff (yield_ or N)
 
 
 
@@ -44,10 +44,10 @@ class FieldMngt:
         curve_number_adj_pct=0,
     ):
 
-        self.mulches = mulches  #  Soil surface covered by mulches (Y or N)
-        self.bunds = bunds  #  Surface bunds present (Y or N)
-        self.curve_number_adj = curve_number_adj  # Field conditions affect curve number (Y or N)
-        self.sr_inhb = sr_inhb  # Management practices fully inhibit surface runoff (Y or N)
+        self.mulches = mulches  #  Soil surface covered by mulches (yield_ or N)
+        self.bunds = bunds  #  Surface bunds present (yield_ or N)
+        self.curve_number_adj = curve_number_adj  # Field conditions affect curve number (yield_ or N)
+        self.sr_inhb = sr_inhb  # Management practices fully inhibit surface runoff (yield_ or N)
 
         self.mulch_pct = mulch_pct  #  Area of soil surface covered by mulches (%)
         self.f_mulch = f_mulch  # Soil evaporation adjustment factor due to effect of mulches

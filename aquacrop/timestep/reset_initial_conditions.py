@@ -41,68 +41,68 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
     CO2_data = ParamStruct.CO2data
 
     # Reset counters
-    InitCond.AgeDays = 0
-    InitCond.AgeDays_NS = 0
-    InitCond.AerDays = 0
-    InitCond.IrrCum = 0
-    InitCond.DelayedGDDs = 0
-    InitCond.DelayedCDs = 0
-    InitCond.PctLagPhase = 0
-    InitCond.tEarlySen = 0
-    InitCond.GDDcum = 0
-    InitCond.DaySubmerged = 0
-    InitCond.IrrNetCum = 0
-    InitCond.DAP = 0
+    InitCond.age_days = 0
+    InitCond.age_days_ns = 0
+    InitCond.aer_days = 0
+    InitCond.irr_cum = 0
+    InitCond.delayed_gdds = 0
+    InitCond.delayed_cds = 0
+    InitCond.pct_lag_phase = 0
+    InitCond.t_early_sen = 0
+    InitCond.gdd_cum = 0
+    InitCond.day_submerged = 0
+    InitCond.irr_net_cum = 0
+    InitCond.dap = 0
 
-    InitCond.AerDaysComp = np.zeros(int(Soil.nComp))
+    InitCond.aer_days_comp = np.zeros(int(Soil.nComp))
 
     # Reset states
     # States
-    InitCond.PreAdj = False
-    InitCond.CropMature = False
-    InitCond.CropDead = False
-    InitCond.Germination = False
-    InitCond.PrematSenes = False
-    InitCond.HarvestFlag = False
+    InitCond.pre_adj = False
+    InitCond.crop_mature = False
+    InitCond.crop_dead = False
+    InitCond.germination = False
+    InitCond.premat_senes = False
+    InitCond.harvest_flag = False
 
     # Harvest index
-    # HI
-    InitCond.Stage = 1
-    InitCond.Fpre = 1
-    InitCond.Fpost = 1
+    # harvest_index
+    InitCond.stage = 1
+    InitCond.f_pre = 1
+    InitCond.f_post = 1
     InitCond.fpost_dwn = 1
     InitCond.fpost_upp = 1
 
-    InitCond.HIcor_Asum = 0
-    InitCond.HIcor_Bsum = 0
-    InitCond.Fpol = 0
-    InitCond.sCor1 = 0
-    InitCond.sCor2 = 0
+    InitCond.h1_cor_asum = 0
+    InitCond.h1_cor_bsum = 0
+    InitCond.f_pol = 0
+    InitCond.s_cor1 = 0
+    InitCond.s_cor2 = 0
 
     # Growth stage
-    InitCond.GrowthStage = 0
+    InitCond.growth_stage = 0
 
     # Transpiration
-    InitCond.TrRatio = 1
+    InitCond.tr_ratio = 1
 
     # crop growth
-    InitCond.rCor = 1
+    InitCond.r_cor = 1
 
-    InitCond.CC = 0
-    InitCond.CCadj = 0
-    InitCond.CC_NS = 0
-    InitCond.CCadj_NS = 0
-    InitCond.B = 0
-    InitCond.B_NS = 0
-    InitCond.HI = 0
-    InitCond.HIadj = 0
-    InitCond.CCxAct = 0
-    InitCond.CCxAct_NS = 0
-    InitCond.CCxW = 0
-    InitCond.CCxW_NS = 0
-    InitCond.CCxEarlySen = 0
-    InitCond.CCprev = 0
-    InitCond.ProtectedSeed = 0
+    InitCond.canopy_cover = 0
+    InitCond.canopy_cover_adj = 0
+    InitCond.canopy_cover_ns = 0
+    InitCond.canopy_cover_adj_ns = 0
+    InitCond.biomass = 0
+    InitCond.biomass_ns = 0
+    InitCond.harvest_index = 0
+    InitCond.harvest_index_adj = 0
+    InitCond.ccx_act = 0
+    InitCond.ccx_act_ns = 0
+    InitCond.ccx_w = 0
+    InitCond.ccx_w_ns = 0
+    InitCond.ccx_early_sen = 0
+    InitCond.cc_prev = 0
+    InitCond.protected_seed = 0
 
     # Update CO2 concentration ##
     # Get CO2 concentration
@@ -153,65 +153,65 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
         # Reset surface storage
         if (FieldMngt.bunds) and (FieldMngt.z_bund > 0.001):
             # Get initial storage between surface bunds
-            InitCond.SurfaceStorage = min(FieldMngt.bund_water, FieldMngt.z_bund)
+            InitCond.surface_storage = min(FieldMngt.bund_water, FieldMngt.z_bund)
         else:
             # No surface bunds
-            InitCond.SurfaceStorage = 0
+            InitCond.surface_storage = 0
 
-    # Update crop parameters (if in GDD mode)
+    # Update crop parameters (if in gdd mode)
     if crop.CalendarType == 2:
         # Extract weather data for upcoming growing season
         weather_df = weather[
             weather[:, 4] >= ClockStruct.planting_dates[ClockStruct.season_counter]
         ]
 
-        Tmin = weather_df[:, 0]
-        Tmax = weather_df[:, 1]
+        temp_min = weather_df[:, 0]
+        temp_max = weather_df[:, 1]
 
-        # Calculate GDD's
+        # Calculate gdd's
         if crop.GDDmethod == 1:
-            Tmean = (Tmax + Tmin) / 2
+            Tmean = (temp_max + temp_min) / 2
             Tmean[Tmean > crop.Tupp] = crop.Tupp
             Tmean[Tmean < crop.Tbase] = crop.Tbase
-            GDD = Tmean - crop.Tbase
+            gdd = Tmean - crop.Tbase
         elif crop.GDDmethod == 2:
-            Tmax[Tmax > crop.Tupp] = crop.Tupp
-            Tmax[Tmax < crop.Tbase] = crop.Tbase
-            Tmin[Tmin > crop.Tupp] = crop.Tupp
-            Tmin[Tmin < crop.Tbase] = crop.Tbase
-            Tmean = (Tmax + Tmin) / 2
-            GDD = Tmean - crop.Tbase
+            temp_max[temp_max > crop.Tupp] = crop.Tupp
+            temp_max[temp_max < crop.Tbase] = crop.Tbase
+            temp_min[temp_min > crop.Tupp] = crop.Tupp
+            temp_min[temp_min < crop.Tbase] = crop.Tbase
+            Tmean = (temp_max + temp_min) / 2
+            gdd = Tmean - crop.Tbase
         elif crop.GDDmethod == 3:
-            Tmax[Tmax > crop.Tupp] = crop.Tupp
-            Tmax[Tmax < crop.Tbase] = crop.Tbase
-            Tmin[Tmin > crop.Tupp] = crop.Tupp
-            Tmean = (Tmax + Tmin) / 2
+            temp_max[temp_max > crop.Tupp] = crop.Tupp
+            temp_max[temp_max < crop.Tbase] = crop.Tbase
+            temp_min[temp_min > crop.Tupp] = crop.Tupp
+            Tmean = (temp_max + temp_min) / 2
             Tmean[Tmean < crop.Tbase] = crop.Tbase
-            GDD = Tmean - crop.Tbase
+            gdd = Tmean - crop.Tbase
 
-        GDDcum = np.cumsum(GDD)
+        gdd_cum = np.cumsum(gdd)
 
         assert (
-            GDDcum[-1] > crop.Maturity
-        ), f"not enough growing degree days in simulation ({GDDcum[-1]}) to reach maturity ({crop.Maturity})"
+            gdd_cum[-1] > crop.Maturity
+        ), f"not enough growing degree days in simulation ({gdd_cum[-1]}) to reach maturity ({crop.Maturity})"
 
-        crop.MaturityCD = np.argmax((GDDcum > crop.Maturity)) + 1
+        crop.MaturityCD = np.argmax((gdd_cum > crop.Maturity)) + 1
 
         assert crop.MaturityCD < 365, "crop will take longer than 1 year to mature"
 
-        # 1. GDD's from sowing to maximum canopy cover
-        crop.MaxCanopyCD = (GDDcum > crop.MaxCanopy).argmax() + 1
-        # 2. GDD's from sowing to end of vegetative growth
-        crop.CanopyDevEndCD = (GDDcum > crop.CanopyDevEnd).argmax() + 1
-        # 3. Calendar days from sowing to start of yield formation
-        crop.HIstartCD = (GDDcum > crop.HIstart).argmax() + 1
-        # 4. Calendar days from sowing to end of yield formation
-        crop.HIendCD = (GDDcum > crop.HIend).argmax() + 1
-        # 5. Duration of yield formation in calendar days
+        # 1. gdd's from sowing to maximum canopy cover
+        crop.MaxCanopyCD = (gdd_cum > crop.MaxCanopy).argmax() + 1
+        # 2. gdd's from sowing to end of vegetative growth
+        crop.CanopyDevEndCD = (gdd_cum > crop.CanopyDevEnd).argmax() + 1
+        # 3. Calendar days from sowing to start of yield_ formation
+        crop.HIstartCD = (gdd_cum > crop.HIstart).argmax() + 1
+        # 4. Calendar days from sowing to end of yield_ formation
+        crop.HIendCD = (gdd_cum > crop.HIend).argmax() + 1
+        # 5. Duration of yield_ formation in calendar days
         crop.YldFormCD = crop.HIendCD - crop.HIstartCD
         if crop.CropType == 3:
             # 1. Calendar days from sowing to end of flowering
-            FloweringEnd = (GDDcum > crop.FloweringEnd).argmax() + 1
+            FloweringEnd = (gdd_cum > crop.FloweringEnd).argmax() + 1
             # 2. Duration of flowering in calendar days
             crop.FloweringCD = FloweringEnd - crop.HIstartCD
         else:
@@ -224,7 +224,7 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
             crop.HIini,
         )
 
-        # Update day to switch to linear HI build-up
+        # Update day to switch to linear harvest_index build-up
         if crop.CropType == 3:
             # Determine linear switch point and HIGC rate for fruit/grain crops
             crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(

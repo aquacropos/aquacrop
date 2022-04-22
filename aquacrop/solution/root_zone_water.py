@@ -45,9 +45,9 @@ def root_zone_water(
 
      `WrAct`: `float` :  Actual rootzone water content
 
-     `Dr`: `DrClass` :  Depletion objection containing rootzone and topsoil depletion
+     `Dr`: `DrClass` :  depletion objection containing rootzone and topsoil depletion
 
-     `TAW`: `TAWClass` :  `TAWClass` containing rootzone and topsoil total avalable water
+     `taw`: `TAWClass` :  `TAWClass` containing rootzone and topsoil total avalable water
 
      `thRZ`: `thRZClass` :  thRZ object conaining rootzone water content paramaters
 
@@ -91,7 +91,7 @@ def root_zone_water(
         WrAct = 0
 
     # define total available water, depletion, root zone water content
-    # TAW = TAWClass()
+    # taw = TAWClass()
     # Dr = DrClass()
     # thRZ = thRZClass()
 
@@ -162,7 +162,7 @@ def root_zone_water(
         # Calculate depletion in top soil (mm)
         Dr_Zt = min(WrFC_Zt - WrAct_Zt, TAW_Zt)
     else:
-        # Set top soil depletions and TAW to root zone values
+        # Set top soil depletions and taw to root zone values
         Dr_Zt = Dr_Rz
         TAW_Zt = TAW_Rz
 

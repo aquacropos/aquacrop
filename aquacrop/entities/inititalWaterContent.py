@@ -6,7 +6,7 @@ class InitialWaterContent:
 
     **Attributes:**\n
 
-    `wc_type` : `str` :  Type of value ('Prop' = 'WP'/'FC'/'SAT'; 'Num' = XXX m3/m3; 'Pct' = % TAW))
+    `wc_type` : `str` :  Type of value ('Prop' = 'WP'/'FC'/'SAT'; 'Num' = XXX m3/m3; 'Pct' = % taw))
 
     `Method` : `str` :  Method ('Depth' = Interpolate depth points; 'Layer' = Constant value for each soil layer)
 

@@ -31,7 +31,7 @@ def irrigation(
     NewCond_th,
     NewCond_DAP,
     NewCond_TimeStepCounter,
-    Crop, prof, Soil_zTop, GrowingSeason, Rain, Runoff):
+    Crop, prof, Soil_zTop, growing_season, Rain, Runoff):
     """
     Function to get irrigation depth for current day
 
@@ -51,7 +51,7 @@ def irrigation(
 
     `Soil`: `SoilClass` : Soil object containing soil paramaters
 
-    `GrowingSeason`: `bool` : is growing season (True or Flase)
+    `growing_season`: `bool` : is growing season (True or Flase)
 
     `Rain`: `float` : daily precipitation mm
 
@@ -70,7 +70,7 @@ def irrigation(
     # NewCond = InitCond
 
     ## Determine irrigation depth (mm/day) to be applied ##
-    if GrowingSeason == True:
+    if growing_season == True:
         # Calculate root zone water content and depletion
         # TAW_ = TAWClass()
         # Dr_ = DrClass()
@@ -95,10 +95,10 @@ def irrigation(
             float(Crop.Zmin),
             Crop.Aer,
         )
-        # WrAct,Dr_,TAW_,thRZ = root_zone_water(prof,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
-        # Use root zone depletions and TAW only for triggering irrigation
+        # WrAct,Dr_,TAW_,thRZ = root_zone_water(prof,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+        # Use root zone depletions and taw only for triggering irrigation
         Dr = Dr_Rz
-        TAW = TAW_Rz
+        taw = TAW_Rz
 
         # Determine adjustment for inflows and outflows on current day #
         if thRZ_Act > thRZ_FC:
@@ -110,7 +110,7 @@ def irrigation(
         WCadj = NewCond_Tpot + NewCond_Epot - Rain + Runoff - AbvFc
 
         NewCond_Depletion = Dr + WCadj
-        NewCond_TAW = TAW
+        NewCond_TAW = taw
 
         # Update growth stage if it is first day of a growing season
         if NewCond_DAP == 1:
@@ -180,7 +180,7 @@ def irrigation(
 
         Irr = max(0, Irr)
 
-    elif GrowingSeason == False:
+    elif growing_season == False:
         # No irrigation outside growing season
         Irr = 0.
         NewCond_IrrCum = 0.

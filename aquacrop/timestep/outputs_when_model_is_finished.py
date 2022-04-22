@@ -15,10 +15,10 @@ def outputs_when_model_is_finished(
             columns=[
                 "time_step_counter",
                 "season_counter",
-                "DAP",
+                "dap",
                 "Wr",
-                "zGW",
-                "SurfaceStorage",
+                "z_gw",
+                "surface_storage",
                 "IrrDay",
                 "Infl",
                 "Runoff",
@@ -34,7 +34,7 @@ def outputs_when_model_is_finished(
 
         water_output_df = pd.DataFrame(
             water_output,
-            columns=["time_step_counter", "GrowingSeason", "DAP"]
+            columns=["time_step_counter", "growing_season", "dap"]
             + ["th" + str(i) for i in range(1, water_output.shape[1] - 2)],
         )
 
@@ -43,17 +43,17 @@ def outputs_when_model_is_finished(
             columns=[
                 "time_step_counter",
                 "season_counter",
-                "DAP",
-                "GDD",
-                "GDDcum",
-                "Zroot",
-                "CC",
-                "CC_NS",
-                "B",
-                "B_NS",
-                "HI",
-                "HIadj",
-                "Y",
+                "dap",
+                "gdd",
+                "gdd_cum",
+                "z_root",
+                "canopy_cover",
+                "canopy_cover_ns",
+                "biomass",
+                "biomass_ns",
+                "harvest_index",
+                "harvest_index_adj",
+                "yield_",
             ],
         )
 

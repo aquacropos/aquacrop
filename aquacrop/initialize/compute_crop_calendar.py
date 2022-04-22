@@ -74,11 +74,11 @@ def compute_crop_calendar(
             )
         )
 
-        # Time from sowing to end of yield formation
+        # Time from sowing to end of yield_ formation
         crop.HIendCD = crop.HIstartCD + crop.YldFormCD
 
         # Duplicate calendar values (needed to minimise if
-        # statements when switching between GDD and CD runs)
+        # statements when switching between gdd and CD runs)
         crop.Emergence = crop.EmergenceCD
         crop.Canopy10Pct = crop.Canopy10PctCD
         crop.MaxRooting = crop.MaxRootingCD
@@ -98,7 +98,7 @@ def compute_crop_calendar(
             crop.FloweringEndCD = ModelConstants.NO_VALUE
             crop.FloweringCD = ModelConstants.NO_VALUE
 
-        # Check if converting crop calendar to GDD mode
+        # Check if converting crop calendar to gdd mode
         if crop.SwitchGDD == 1:
             #             # Extract weather data for first growing season that crop is planted
             #             for i,n in enumerate(ParamStruct.CropChoices):
@@ -113,62 +113,62 @@ def compute_crop_calendar(
             weather_df = weather_df.copy()
             weather_df.index = weather_df.Date
             weather_df = weather_df.loc[date_range]
-            Tmin = weather_df.MinTemp
-            Tmax = weather_df.MaxTemp
+            temp_min = weather_df.MinTemp
+            temp_max = weather_df.MaxTemp
 
-            # Calculate GDD's
+            # Calculate gdd's
             if crop.GDDmethod == 1:
 
-                Tmean = (Tmax + Tmin) / 2
+                Tmean = (temp_max + temp_min) / 2
                 Tmean = Tmean.clip(lower=crop.Tbase, upper=crop.Tupp)
-                GDD = Tmean - crop.Tbase
+                gdd = Tmean - crop.Tbase
 
             elif crop.GDDmethod == 2:
 
-                Tmax = Tmax.clip(lower=crop.Tbase, upper=crop.Tupp)
-                Tmin = Tmin.clip(lower=crop.Tbase, upper=crop.Tupp)
-                Tmean = (Tmax + Tmin) / 2
-                GDD = Tmean - crop.Tbase
+                temp_max = temp_max.clip(lower=crop.Tbase, upper=crop.Tupp)
+                temp_min = temp_min.clip(lower=crop.Tbase, upper=crop.Tupp)
+                Tmean = (temp_max + temp_min) / 2
+                gdd = Tmean - crop.Tbase
 
             elif crop.GDDmethod == 3:
 
-                Tmax = Tmax.clip(lower=crop.Tbase, upper=crop.Tupp)
-                Tmin = Tmin.clip(upper=crop.Tupp)
-                Tmean = (Tmax + Tmin) / 2
+                temp_max = temp_max.clip(lower=crop.Tbase, upper=crop.Tupp)
+                temp_min = temp_min.clip(upper=crop.Tupp)
+                Tmean = (temp_max + temp_min) / 2
                 Tmean = Tmean.clip(lower=crop.Tbase)
-                GDD = Tmean - crop.Tbase
+                gdd = Tmean - crop.Tbase
 
-            GDDcum = np.cumsum(GDD)
-            # Find GDD equivalent for each crop calendar variable
-            # 1. GDD's from sowing to emergence
-            crop.Emergence = GDDcum.iloc[int(crop.EmergenceCD)]
-            # 2. GDD's from sowing to 10# canopy cover
-            crop.Canopy10Pct = GDDcum.iloc[int(crop.Canopy10PctCD)]
-            # 3. GDD's from sowing to maximum rooting
-            crop.MaxRooting = GDDcum.iloc[int(crop.MaxRootingCD)]
-            # 4. GDD's from sowing to maximum canopy cover
-            crop.MaxCanopy = GDDcum.iloc[int(crop.MaxCanopyCD)]
-            # 5. GDD's from sowing to end of vegetative growth
-            crop.CanopyDevEnd = GDDcum.iloc[int(crop.CanopyDevEndCD)]
-            # 6. GDD's from sowing to senescence
-            crop.Senescence = GDDcum.iloc[int(crop.SenescenceCD)]
-            # 7. GDD's from sowing to maturity
-            crop.Maturity = GDDcum.iloc[int(crop.MaturityCD)]
-            # 8. GDD's from sowing to start of yield formation
-            crop.HIstart = GDDcum.iloc[int(crop.HIstartCD)]
-            # 9. GDD's from sowing to start of yield formation
-            crop.HIend = GDDcum.iloc[int(crop.HIendCD)]
-            # 10. Duration of yield formation (GDD's)
+            gdd_cum = np.cumsum(gdd)
+            # Find gdd equivalent for each crop calendar variable
+            # 1. gdd's from sowing to emergence
+            crop.Emergence = gdd_cum.iloc[int(crop.EmergenceCD)]
+            # 2. gdd's from sowing to 10# canopy cover
+            crop.Canopy10Pct = gdd_cum.iloc[int(crop.Canopy10PctCD)]
+            # 3. gdd's from sowing to maximum rooting
+            crop.MaxRooting = gdd_cum.iloc[int(crop.MaxRootingCD)]
+            # 4. gdd's from sowing to maximum canopy cover
+            crop.MaxCanopy = gdd_cum.iloc[int(crop.MaxCanopyCD)]
+            # 5. gdd's from sowing to end of vegetative growth
+            crop.CanopyDevEnd = gdd_cum.iloc[int(crop.CanopyDevEndCD)]
+            # 6. gdd's from sowing to senescence
+            crop.Senescence = gdd_cum.iloc[int(crop.SenescenceCD)]
+            # 7. gdd's from sowing to maturity
+            crop.Maturity = gdd_cum.iloc[int(crop.MaturityCD)]
+            # 8. gdd's from sowing to start of yield_ formation
+            crop.HIstart = gdd_cum.iloc[int(crop.HIstartCD)]
+            # 9. gdd's from sowing to start of yield_ formation
+            crop.HIend = gdd_cum.iloc[int(crop.HIendCD)]
+            # 10. Duration of yield_ formation (gdd's)
             crop.YldForm = crop.HIend - crop.HIstart
 
-            # 11. Duration of flowering (GDD's) - (fruit/grain crops only)
+            # 11. Duration of flowering (gdd's) - (fruit/grain crops only)
             if crop.CropType == 3:
-                # GDD's from sowing to end of flowering
-                crop.FloweringEnd = GDDcum.iloc[int(crop.FloweringEndCD)]
-                # Duration of flowering (GDD's)
+                # gdd's from sowing to end of flowering
+                crop.FloweringEnd = gdd_cum.iloc[int(crop.FloweringEndCD)]
+                # Duration of flowering (gdd's)
                 crop.Flowering = crop.FloweringEnd - crop.HIstart
 
-            # Convert CGC to GDD mode
+            # Convert CGC to gdd mode
             # crop.CGC_CD = crop.CGC
             crop.CGC = (
                 np.log(
@@ -177,7 +177,7 @@ def compute_crop_calendar(
                 )
             ) / (-(crop.MaxCanopy - crop.Emergence))
 
-            # Convert CDC to GDD mode
+            # Convert CDC to gdd mode
             # crop.CDC_CD = crop.CDC
             tCD = crop.MaturityCD - crop.SenescenceCD
             if tCD <= 0:
@@ -192,7 +192,7 @@ def compute_crop_calendar(
                 tGDD = 5
 
             crop.CDC = (crop.CCx / tGDD) * np.log(1 + ((1 - CCi / crop.CCx) / 0.05))
-            # Set calendar type to GDD mode
+            # Set calendar type to gdd mode
             crop.CalendarType = 2
 
         else:
@@ -223,7 +223,7 @@ def compute_crop_calendar(
             )
         )
 
-        # Time from sowing to end of yield formation
+        # Time from sowing to end of yield_ formation
         crop.HIend = crop.HIstart + crop.YldForm
 
         # Time from sowing to end of flowering (if fruit/grain crop)
@@ -243,54 +243,54 @@ def compute_crop_calendar(
         weather_df.index = weather_df.Date
 
         weather_df = weather_df.loc[date_range]
-        Tmin = weather_df.MinTemp
-        Tmax = weather_df.MaxTemp
+        temp_min = weather_df.MinTemp
+        temp_max = weather_df.MaxTemp
 
-        # Calculate GDD's
+        # Calculate gdd's
         if crop.GDDmethod == 1:
 
-            Tmean = (Tmax + Tmin) / 2
+            Tmean = (temp_max + temp_min) / 2
             Tmean = Tmean.clip(lower=crop.Tbase, upper=crop.Tupp)
-            GDD = Tmean - crop.Tbase
+            gdd = Tmean - crop.Tbase
 
         elif crop.GDDmethod == 2:
 
-            Tmax = Tmax.clip(lower=crop.Tbase, upper=crop.Tupp)
-            Tmin = Tmin.clip(lower=crop.Tbase, upper=crop.Tupp)
-            Tmean = (Tmax + Tmin) / 2
-            GDD = Tmean - crop.Tbase
+            temp_max = temp_max.clip(lower=crop.Tbase, upper=crop.Tupp)
+            temp_min = temp_min.clip(lower=crop.Tbase, upper=crop.Tupp)
+            Tmean = (temp_max + temp_min) / 2
+            gdd = Tmean - crop.Tbase
 
         elif crop.GDDmethod == 3:
 
-            Tmax = Tmax.clip(lower=crop.Tbase, upper=crop.Tupp)
-            Tmin = Tmin.clip(upper=crop.Tupp)
-            Tmean = (Tmax + Tmin) / 2
+            temp_max = temp_max.clip(lower=crop.Tbase, upper=crop.Tupp)
+            temp_min = temp_min.clip(upper=crop.Tupp)
+            Tmean = (temp_max + temp_min) / 2
             Tmean = Tmean.clip(lower=crop.Tbase)
-            GDD = Tmean - crop.Tbase
+            gdd = Tmean - crop.Tbase
 
-        GDDcum = np.cumsum(GDD).reset_index(drop=True)
+        gdd_cum = np.cumsum(gdd).reset_index(drop=True)
 
         assert (
-            GDDcum.values[-1] > crop.Maturity
-        ), f"not enough growing degree days in simulation ({GDDcum.values[-1]}) to reach maturity ({crop.Maturity})"
+            gdd_cum.values[-1] > crop.Maturity
+        ), f"not enough growing degree days in simulation ({gdd_cum.values[-1]}) to reach maturity ({crop.Maturity})"
 
-        crop.MaturityCD = (GDDcum > crop.Maturity).idxmax() + 1
+        crop.MaturityCD = (gdd_cum > crop.Maturity).idxmax() + 1
 
         assert crop.MaturityCD < 365, "crop will take longer than 1 year to mature"
 
-        # 1. GDD's from sowing to maximum canopy cover
-        crop.MaxCanopyCD = (GDDcum > crop.MaxCanopy).idxmax() + 1
-        # 2. GDD's from sowing to end of vegetative growth
-        crop.CanopyDevEndCD = (GDDcum > crop.CanopyDevEnd).idxmax() + 1
-        # 3. Calendar days from sowing to start of yield formation
-        crop.HIstartCD = (GDDcum > crop.HIstart).idxmax() + 1
-        # 4. Calendar days from sowing to end of yield formation
-        crop.HIendCD = (GDDcum > crop.HIend).idxmax() + 1
-        # 5. Duration of yield formation in calendar days
+        # 1. gdd's from sowing to maximum canopy cover
+        crop.MaxCanopyCD = (gdd_cum > crop.MaxCanopy).idxmax() + 1
+        # 2. gdd's from sowing to end of vegetative growth
+        crop.CanopyDevEndCD = (gdd_cum > crop.CanopyDevEnd).idxmax() + 1
+        # 3. Calendar days from sowing to start of yield_ formation
+        crop.HIstartCD = (gdd_cum > crop.HIstart).idxmax() + 1
+        # 4. Calendar days from sowing to end of yield_ formation
+        crop.HIendCD = (gdd_cum > crop.HIend).idxmax() + 1
+        # 5. Duration of yield_ formation in calendar days
         crop.YldFormCD = crop.HIendCD - crop.HIstartCD
         if crop.CropType == 3:
             # 1. Calendar days from sowing to end of flowering
-            FloweringEnd = (GDDcum > crop.FloweringEnd).idxmax() + 1
+            FloweringEnd = (gdd_cum > crop.FloweringEnd).idxmax() + 1
             # 2. Duration of flowering in calendar days
             crop.FloweringCD = FloweringEnd - crop.HIstartCD
         else:

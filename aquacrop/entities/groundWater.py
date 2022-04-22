@@ -7,7 +7,7 @@ class GroundWater:
     **Attributes:**\n
 
 
-    `water_table` : `str` :  Water table considered (Y or N)
+    `water_table` : `str` :  Water table considered (yield_ or N)
 
     `method` : `str` :  Water table input data ('Constant' or 'Variable')
 

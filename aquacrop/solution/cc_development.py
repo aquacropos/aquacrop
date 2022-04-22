@@ -11,7 +11,7 @@ def cc_development(CCo, CCx, CGC, CDC, dt, Mode, CCx0):
     """
     Function to calculate canopy cover development by end of the current simulation day
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=30" target="_blank">Reference Manual: CC devlopment</a> (pg. 21-24)
+    <a href="../pdfs/ac_ref_man_3.pdf#page=30" target="_blank">Reference Manual: canopy_cover devlopment</a> (pg. 21-24)
 
 
     *Arguments:*
@@ -22,19 +22,19 @@ def cc_development(CCo, CCx, CGC, CDC, dt, Mode, CCx0):
 
     `CCx`: `float` : Maximum canopy cover (fraction of soil cover)
 
-    `CGC`: `float` : Canopy growth coefficient (fraction per GDD)
+    `CGC`: `float` : Canopy growth coefficient (fraction per gdd)
 
-    `CDC`: `float` : Canopy decline coefficient (fraction per GDD/calendar day)
+    `CDC`: `float` : Canopy decline coefficient (fraction per gdd/calendar day)
 
-    `dt`: `float` : Time delta of canopy growth (1 calander day or ... GDD)
+    `dt`: `float` : Time delta of canopy growth (1 calander day or ... gdd)
 
-    `Mode`: `str` : Stage of Canopy developement (Growth or Decline)
+    `Mode`: `str` : stage of Canopy developement (Growth or Decline)
 
     `CCx0`: `float` : Maximum canopy cover (fraction of soil cover)
 
     *Returns:*
 
-    `CC`: `float` : Canopy Cover
+    `canopy_cover`: `float` : Canopy Cover
 
 
 
@@ -47,33 +47,33 @@ def cc_development(CCo, CCx, CGC, CDC, dt, Mode, CCx0):
     if Mode == "Growth":
         # Calculate canopy growth
         # Exponential growth stage
-        CC = CCo * np.exp(CGC * dt)
-        if CC > (CCx / 2):
+        canopy_cover = CCo * np.exp(CGC * dt)
+        if canopy_cover > (CCx / 2):
             # Exponential decay stage
-            CC = CCx - 0.25 * (CCx / CCo) * CCx * np.exp(-CGC * dt)
+            canopy_cover = CCx - 0.25 * (CCx / CCo) * CCx * np.exp(-CGC * dt)
 
-        # Limit CC to CCx
-        if CC > CCx:
-            CC = CCx
+        # Limit canopy_cover to CCx
+        if canopy_cover > CCx:
+            canopy_cover = CCx
 
     elif Mode == "Decline":
         # Calculate canopy decline
         if CCx < 0.001:
-            CC = 0
+            canopy_cover = 0
         else:
-            CC = CCx * (
+            canopy_cover = CCx * (
                 1
                 - 0.05
                 * (np.exp(dt * CDC * 3.33 * ((CCx + 2.29) / (CCx0 + 2.29)) / (CCx + 2.29)) - 1)
             )
 
     ## Limit canopy cover to between 0 and 1 ##
-    if CC > 1:
-        CC = 1
-    elif CC < 0:
-        CC = 0
+    if canopy_cover > 1:
+        canopy_cover = 1
+    elif canopy_cover < 0:
+        canopy_cover = 0
 
-    return CC
+    return canopy_cover
 
 if __name__ == "__main__":
     cc.compile()

@@ -51,11 +51,11 @@ class TestModelTillTermination(unittest.TestCase):
         crop_growth = self._model_os.get_crop_growth().head()
 
         gdd_4_expected = 22.5
-        gdd_4_returned = crop_growth["GDD"][4]
+        gdd_4_returned = crop_growth["gdd"][4]
         self.assertEqual(gdd_4_expected, gdd_4_returned)
 
         gd_cum_d_4_expected = 104
-        gdd_4_cum_returned = crop_growth["GDDcum"][4]
+        gdd_4_cum_returned = crop_growth["gdd_cum"][4]
         self.assertEqual(gd_cum_d_4_expected, gdd_4_cum_returned)
 
     def test_water_flux(self):

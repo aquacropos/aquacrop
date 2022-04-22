@@ -16,8 +16,8 @@ def water_stress(
     Crop_fshape_w,
     InitCond_tEarlySen,
     Dr,
-    TAW,
-    Et0,
+    taw,
+    et0,
     beta,
 ):
     """
@@ -33,11 +33,11 @@ def water_stress(
 
     `InitCond`: `InitCondClass` : InitCond object
 
-    `Dr`: `DrClass` : Depletion object (contains rootzone and top soil depletion totals)
+    `Dr`: `DrClass` : depletion object (contains rootzone and top soil depletion totals)
 
-    `TAW`: `TAWClass` : TAW object (contains rootzone and top soil total available water)
+    `taw`: `TAWClass` : taw object (contains rootzone and top soil total available water)
 
-    `Et0`: `float` : Reference Evapotranspiration
+    `et0`: `float` : Reference Evapotranspiration
 
     `beta`: `float` : Adjust senescence threshold if early sensescence is triggered
 
@@ -56,12 +56,12 @@ def water_stress(
     p_up = np.ones(nstress) * Crop_p_up
     p_lo = np.ones(nstress) * Crop_p_lo
     if Crop_ETadj == 1:
-        # Adjust stress thresholds for Et0 on currentbeta day (don't do this for
+        # Adjust stress thresholds for et0 on currentbeta day (don't do this for
         # pollination water stress coefficient)
 
         for ii in range(3):
-            p_up[ii] = p_up[ii] + (0.04 * (5 - Et0)) * (np.log10(10 - 9 * p_up[ii]))
-            p_lo[ii] = p_lo[ii] + (0.04 * (5 - Et0)) * (np.log10(10 - 9 * p_lo[ii]))
+            p_up[ii] = p_up[ii] + (0.04 * (5 - et0)) * (np.log10(10 - 9 * p_up[ii]))
+            p_lo[ii] = p_lo[ii] + (0.04 * (5 - et0)) * (np.log10(10 - 9 * p_lo[ii]))
 
     # Adjust senescence threshold if early sensescence is triggered
     if (beta == True) and (InitCond_tEarlySen > 0):
@@ -76,13 +76,13 @@ def water_stress(
     # Calculate relative depletion
     Drel = np.zeros(nstress)
     for ii in range(nstress):
-        if Dr <= (p_up[ii] * TAW):
+        if Dr <= (p_up[ii] * taw):
             # No water stress
             Drel[ii] = 0
-        elif (Dr > (p_up[ii] * TAW)) and (Dr < (p_lo[ii] * TAW)):
+        elif (Dr > (p_up[ii] * taw)) and (Dr < (p_lo[ii] * taw)):
             # Partial water stress
-            Drel[ii] = 1 - ((p_lo[ii] - (Dr / TAW)) / (p_lo[ii] - p_up[ii]))
-        elif Dr >= (p_lo[ii] * TAW):
+            Drel[ii] = 1 - ((p_lo[ii] - (Dr / taw)) / (p_lo[ii] - p_up[ii]))
+        elif Dr >= (p_lo[ii] * taw):
             # Full water stress
             Drel[ii] = 1
 

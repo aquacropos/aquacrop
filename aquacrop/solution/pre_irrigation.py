@@ -2,7 +2,7 @@ import numpy as np
 
 
 
-def pre_irrigation(prof, Crop, InitCond, GrowingSeason, IrrMngt):
+def pre_irrigation(prof, Crop, InitCond, growing_season, IrrMngt):
     """
     Function to calculate pre-irrigation when in net irrigation mode
 
@@ -17,7 +17,7 @@ def pre_irrigation(prof, Crop, InitCond, GrowingSeason, IrrMngt):
 
     `InitCond`: `InitCondClass` : InitCond object containing model paramaters
 
-    `GrowingSeason`: `bool` : is growing season (True or Flase)
+    `growing_season`: `bool` : is growing season (True or Flase)
 
     `IrrMngt`: ``IrrMngtStruct`  object containing irrigation management paramaters
 
@@ -37,14 +37,14 @@ def pre_irrigation(prof, Crop, InitCond, GrowingSeason, IrrMngt):
     NewCond = InitCond
 
     ## Calculate pre-irrigation needs ##
-    if GrowingSeason == True:
-        if (IrrMngt.IrrMethod != 4) or (NewCond.DAP != 1):
+    if growing_season == True:
+        if (IrrMngt.IrrMethod != 4) or (NewCond.dap != 1):
             # No pre-irrigation as not in net irrigation mode or not on first day
             # of the growing season
             PreIrr = 0
         else:
             # Determine compartments covered by the root zone
-            rootdepth = round(max(NewCond.Zroot, Crop.Zmin), 2)
+            rootdepth = round(max(NewCond.z_root, Crop.Zmin), 2)
 
             compRz = np.argwhere(prof.dzsum >= rootdepth).flatten()[0]
 

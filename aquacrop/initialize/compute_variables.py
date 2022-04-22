@@ -94,7 +94,7 @@ def compute_variables(
             crop.HIini,
         )
 
-        # Days to linear HI switch point
+        # Days to linear harvest_index switch point
         if crop.CropType == 3:
             # Determine linear switch point and HIGC rate for fruit/grain crops
             crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(

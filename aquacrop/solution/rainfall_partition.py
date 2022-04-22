@@ -14,7 +14,7 @@ cc = CC("solution_rainfall_partition")
 
 @cc.export("rainfall_partition", (f8,f8[:],i8,f8,f8,f8,f8,f8,f8,f8,f8,SoilProfileNT_typ_sig))
 def rainfall_partition(
-    P,
+    precipitation,
     InitCond_th,
     NewCond_DaySubmerged,
     FieldMngt_SRinhb,
@@ -38,7 +38,7 @@ def rainfall_partition(
     *Arguments:*
 
 
-    `P`: `float` : Percipitation on current day
+    `precipitation`: `float` : Percipitation on current day
 
     `InitCond`: `InitCondClass` : InitCond object containing model paramaters
 
@@ -70,7 +70,7 @@ def rainfall_partition(
 
     """
 
-    # can probs make this faster by doing a if P=0 loop
+    # can probs make this faster by doing a if precipitation=0 loop
 
     ## Store initial conditions for updating ##
     # NewCond = InitCond
@@ -140,18 +140,18 @@ def rainfall_partition(
 
         # Partition rainfall into runoff and infiltration (mm)
         S = (25400 / CN) - 254
-        term = P - ((5 / 100) * S)
+        term = precipitation - ((5 / 100) * S)
         if term <= 0:
             Runoff = 0
-            Infl = P
+            Infl = precipitation
         else:
-            Runoff = (term ** 2) / (P + (1 - (5 / 100)) * S)
-            Infl = P - Runoff
+            Runoff = (term ** 2) / (precipitation + (1 - (5 / 100)) * S)
+            Infl = precipitation - Runoff
 
     else:
         # bunds on field, therefore no surface runoff
         Runoff = 0
-        Infl = P
+        Infl = precipitation
 
     return Runoff, Infl, NewCond_DaySubmerged
 

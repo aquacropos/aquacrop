@@ -24,8 +24,8 @@ def biomass_accumulation(
                         NewCond_B_NS,
                         Tr, 
                         TrPot, 
-                        Et0, 
-                        GrowingSeason):
+                        et0, 
+                        growing_season):
     """
     Function to calculate biomass accumulation
 
@@ -44,9 +44,9 @@ def biomass_accumulation(
 
     `TrPot`: `float` : Daily potential transpiration
 
-    `Et0`: `float` : Daily reference evapotranspiration
+    `et0`: `float` : Daily reference evapotranspiration
 
-    `GrowingSeason`:: `bool` : is Growing season? (True, False)
+    `growing_season`:: `bool` : is Growing season? (True, False)
 
     *Returns:*
 
@@ -62,7 +62,7 @@ def biomass_accumulation(
     # NewCond = InitCond
 
     ## Calculate biomass accumulation (if in growing season) ##
-    if GrowingSeason == True:
+    if growing_season == True:
         # Get time for harvest index build-up
         HIt = NewCond_DAP - NewCond_DelayedCDs - Crop.HIstartCD - 1
 
@@ -89,9 +89,9 @@ def biomass_accumulation(
 
         # Calculate biomass accumulation on current day
         # No water stress
-        dB_NS = WPadj * (TrPot / Et0)
+        dB_NS = WPadj * (TrPot / et0)
         # With water stress
-        dB = WPadj * (Tr / Et0)
+        dB = WPadj * (Tr / et0)
         if np.isnan(dB) == True:
             dB = 0
 

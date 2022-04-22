@@ -32,7 +32,7 @@ class ClockStruct:
     `evap_time_steps` : `int`: Number of time-steps (per day) for soil
         evaporation calculation
 
-    `sim_off_season` : `str`: 'Y' if you want to simulate the off season,
+    `sim_off_season` : `str`: 'yield_' if you want to simulate the off season,
     'N' otherwise
 
     `planting_dates` : `list-like`: list of planting dates in datetime format
@@ -63,7 +63,7 @@ class ClockStruct:
         # Number of time-steps (per day) for soil evaporation calculation
         self.evap_time_steps = 20
         self.sim_off_season = (
-            "N"  # 'Y' if you want to simulate the off season, 'N' otherwise
+            "N"  # 'yield_' if you want to simulate the off season, 'N' otherwise
         )
         self.planting_dates = (
             []

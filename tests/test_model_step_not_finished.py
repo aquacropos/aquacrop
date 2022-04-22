@@ -48,11 +48,11 @@ class TestModelByStepNotFinished(unittest.TestCase):
         """
         crop_growth = self._model_os.get_crop_growth().head()
         gdd_2_expected = 20
-        gdd_2_returned = crop_growth["GDD"][2]
+        gdd_2_returned = crop_growth["gdd"][2]
         self.assertEqual(gdd_2_expected, gdd_2_returned)
 
         gd_cum_d_4_expected = 0.0
-        gdd_4_cum_returned = crop_growth["GDDcum"][4]
+        gdd_4_cum_returned = crop_growth["gdd_cum"][4]
         self.assertEqual(gd_cum_d_4_expected, gdd_4_cum_returned)
 
     def test_water_flux(self):

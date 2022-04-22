@@ -21,7 +21,7 @@ def calculate_HIGC(
 
     """
     # Determine HIGC
-    # Total yield formation days
+    # Total yield_ formation days
     tHI = crop_YldFormCD
     # Iteratively estimate HIGC
     HIGC = 0.001

@@ -34,7 +34,7 @@ else:
 
 
 
-def harvest_index(prof, Soil_zTop, Crop, InitCond, Et0, Tmax, Tmin, GrowingSeason):
+def harvest_index(prof, Soil_zTop, Crop, InitCond, et0, temp_max, temp_min, growing_season):
 
     """
     Function to simulate build up of harvest index
@@ -51,13 +51,13 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, Et0, Tmax, Tmin, GrowingSeaso
 
     `InitCond`: `InitCondClass` : InitCond object containing model paramaters
 
-    `Et0`: `float` : reference evapotranspiration on current day
+    `et0`: `float` : reference evapotranspiration on current day
 
-    `Tmax`: `float` : maximum tempature on current day (celcius)
+    `temp_max`: `float` : maximum tempature on current day (celcius)
 
-    `Tmin`: `float` : minimum tempature on current day (celcius)
+    `temp_min`: `float` : minimum tempature on current day (celcius)
 
-    `GrowingSeason`:: `bool` : is growing season (True or Flase)
+    `growing_season`:: `bool` : is growing season (True or Flase)
 
 
     *Returns:*
@@ -72,41 +72,41 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, Et0, Tmax, Tmin, GrowingSeaso
     ## Store initial conditions for updating ##
     NewCond = InitCond
 
-    InitCond_HI = InitCond.HI
-    InitCond_HIadj = InitCond.HIadj
-    InitCond_PreAdj = InitCond.PreAdj
+    InitCond_HI = InitCond.harvest_index
+    InitCond_HIadj = InitCond.harvest_index_adj
+    InitCond_PreAdj = InitCond.pre_adj
 
     ## Calculate harvest index build up (if in growing season) ##
-    if GrowingSeason == True:
+    if growing_season == True:
         # Calculate root zone water content
 
-        TAW = TAWClass()
+        taw = TAWClass()
         Dr = DrClass()
         # thRZ = thRZClass()
-        _, Dr.Zt, Dr.Rz, TAW.Zt, TAW.Rz, _,_,_,_,_,_, = root_zone_water(
+        _, Dr.Zt, Dr.Rz, taw.Zt, taw.Rz, _,_,_,_,_,_, = root_zone_water(
             prof,
-            float(NewCond.Zroot),
+            float(NewCond.z_root),
             NewCond.th,
             Soil_zTop,
             float(Crop.Zmin),
             Crop.Aer,
         )
 
-        # _,Dr,TAW,_ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+        # _,Dr,taw,_ = root_zone_water(Soil_Profile,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Check whether to use root zone or top soil depletions for calculating
         # water stress
-        if (Dr.Rz / TAW.Rz) <= (Dr.Zt / TAW.Zt):
+        if (Dr.Rz / taw.Rz) <= (Dr.Zt / taw.Zt):
             # Root zone is wetter than top soil, so use root zone value
             Dr = Dr.Rz
-            TAW = TAW.Rz
+            taw = taw.Rz
         else:
             # Top soil is wetter than root zone, so use top soil values
             Dr = Dr.Zt
-            TAW = TAW.Zt
+            taw = taw.Zt
 
         # Calculate water stress
         beta = True
-        # Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
+        # Ksw = water_stress(Crop, NewCond, Dr, taw, et0, beta)
         # Ksw = KswClass()
         Ksw_Exp, Ksw_Sto, Ksw_Sen, Ksw_Pol, Ksw_StoLin = water_stress(
             Crop.p_up,
@@ -114,42 +114,42 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, Et0, Tmax, Tmin, GrowingSeaso
             Crop.ETadj,
             Crop.beta,
             Crop.fshape_w,
-            NewCond.tEarlySen,
+            NewCond.t_early_sen,
             Dr,
-            TAW,
-            Et0,
+            taw,
+            et0,
             beta,
         )
         Ksw = KswNT(Exp=Ksw_Exp, Sto=Ksw_Sto, Sen=Ksw_Sen, Pol=Ksw_Pol, StoLin=Ksw_StoLin )
         # Calculate temperature stress
-        (Kst_PolH,Kst_PolC) = temperature_stress(Crop, Tmax, Tmin)
+        (Kst_PolH,Kst_PolC) = temperature_stress(Crop, temp_max, temp_min)
         Kst = KstNT(PolH=Kst_PolH,PolC=Kst_PolC)
         # Get reference harvest index on current day
-        HIi = NewCond.HIref
+        HIi = NewCond.hi_ref
 
         # Get time for harvest index build-up
-        HIt = NewCond.DAP - NewCond.DelayedCDs - Crop.HIstartCD - 1
+        HIt = NewCond.dap - NewCond.delayed_cds - Crop.HIstartCD - 1
 
         # Calculate harvest index
-        if (NewCond.YieldForm == True) and (HIt >= 0):
-            # print(NewCond.DAP)
+        if (NewCond.yield_form == True) and (HIt >= 0):
+            # print(NewCond.dap)
             # Root/tuber or fruit/grain crops
             if (Crop.CropType == 2) or (Crop.CropType == 3):
                 # Detemine adjustment for water stress before anthesis
                 if InitCond_PreAdj == False:
-                    InitCond.PreAdj = True
-                    NewCond.Fpre = HIadj_pre_anthesis(NewCond.B,
-                                                NewCond.B_NS,
-                                                NewCond.CC,
+                    InitCond.pre_adj = True
+                    NewCond.f_pre = HIadj_pre_anthesis(NewCond.biomass,
+                                                NewCond.biomass_ns,
+                                                NewCond.canopy_cover,
                                                 Crop.dHI_pre)
 
                 # Determine adjustment for crop pollination failure
                 if Crop.CropType == 3:  # Adjustment only for fruit/grain crops
                     if (HIt > 0) and (HIt <= Crop.FloweringCD):
 
-                        NewCond.Fpol = HIadj_pollination(
-                            NewCond.CC,
-                            NewCond.Fpol,
+                        NewCond.f_pol = HIadj_pollination(
+                            NewCond.canopy_cover,
+                            NewCond.f_pol,
                             Crop.FloweringCD,
                             Crop.CCmin,
                             Crop.exc,
@@ -158,60 +158,60 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, Et0, Tmax, Tmin, GrowingSeaso
                             HIt,
                         )
 
-                    HImax = NewCond.Fpol * Crop.HI0
+                    HImax = NewCond.f_pol * Crop.HI0
                 else:
                     # No pollination adjustment for root/tuber crops
                     HImax = Crop.HI0
 
                 # Determine adjustments for post-anthesis water stress
                 if HIt > 0:
-                    (NewCond.sCor1,
-                    NewCond.sCor2,
+                    (NewCond.s_cor1,
+                    NewCond.s_cor2,
                     NewCond.fpost_upp,
                     NewCond.fpost_dwn,
-                    NewCond.Fpost) = HIadj_post_anthesis(NewCond.DelayedCDs,
-                                                        NewCond.sCor1,
-                                                        NewCond.sCor2,
-                                                        NewCond.DAP,
-                                                        NewCond.Fpre,
-                                                        NewCond.CC,
+                    NewCond.f_post) = HIadj_post_anthesis(NewCond.delayed_cds,
+                                                        NewCond.s_cor1,
+                                                        NewCond.s_cor2,
+                                                        NewCond.dap,
+                                                        NewCond.f_pre,
+                                                        NewCond.canopy_cover,
                                                         NewCond.fpost_upp,
                                                         NewCond.fpost_dwn,
                                                         Crop, 
                                                         Ksw)
 
-                # Limit HI to maximum allowable increase due to pre- and
+                # Limit harvest_index to maximum allowable increase due to pre- and
                 # post-anthesis water stress combinations
-                HImult = NewCond.Fpre * NewCond.Fpost
+                HImult = NewCond.f_pre * NewCond.f_post
                 if HImult > 1 + (Crop.dHI0 / 100):
                     HImult = 1 + (Crop.dHI0 / 100)
 
                 # Determine harvest index on current day, adjusted for stress
                 # effects
                 if HImax >= HIi:
-                    HIadj = HImult * HIi
+                    harvest_index_adj = HImult * HIi
                 else:
-                    HIadj = HImult * HImax
+                    harvest_index_adj = HImult * HImax
 
             elif Crop.CropType == 1:
                 # Leafy vegetable crops - no adjustment, harvest index equal to
                 # reference value for current day
-                HIadj = HIi
+                harvest_index_adj = HIi
 
         else:
 
-            # No build-up of harvest index if outside yield formation period
+            # No build-up of harvest index if outside yield_ formation period
             HIi = InitCond_HI
-            HIadj = InitCond_HIadj
+            harvest_index_adj = InitCond_HIadj
 
         # Store final values for current time step
-        NewCond.HI = HIi
-        NewCond.HIadj = HIadj
+        NewCond.harvest_index = HIi
+        NewCond.harvest_index_adj = harvest_index_adj
 
     else:
         # No harvestable crop outside of a growing season
-        NewCond.HI = 0
-        NewCond.HIadj = 0
+        NewCond.harvest_index = 0
+        NewCond.harvest_index_adj = 0
 
-    # print([NewCond.DAP , Crop.YldFormCD])
+    # print([NewCond.dap , Crop.YldFormCD])
     return NewCond

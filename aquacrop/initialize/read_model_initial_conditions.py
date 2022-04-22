@@ -37,12 +37,12 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
     # InitCond = InitCondStruct(**class_args)
 
     if ClockStruct.season_counter == -1:
-        InitCond.Zroot = 0.
-        InitCond.CC0adj = 0.
+        InitCond.z_root = 0.
+        InitCond.cc0_adj = 0.
 
     elif ClockStruct.season_counter == 0:
-        InitCond.Zroot = ParamStruct.Seasonal_Crop_List[0].Zmin
-        InitCond.CC0adj = ParamStruct.Seasonal_Crop_List[0].CC0
+        InitCond.z_root = ParamStruct.Seasonal_Crop_List[0].Zmin
+        InitCond.cc0_adj = ParamStruct.Seasonal_Crop_List[0].CC0
 
     ##################
     # save field management
@@ -55,12 +55,12 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
             float(ParamStruct.FallowFieldMngt.z_bund) > 0.001
         ):
             # Get initial storage between surface bunds
-            InitCond.SurfaceStorage = float(ParamStruct.FallowFieldMngt.bund_water)
-            if InitCond.SurfaceStorage > float(ParamStruct.FallowFieldMngt.z_bund):
-                InitCond.SurfaceStorage = float(ParamStruct.FallowFieldMngt.z_bund)
+            InitCond.surface_storage = float(ParamStruct.FallowFieldMngt.bund_water)
+            if InitCond.surface_storage > float(ParamStruct.FallowFieldMngt.z_bund):
+                InitCond.surface_storage = float(ParamStruct.FallowFieldMngt.z_bund)
         else:
             # No surface bunds
-            InitCond.SurfaceStorage = 0
+            InitCond.surface_storage = 0
 
     elif ClockStruct.season_counter == 0:
         # First day of simulation is in first growing season
@@ -68,12 +68,12 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
         FieldMngtTmp = ParamStruct.FieldMngt
         if (FieldMngtTmp.bunds) and (float(FieldMngtTmp.z_bund) > 0.001):
             # Get initial storage between surface bunds
-            InitCond.SurfaceStorage = float(FieldMngtTmp.bund_water)
-            if InitCond.SurfaceStorage > float(FieldMngtTmp.z_bund):
-                InitCond.SurfaceStorage = float(FieldMngtTmp.z_bund)
+            InitCond.surface_storage = float(FieldMngtTmp.bund_water)
+            if InitCond.surface_storage > float(FieldMngtTmp.z_bund):
+                InitCond.surface_storage = float(FieldMngtTmp.z_bund)
         else:
             # No surface bunds
-            InitCond.SurfaceStorage = 0
+            InitCond.surface_storage = 0
 
     ############
     # watertable
@@ -84,24 +84,24 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
     # Check for presence of groundwater table
     if ParamStruct.water_table == 0:  # No water table present
         # Set initial groundwater level to dummy value
-        InitCond.zGW = ModelConstants.NO_VALUE
-        InitCond.WTinSoil = False
+        InitCond.z_gw = ModelConstants.NO_VALUE
+        InitCond.wt_in_soil = False
         # Set adjusted field capacity to default field capacity
         InitCond.th_fc_Adj = profile.th_fc.values
     elif ParamStruct.water_table == 1:  # Water table is present
         # Set initial groundwater level
-        InitCond.zGW = float(ParamStruct.zGW[ClockStruct.time_step_counter])
+        InitCond.z_gw = float(ParamStruct.z_gw[ClockStruct.time_step_counter])
         # Find compartment mid-points
         zMid = profile.zMid
         # Check if water table is within modelled soil profile
-        if InitCond.zGW >= 0:
-            idx = zMid[zMid >= InitCond.zGW].index
+        if InitCond.z_gw >= 0:
+            idx = zMid[zMid >= InitCond.z_gw].index
             if idx.shape[0] == 0:
-                InitCond.WTinSoil = False
+                InitCond.wt_in_soil = False
             else:
-                InitCond.WTinSoil = True
+                InitCond.wt_in_soil = True
         else:
-            InitCond.WTinSoil = False
+            InitCond.wt_in_soil = False
 
         # Adjust compartment field capacity
         compi = int(len(profile)) - 1
@@ -118,7 +118,7 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
                     pF = 2 + 0.3 * (compdf.th_fc - 0.1) / 0.2
                     Xmax = (np.exp(pF * np.log(10))) / 100
 
-            if (InitCond.zGW < 0) or ((InitCond.zGW - zMid.iloc[compi]) >= Xmax):
+            if (InitCond.z_gw < 0) or ((InitCond.z_gw - zMid.iloc[compi]) >= Xmax):
                 for ii in range(compi):
                     compdfii = profile.loc[ii]
                     thfcAdj[ii] = compdfii.th_fc
@@ -128,11 +128,11 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
                 if compdf.th_fc >= compdf.th_s:
                     thfcAdj[compi] = compdf.th_fc
                 else:
-                    if zMid.iloc[compi] >= InitCond.zGW:
+                    if zMid.iloc[compi] >= InitCond.z_gw:
                         thfcAdj[compi] = compdf.th_s
                     else:
                         dV = compdf.th_s - compdf.th_fc
-                        dFC = (dV / (Xmax ** 2)) * ((zMid.iloc[compi] - (InitCond.zGW - Xmax)) ** 2)
+                        dFC = (dV / (Xmax ** 2)) * ((zMid.iloc[compi] - (InitCond.z_gw - Xmax)) ** 2)
                         thfcAdj[compi] = compdf.th_fc + dFC
 
                 compi = compi - 1
@@ -167,7 +167,7 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
         values = np.array(datapoints, dtype=float)
 
     elif typestr == "Pct":
-        # Values are defined as percentage of TAW. Extract and assign value for
+        # Values are defined as percentage of taw. Extract and assign value for
         # each soil layer based on calculated/input soil hydraulic properties
         depth_layer = np.array(depth_layer, dtype=float)
         datapoints = np.array(datapoints, dtype=float)
@@ -281,13 +281,13 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
 
     # If groundwater table is present in soil profile then set all water
     # contents below the water table to saturation
-    if InitCond.WTinSoil == True:
+    if InitCond.wt_in_soil == True:
         # Find compartment mid-points
         SoilDepths = profile.dzsum.values
         comp_top = np.append([0], SoilDepths[:-1])
         comp_bot = SoilDepths
         comp_mid = (comp_top + comp_bot) / 2
-        idx = np.where(comp_mid >= InitCond.zGW)[0][0]
+        idx = np.where(comp_mid >= InitCond.z_gw)[0][0]
         for ii in range(idx, len(profile)):
             layeri = profile.loc[ii].Layer
             InitCond.th[ii] = hydf.th_s.loc[layeri]

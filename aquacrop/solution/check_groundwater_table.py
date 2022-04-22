@@ -18,7 +18,7 @@ def check_groundwater_table(
     NewCond_th,
     NewCond_th_fc_Adj,
     water_table_presence,
-    zGW,
+    z_gw,
 ):
     """
     Function to check for presence of a groundwater table, and, if present,
@@ -51,7 +51,7 @@ def check_groundwater_table(
     if water_table_presence == 1:
 
         # Update groundwater conditions for current day
-        NewCond_zGW = zGW
+        NewCond_zGW = z_gw
 
         # Find compartment mid-points
         zMid = prof.zMid

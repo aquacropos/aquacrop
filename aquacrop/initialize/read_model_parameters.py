@@ -57,7 +57,7 @@ def read_model_parameters(clock_struct, soil, crop, weather_df):
     #     # assign variables to paramstruct
     #     paramStruct.nCrops = len(cropList)
     #     if paramStruct.nCrops > 1:
-    #         paramStruct.SpecifiedPlantcalendar = 'Y'
+    #         paramStruct.SpecifiedPlantcalendar = 'yield_'
     #     else:
     #         paramStruct.SpecifiedPlantcalendar = 'N'
 
@@ -70,7 +70,7 @@ def read_model_parameters(clock_struct, soil, crop, weather_df):
 
     #     # find planting and harvest dates
     #     # check if there is more than 1 crop or multiple plant dates in sim year
-    #     if paramStruct.SpecifiedPlantcalendar == "Y":
+    #     if paramStruct.SpecifiedPlantcalendar == "yield_":
     #         # if here than crop rotation occours during same period
 
     #         # create variables from dataframe

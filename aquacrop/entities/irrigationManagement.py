@@ -22,13 +22,13 @@ class IrrigationManagement:
 
     `MaxIrr` : `float` : Maximum depth (mm) that can be applied each day
 
-    `SMT` : `list` :  Soil moisture targets (%TAW) to maintain in each growth stage (only used if irrigation method is equal to 1)
+    `SMT` : `list` :  Soil moisture targets (%taw) to maintain in each growth stage (only used if irrigation method is equal to 1)
 
     `IrrInterval` : `int` : Irrigation interval in days (only used if irrigation method is equal to 2)
 
     `Schedule` : `pandas.DataFrame` : DataFrame containing dates and depths
 
-    `NetIrrSMT` : `float` : Net irrigation threshold moisture level (% of TAW that will be maintained, for IrrMethod=4)
+    `NetIrrSMT` : `float` : Net irrigation threshold moisture level (% of taw that will be maintained, for IrrMethod=4)
 
     `Depth` : `float` : constant depth to apply on each day
 

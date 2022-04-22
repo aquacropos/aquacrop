@@ -54,7 +54,7 @@ def solution_single_time_step(
 
     `clock_struct` : `ClockStructClass` :  model time paramaters
 
-    `weather_step`: `np.array` :  containing P,ET,Tmax,Tmin for current day
+    `weather_step`: `np.array` :  containing precipitation,ET,temp_max,temp_min for current day
 
     `outputs` : `OutputClass` :  object to store outputs
 
@@ -72,14 +72,14 @@ def solution_single_time_step(
     Soil = param_struct.Soil
     CO2 = param_struct.CO2
     if param_struct.water_table == 1:
-        Groundwater = param_struct.zGW[clock_struct.time_step_counter]
+        Groundwater = param_struct.z_gw[clock_struct.time_step_counter]
     else:
         Groundwater = 0
 
-    P = weather_step[2]
-    Tmax = weather_step[1]
-    Tmin = weather_step[0]
-    Et0 = weather_step[3]
+    precipitation = weather_step[2]
+    temp_max = weather_step[1]
+    temp_min = weather_step[0]
+    et0 = weather_step[3]
 
     # Store initial conditions in structure for updating %%
     NewCond = init_cond
@@ -94,26 +94,26 @@ def solution_single_time_step(
         if (
             (planting_date <= CurrentDate)
             and (harvest_date >= CurrentDate)
-            and (NewCond.CropMature is False)
-            and (NewCond.CropDead is False)
+            and (NewCond.crop_mature is False)
+            and (NewCond.crop_dead is False)
         ):
-            GrowingSeason = True
+            growing_season = True
         else:
-            GrowingSeason = False
+            growing_season = False
 
         # Assign crop, irrigation management, and field management structures
         Crop_ = param_struct.Seasonal_Crop_List[clock_struct.season_counter]
         Crop_Name = param_struct.CropChoices[clock_struct.season_counter]
         IrrMngt = param_struct.IrrMngt
 
-        if GrowingSeason is True:
+        if growing_season is True:
             FieldMngt = param_struct.FieldMngt
         else:
             FieldMngt = param_struct.FallowFieldMngt
 
     else:
         # Not yet reached start of first growing season
-        GrowingSeason = False
+        growing_season = False
         # Assign crop, irrigation management, and field management structures
         # Assign first crop as filler crop
         Crop_ = param_struct.Fallow_Crop
@@ -125,33 +125,33 @@ def solution_single_time_step(
         FieldMngt = param_struct.FallowFieldMngt
 
     # Increment time counters %%
-    if GrowingSeason is True:
+    if growing_season is True:
         # Calendar days after planting
-        NewCond.DAP = NewCond.DAP + 1
+        NewCond.dap = NewCond.dap + 1
         # Growing degree days after planting
 
-        GDD = growing_degree_day(Crop_.GDDmethod, Crop_.Tupp, Crop_.Tbase, Tmax, Tmin)
+        gdd = growing_degree_day(Crop_.GDDmethod, Crop_.Tupp, Crop_.Tbase, temp_max, temp_min)
 
-        ## Update cumulative GDD counter ##
-        NewCond.GDD = GDD
-        NewCond.GDDcum = NewCond.GDDcum + GDD
+        ## Update cumulative gdd counter ##
+        NewCond.gdd = gdd
+        NewCond.gdd_cum = NewCond.gdd_cum + gdd
 
-        NewCond.GrowingSeason = True
+        NewCond.growing_season = True
     else:
-        NewCond.GrowingSeason = False
+        NewCond.growing_season = False
 
         # Calendar days after planting
-        NewCond.DAP = 0
+        NewCond.dap = 0
         # Growing degree days after planting
-        GDD = 0.3
-        NewCond.GDDcum = 0
+        gdd = 0.3
+        NewCond.gdd_cum = 0
 
     # save current timestep counter
     NewCond.time_step_counter = clock_struct.time_step_counter
-    NewCond.P = weather_step[2]
-    NewCond.Tmax = weather_step[1]
-    NewCond.Tmin = weather_step[0]
-    NewCond.Et0 = weather_step[3]
+    NewCond.precipitation = weather_step[2]
+    NewCond.temp_max = weather_step[1]
+    NewCond.temp_min = weather_step[0]
+    NewCond.et0 = weather_step[3]
 
     class_args = {
         key: value
@@ -164,7 +164,7 @@ def solution_single_time_step(
     # 1. Check for groundwater table
     (NewCond.th_fc_Adj, _) = check_groundwater_table(
         Soil.Profile,
-        NewCond.zGW,
+        NewCond.z_gw,
         NewCond.th,
         NewCond.th_fc_Adj,
         param_struct.water_table,
@@ -172,30 +172,30 @@ def solution_single_time_step(
     )
 
     # 2. Root development
-    NewCond.Zroot = root_development(
+    NewCond.z_root = root_development(
         Crop,
         Soil.Profile,
-        NewCond.DAP,
-        NewCond.Zroot,
-        NewCond.DelayedCDs,
-        NewCond.GDDcum,
-        NewCond.DelayedGDDs,
-        NewCond.TrRatio,
+        NewCond.dap,
+        NewCond.z_root,
+        NewCond.delayed_cds,
+        NewCond.gdd_cum,
+        NewCond.delayed_gdds,
+        NewCond.tr_ratio,
         NewCond.th,
-        NewCond.CC,
-        NewCond.CC_NS,
-        NewCond.Germination,
-        NewCond.rCor,
-        NewCond.Tpot,
-        NewCond.zGW,
-        GDD,
-        GrowingSeason,
+        NewCond.canopy_cover,
+        NewCond.canopy_cover_ns,
+        NewCond.germination,
+        NewCond.r_cor,
+        NewCond.t_pot,
+        NewCond.z_gw,
+        gdd,
+        growing_season,
         param_struct.water_table,
     )
 
     # 3. Pre-irrigation
     NewCond, PreIrr = pre_irrigation(
-        Soil.Profile, Crop, NewCond, GrowingSeason, IrrMngt
+        Soil.Profile, Crop, NewCond, growing_season, IrrMngt
     )
 
     # 4. Drainage
@@ -207,10 +207,10 @@ def solution_single_time_step(
     )
 
     # 5. Surface runoff
-    Runoff, Infl, NewCond.DaySubmerged = rainfall_partition(
-        P,
+    Runoff, Infl, NewCond.day_submerged = rainfall_partition(
+        precipitation,
         NewCond.th,
-        NewCond.DaySubmerged,
+        NewCond.day_submerged,
         FieldMngt.sr_inhb,
         FieldMngt.bunds,
         FieldMngt.z_bund,
@@ -223,7 +223,7 @@ def solution_single_time_step(
     )
 
     # 6. Irrigation
-    NewCond.Depletion, NewCond.TAW, NewCond.IrrCum, Irr = irrigation(
+    NewCond.depletion, NewCond.taw, NewCond.irr_cum, Irr = irrigation(
         IrrMngt.IrrMethod,
         IrrMngt.SMT,
         IrrMngt.AppEff,
@@ -232,33 +232,33 @@ def solution_single_time_step(
         IrrMngt.Schedule,
         IrrMngt.depth,
         IrrMngt.MaxIrrSeason,
-        NewCond.GrowthStage,
-        NewCond.IrrCum,
-        NewCond.Epot,
-        NewCond.Tpot,
-        NewCond.Zroot,
+        NewCond.growth_stage,
+        NewCond.irr_cum,
+        NewCond.e_pot,
+        NewCond.t_pot,
+        NewCond.z_root,
         NewCond.th,
-        NewCond.DAP,
+        NewCond.dap,
         NewCond.time_step_counter,
         Crop,
         Soil.Profile,
         Soil.zTop,
-        GrowingSeason,
-        P,
+        growing_season,
+        precipitation,
         Runoff,
     )
 
     # 7. Infiltration
     (
         NewCond.th,
-        NewCond.SurfaceStorage,
+        NewCond.surface_storage,
         DeepPerc,
         Runoff,
         Infl,
         FluxOut,
     ) = infiltration(
         Soil.Profile,
-        NewCond.SurfaceStorage,
+        NewCond.surface_storage,
         NewCond.th_fc_Adj,
         NewCond.th,
         Infl,
@@ -269,7 +269,7 @@ def solution_single_time_step(
         FluxOut,
         DeepPerc,
         Runoff,
-        GrowingSeason,
+        growing_season,
     )
     # 8. Capillary Rise
     NewCond, CR = capillary_rise(
@@ -288,27 +288,27 @@ def solution_single_time_step(
         Soil.Profile,
         Crop.GermThr,
         Crop.PlantMethod,
-        GDD,
-        GrowingSeason,
+        gdd,
+        growing_season,
     )
 
     # 10. Update growth stage
-    NewCond = growth_stage(Crop, NewCond, GrowingSeason)
+    NewCond = growth_stage(Crop, NewCond, growing_season)
 
     # 11. Canopy cover development
     NewCond = canopy_cover(
-        Crop, Soil.Profile, Soil.zTop, NewCond, GDD, Et0, GrowingSeason
+        Crop, Soil.Profile, Soil.zTop, NewCond, gdd, et0, growing_season
     )
 
     # 12. Soil evaporation
     (
-        NewCond.Epot,
+        NewCond.e_pot,
         NewCond.th,
-        NewCond.Stage2,
-        NewCond.Wstage2,
-        NewCond.Wsurf,
-        NewCond.SurfaceStorage,
-        NewCond.EvapZ,
+        NewCond.stage2,
+        NewCond.w_stage_2,
+        NewCond.w_surf,
+        NewCond.surface_storage,
+        NewCond.evap_z,
         Es,
         EsPot,
     ) = soil_evaporation(
@@ -330,27 +330,27 @@ def solution_single_time_step(
         FieldMngt.mulches,
         FieldMngt.f_mulch,
         FieldMngt.mulch_pct,
-        NewCond.DAP,
-        NewCond.Wsurf,
-        NewCond.EvapZ,
-        NewCond.Stage2,
+        NewCond.dap,
+        NewCond.w_surf,
+        NewCond.evap_z,
+        NewCond.stage2,
         NewCond.th,
-        NewCond.DelayedCDs,
-        NewCond.GDDcum,
-        NewCond.DelayedGDDs,
-        NewCond.CCxW,
-        NewCond.CCadj,
-        NewCond.CCxAct,
-        NewCond.CC,
-        NewCond.PrematSenes,
-        NewCond.SurfaceStorage,
-        NewCond.Wstage2,
-        NewCond.Epot,
-        Et0,
+        NewCond.delayed_cds,
+        NewCond.gdd_cum,
+        NewCond.delayed_gdds,
+        NewCond.ccx_w,
+        NewCond.canopy_cover_adj,
+        NewCond.ccx_act,
+        NewCond.canopy_cover,
+        NewCond.premat_senes,
+        NewCond.surface_storage,
+        NewCond.w_stage_2,
+        NewCond.e_pot,
+        et0,
         Infl,
-        P,
+        precipitation,
         Irr,
-        GrowingSeason,
+        growing_season,
     )
 
     # 13. Crop transpiration
@@ -362,62 +362,62 @@ def solution_single_time_step(
         IrrMngt.IrrMethod,
         IrrMngt.NetIrrSMT,
         NewCond,
-        Et0,
+        et0,
         CO2,
-        GrowingSeason,
-        GDD,
+        growing_season,
+        gdd,
     )
 
     # 14. Groundwater inflow
     NewCond, GwIn = groundwater_inflow(Soil.Profile, NewCond)
 
     # 15. Reference harvest index
-    (NewCond.HIref, NewCond.YieldForm, NewCond.PctLagPhase,) = HIref_current_day(
-        NewCond.HIref,
-        NewCond.DAP,
-        NewCond.DelayedCDs,
-        NewCond.YieldForm,
-        NewCond.PctLagPhase,
-        NewCond.CCprev,
+    (NewCond.hi_ref, NewCond.yield_form, NewCond.pct_lag_phase,) = HIref_current_day(
+        NewCond.hi_ref,
+        NewCond.dap,
+        NewCond.delayed_cds,
+        NewCond.yield_form,
+        NewCond.pct_lag_phase,
+        NewCond.cc_prev,
         Crop,
-        GrowingSeason,
+        growing_season,
     )
 
     # 16. Biomass accumulation
-    (NewCond.B, NewCond.B_NS) = biomass_accumulation(
+    (NewCond.biomass, NewCond.biomass_ns) = biomass_accumulation(
         Crop,
-        NewCond.DAP,
-        NewCond.DelayedCDs,
-        NewCond.HIref,
-        NewCond.PctLagPhase,
-        NewCond.B,
-        NewCond.B_NS,
+        NewCond.dap,
+        NewCond.delayed_cds,
+        NewCond.hi_ref,
+        NewCond.pct_lag_phase,
+        NewCond.biomass,
+        NewCond.biomass_ns,
         Tr,
         TrPot_NS,
-        Et0,
-        GrowingSeason,
+        et0,
+        growing_season,
     )
 
     # 17. Harvest index
     NewCond = harvest_index(
-        Soil.Profile, Soil.zTop, Crop, NewCond, Et0, Tmax, Tmin, GrowingSeason
+        Soil.Profile, Soil.zTop, Crop, NewCond, et0, temp_max, temp_min, growing_season
     )
 
-    # 18. Crop yield
-    if GrowingSeason is True:
-        # Calculate crop yield (tonne/ha)
-        NewCond.Y = (NewCond.B / 100) * NewCond.HIadj
-        # print( clock_struct.time_step_counter,(NewCond.B/100),NewCond.HIadj)
+    # 18. Crop yield_
+    if growing_season is True:
+        # Calculate crop yield_ (tonne/ha)
+        NewCond.yield_ = (NewCond.biomass / 100) * NewCond.harvest_index_adj
+        # print( clock_struct.time_step_counter,(NewCond.biomass/100),NewCond.harvest_index_adj)
         # Check if crop has reached maturity
-        if ((Crop.CalendarType == 1) and (NewCond.DAP >= Crop.Maturity)) or (
-            (Crop.CalendarType == 2) and (NewCond.GDDcum >= Crop.Maturity)
+        if ((Crop.CalendarType == 1) and (NewCond.dap >= Crop.Maturity)) or (
+            (Crop.CalendarType == 2) and (NewCond.gdd_cum >= Crop.Maturity)
         ):
             # Crop has reached maturity
-            NewCond.CropMature = True
+            NewCond.crop_mature = True
 
-    elif GrowingSeason is False:
-        # Crop yield is zero outside of growing season
-        NewCond.Y = 0
+    elif growing_season is False:
+        # Crop yield_ is zero outside of growing season
+        NewCond.yield_ = 0
 
     # 19. Root zone water
     _TAW = TAWClass()
@@ -426,7 +426,7 @@ def solution_single_time_step(
 
     Wr, _Dr.Zt, _Dr.Rz, _TAW.Zt, _TAW.Rz, _, _, _, _, _, _ = root_zone_water(
         Soil.Profile,
-        float(NewCond.Zroot),
+        float(NewCond.z_root),
         NewCond.th,
         Soil.zTop,
         float(Crop.Zmin),
@@ -435,33 +435,33 @@ def solution_single_time_step(
 
     # 20. Update net irrigation to add any pre irrigation
     IrrNet = IrrNet + PreIrr
-    NewCond.IrrNetCum = NewCond.IrrNetCum + PreIrr
+    NewCond.irr_net_cum = NewCond.irr_net_cum + PreIrr
 
     # Update model outputs %%
     row_day = clock_struct.time_step_counter
     row_gs = clock_struct.season_counter
 
     # Irrigation
-    if GrowingSeason is True:
+    if growing_season is True:
         if IrrMngt.IrrMethod == 4:
             # Net irrigation
             IrrDay = IrrNet
-            IrrTot = NewCond.IrrNetCum
+            IrrTot = NewCond.irr_net_cum
         else:
             # Irrigation
             IrrDay = Irr
-            IrrTot = NewCond.IrrCum
+            IrrTot = NewCond.irr_cum
 
     else:
         IrrDay = 0
         IrrTot = 0
 
-        NewCond.Depletion = _Dr.Rz
-        NewCond.TAW = _TAW.Rz
+        NewCond.depletion = _Dr.Rz
+        NewCond.taw = _TAW.Rz
 
     # Water contents
     outputs.water_storage[row_day, :3] = np.array(
-        [clock_struct.time_step_counter, GrowingSeason, NewCond.DAP]
+        [clock_struct.time_step_counter, growing_season, NewCond.dap]
     )
     outputs.water_storage[row_day, 3:] = NewCond.th
 
@@ -469,10 +469,10 @@ def solution_single_time_step(
     outputs.water_flux[row_day, :] = [
         clock_struct.time_step_counter,
         clock_struct.season_counter,
-        NewCond.DAP,
+        NewCond.dap,
         Wr,
-        NewCond.zGW,
-        NewCond.SurfaceStorage,
+        NewCond.z_gw,
+        NewCond.surface_storage,
         IrrDay,
         Infl,
         Runoff,
@@ -489,29 +489,29 @@ def solution_single_time_step(
     outputs.crop_growth[row_day, :] = [
         clock_struct.time_step_counter,
         clock_struct.season_counter,
-        NewCond.DAP,
-        GDD,
-        NewCond.GDDcum,
-        NewCond.Zroot,
-        NewCond.CC,
-        NewCond.CC_NS,
-        NewCond.B,
-        NewCond.B_NS,
-        NewCond.HI,
-        NewCond.HIadj,
-        NewCond.Y,
+        NewCond.dap,
+        gdd,
+        NewCond.gdd_cum,
+        NewCond.z_root,
+        NewCond.canopy_cover,
+        NewCond.canopy_cover_ns,
+        NewCond.biomass,
+        NewCond.biomass_ns,
+        NewCond.harvest_index,
+        NewCond.harvest_index_adj,
+        NewCond.yield_,
     ]
 
     # Final output (if at end of growing season)
     if clock_struct.season_counter > -1:
         if (
-            (NewCond.CropMature is True)
-            or (NewCond.CropDead is True)
+            (NewCond.crop_mature is True)
+            or (NewCond.crop_dead is True)
             or (
                 clock_struct.harvest_dates[clock_struct.season_counter]
                 == clock_struct.step_end_time
             )
-        ) and (NewCond.HarvestFlag is False):
+        ) and (NewCond.harvest_flag is False):
 
             # Store final outputs
             outputs.final_stats.loc[row_gs] = [
@@ -519,11 +519,11 @@ def solution_single_time_step(
                 Crop_Name,
                 clock_struct.step_end_time,
                 clock_struct.time_step_counter,
-                NewCond.Y,
+                NewCond.yield_,
                 IrrTot,
             ]
 
             # Set harvest flag
-            NewCond.HarvestFlag = True
+            NewCond.harvest_flag = True
 
     return NewCond, param_struct, outputs

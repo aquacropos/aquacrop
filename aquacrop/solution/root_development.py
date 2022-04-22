@@ -31,8 +31,8 @@ def root_development(Crop,
                     NewCond_rCor,
                     NewCond_Tpot,
                     NewCond_zGW,
-                    GDD,
-                    GrowingSeason,
+                    gdd,
+                    growing_season,
                     water_table_presence):
     """
     Function to calculate root zone expansion
@@ -48,9 +48,9 @@ def root_development(Crop,
 
     `InitCond`: `InitCondClass` : InitCond object containing model paramaters
 
-    `GDD`: `float` : Growing degree days on current day
+    `gdd`: `float` : Growing degree days on current day
 
-    `GrowingSeason`: `bool` : is growing season (True or Flase)
+    `growing_season`: `bool` : is growing season (True or Flase)
 
     `water_table_presence`: `int` : water table present (True=1 or Flase=0)
 
@@ -69,7 +69,7 @@ def root_development(Crop,
     Soil_nLayer = np.unique(prof.Layer).shape[0]
 
     # Calculate root expansion (if in growing season)
-    if GrowingSeason == True:
+    if growing_season == True:
         # If today is first day of season, root depth is equal to minimum depth
         if NewCond_DAP == 1:
             NewCond_Zroot = float(Crop.Zmin) * 1.0
@@ -88,7 +88,7 @@ def root_development(Crop,
         if Crop.CalendarType == 1:
             tOld = tAdj - 1
         elif Crop.CalendarType == 2:
-            tOld = tAdj - GDD
+            tOld = tAdj - gdd
 
         # Potential root depth on previous day
         if tOld >= tmax:
@@ -168,7 +168,7 @@ def root_development(Crop,
                 fAdj = (np.exp(NewCond_TrRatio * Crop.fshape_ex) - 1) / (np.exp(Crop.fshape_ex) - 1)
                 dZr = dZr * fAdj
 
-        # print(NewCond.DAP,NewCond.th)
+        # print(NewCond.dap,NewCond.th)
 
         # Adjust rate of root expansion for dry soil at expansion front
         if dZr > 0.001:
@@ -180,7 +180,7 @@ def root_development(Crop,
             # compi_index = prof.dzsum[prof.dzsum>=ZiTmp].index[0] # have changed to index
             idx = np.argwhere(prof.dzsum >= ZiTmp).flatten()[0]
             prof = prof
-            # Get TAW in compartment
+            # Get taw in compartment
             layeri = prof.Layer[idx]
             TAWprof = prof.th_fc[idx] - prof.th_wp[idx]
             # Define stress threshold

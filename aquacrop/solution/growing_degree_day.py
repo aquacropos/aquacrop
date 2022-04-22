@@ -7,7 +7,7 @@ cc = CC("solution_growing_degree_day")
 
 
 @cc.export("growing_degree_day", "f8(i4,f8,f8,f8,f8)")
-def growing_degree_day(GDDmethod, Tupp, Tbase, Tmax, Tmin):
+def growing_degree_day(GDDmethod, Tupp, Tbase, temp_max, temp_min):
     """
     Function to calculate number of growing degree days on current day
 
@@ -17,21 +17,21 @@ def growing_degree_day(GDDmethod, Tupp, Tbase, Tmax, Tmin):
 
     *Arguments:*
 
-    `GDDmethod`: `int` : GDD calculation method
+    `GDDmethod`: `int` : gdd calculation method
 
     `Tupp`: `float` : Upper temperature (degC) above which crop development no longer increases
 
     `Tbase`: `float` : Base temperature (degC) below which growth does not progress
 
-    `Tmax`: `float` : Maximum tempature on current day (celcius)
+    `temp_max`: `float` : Maximum tempature on current day (celcius)
 
-    `Tmin`: `float` : Minimum tempature on current day (celcius)
+    `temp_min`: `float` : Minimum tempature on current day (celcius)
 
 
     *Returns:*
 
 
-    `GDD`: `float` : Growing degree days for current day
+    `gdd`: `float` : Growing degree days for current day
 
 
 
@@ -40,31 +40,31 @@ def growing_degree_day(GDDmethod, Tupp, Tbase, Tmax, Tmin):
     ## Calculate GDDs ##
     if GDDmethod == 1:
         # method 1
-        Tmean = (Tmax + Tmin) / 2
+        Tmean = (temp_max + temp_min) / 2
         Tmean = min(Tmean, Tupp)
         Tmean = max(Tmean, Tbase)
-        GDD = Tmean - Tbase
+        gdd = Tmean - Tbase
     elif GDDmethod == 2:
         # method 2
-        Tmax = min(Tmax, Tupp)
-        Tmax = max(Tmax, Tbase)
+        temp_max = min(temp_max, Tupp)
+        temp_max = max(temp_max, Tbase)
 
-        Tmin = min(Tmin, Tupp)
-        Tmin = max(Tmin, Tbase)
+        temp_min = min(temp_min, Tupp)
+        temp_min = max(temp_min, Tbase)
 
-        Tmean = (Tmax + Tmin) / 2
-        GDD = Tmean - Tbase
+        Tmean = (temp_max + temp_min) / 2
+        gdd = Tmean - Tbase
     elif GDDmethod == 3:
         # method 3
-        Tmax = min(Tmax, Tupp)
-        Tmax = max(Tmax, Tbase)
+        temp_max = min(temp_max, Tupp)
+        temp_max = max(temp_max, Tbase)
 
-        Tmin = min(Tmin, Tupp)
-        Tmean = (Tmax + Tmin) / 2
+        temp_min = min(temp_min, Tupp)
+        Tmean = (temp_max + temp_min) / 2
         Tmean = max(Tmean, Tbase)
-        GDD = Tmean - Tbase
+        gdd = Tmean - Tbase
 
-    return GDD
+    return gdd
 
 if __name__ == "__main__":
     cc.compile()

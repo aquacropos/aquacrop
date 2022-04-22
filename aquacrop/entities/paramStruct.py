@@ -13,7 +13,7 @@ class ParamStruct:
 
     `NCrops` : `int` : Number of crop types to be simulated
 
-    `SpecifiedPlantCalander` : `str` :  Specified crop rotation calendar (Y or N)
+    `SpecifiedPlantCalander` : `str` :  Specified crop rotation calendar (yield_ or N)
 
     `CropChoices` : `list` : List of crop type names in each simulated season
 
@@ -23,9 +23,9 @@ class ParamStruct:
 
     `water_table` : `int` : Water table present (1=yes, 0=no)
 
-    `zGW` : `np.array` : water_table depth (mm) for each day of simulation
+    `z_gw` : `np.array` : water_table depth (mm) for each day of simulation
 
-    `zGW_dates` : `np.array` : Corresponding dates to the zGW values
+    `zGW_dates` : `np.array` : Corresponding dates to the z_gw values
 
     `WTMethod` : `str` : 'Constant' or 'Variable'
 
@@ -64,7 +64,7 @@ class ParamStruct:
 
         # water table
         self.water_table = 0
-        self.zGW = []
+        self.z_gw = []
         self.zGW_dates = []
         self.WTMethod = ""
 

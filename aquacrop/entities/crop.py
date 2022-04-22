@@ -30,7 +30,7 @@ class Crop:
 
     `CalendarType` : `int` : Calendar Type (1 = Calendar days, 2 = Growing degree days)
 
-    `SwitchGDD` : `int` : Convert calendar to GDD mode if inputs are given in calendar days (0 = No; 1 = Yes)
+    `SwitchGDD` : `int` : Convert calendar to gdd mode if inputs are given in calendar days (0 = No; 1 = Yes)
 
 
 
@@ -65,7 +65,7 @@ class Crop:
         self.beta = 12  # Reduction (%) to p_lo3 when early canopy senescence is triggered
         self.a_Tr = 1  # Exponent parameter for adjustment of Kcx once senescence is triggered
         self.GermThr = 0.2  # Proportion of total water storage needed for crop to germinate
-        self.CCmin = 0.05  # Minimum canopy size below which yield formation cannot occur
+        self.CCmin = 0.05  # Minimum canopy size below which yield_ formation cannot occur
         self.MaxFlowPct = (
             100 / 3
         )  # Proportion of total flowering time (%) at which peak flowering occurs
@@ -366,7 +366,7 @@ class CropStruct(object):
         self.beta = 12  # Reduction (%) to p_lo3 when early canopy senescence is triggered
         self.a_Tr = 1  # Exponent parameter for adjustment of Kcx once senescence is triggered
         self.GermThr = 0.2  # Proportion of total water storage needed for crop to germinate
-        self.CCmin = 0.05  # Minimum canopy size below which yield formation cannot occur
+        self.CCmin = 0.05  # Minimum canopy size below which yield_ formation cannot occur
         self.MaxFlowPct = (
             100 / 3
         )  # Proportion of total flowering time (%) at which peak flowering occurs
@@ -382,7 +382,7 @@ class CropStruct(object):
         self.CalendarType = (
             2  # Calendar Type (1 = Calendar days, 2 = Growing degree days)
         )
-        self.SwitchGDD = 0  # Convert calendar to GDD mode if inputs are given in calendar days (0 = No; 1 = Yes)
+        self.SwitchGDD = 0  # Convert calendar to gdd mode if inputs are given in calendar days (0 = No; 1 = Yes)
 
         self.EmergenceCD = 0
         self.Canopy10PctCD = 0
@@ -405,10 +405,10 @@ class CropStruct(object):
         self.Maturity = (
             1670  # Growing degree/Calendar days from sowing to maturity
         )
-        self.HIstart = 850  # Growing degree/Calendar days from sowing to start of yield formation
+        self.HIstart = 850  # Growing degree/Calendar days from sowing to start of yield_ formation
         self.Flowering = 190  # Duration of flowering in growing degree/calendar days (-999 for non-fruit/grain crops)
         self.YldForm = (
-            775  # Duration of yield formation in growing degree/calendar days
+            775  # Duration of yield_ formation in growing degree/calendar days
         )
         self.HIend = 0
         self.MaxCanopy = 0
@@ -446,22 +446,22 @@ class CropStruct(object):
         self.PlantPop = 75_000  # Number of plants per hectare
         self.CCx = 0.96  # Maximum canopy cover (fraction of soil cover)
         self.CDC = (
-            0.01  # Canopy decline coefficient (fraction per GDD/calendar day)
+            0.01  # Canopy decline coefficient (fraction per gdd/calendar day)
         )
-        self.CGC = 0.0125  # Canopy growth coefficient (fraction per GDD)
+        self.CGC = 0.0125  # Canopy growth coefficient (fraction per gdd)
         self.CDC_CD = (
-            0.01  # Canopy decline coefficient (fraction per GDD/calendar day)
+            0.01  # Canopy decline coefficient (fraction per gdd/calendar day)
         )
-        self.CGC_CD = 0.0125  # Canopy growth coefficient (fraction per GDD)
+        self.CGC_CD = 0.0125  # Canopy growth coefficient (fraction per gdd)
         self.Kcb = 1.05  # Crop coefficient when canopy growth is complete but prior to senescence
         self.fage = 0.3  #  Decline of crop coefficient due to ageing (%/day)
         self.WP = 33.7  # Water productivity normalized for ET0 and C02 (g/m2)
-        self.WPy = 100  # Adjustment of water productivity in yield formation stage (% of WP)
+        self.WPy = 100  # Adjustment of water productivity in yield_ formation stage (% of WP)
         self.fsink = 0.5  # Crop performance under elevated atmospheric CO2 concentration (%/100)
         self.HI0 = 0.48  # Reference harvest index
         self.dHI_pre = 0  # Possible increase of harvest index due to water stress before flowering (%)
-        self.a_HI = 7  # Coefficient describing positive impact on harvest index of restricted vegetative growth during yield formation
-        self.b_HI = 3  # Coefficient describing negative impact on harvest index of stomatal closure during yield formation
+        self.a_HI = 7  # Coefficient describing positive impact on harvest index of restricted vegetative growth during yield_ formation
+        self.b_HI = 3  # Coefficient describing negative impact on harvest index of stomatal closure during yield_ formation
         self.dHI0 = 15  # Maximum allowable increase of harvest index above reference value
         self.Determinant = (
             1  # Crop Determinancy (0 = Indeterminant, 1 = Determinant)

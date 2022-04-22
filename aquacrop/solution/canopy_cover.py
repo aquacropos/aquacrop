@@ -31,13 +31,13 @@ else:
 
 
 
-def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
-    # def canopy_cover(Crop,Soil_Profile,Soil_zTop,InitCond,GDD,Et0,GrowingSeason):
+def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
+    # def CCCrop,Soil_Profile,Soil_zTop,InitCond,gdd,et0,growing_season):
 
     """
     Function to simulate canopy growth/decline
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=30" target="_blank">Reference Manual: CC equations</a> (pg. 21-33)
+    <a href="../pdfs/ac_ref_man_3.pdf#page=30" target="_blank">Reference Manual: canopy_cover equations</a> (pg. 21-33)
 
 
     *Arguments:*
@@ -51,11 +51,11 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
 
     `InitCond`: `InitCondClass` : InitCond object
 
-    `GDD`: `float` : Growing Degree Days
+    `gdd`: `float` : Growing Degree Days
 
-    `Et0`: `float` : reference evapotranspiration
+    `et0`: `float` : reference evapotranspiration
 
-    `GrowingSeason`:: `bool` : is it currently within the growing season (True, Flase)
+    `growing_season`:: `bool` : is it currently within the growing season (True, Flase)
 
     *Returns:*
 
@@ -67,44 +67,44 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
 
     # Function to simulate canopy growth/decline
 
-    InitCond_CC_NS = InitCond.CC_NS
-    InitCond_CC = InitCond.CC
-    InitCond_ProtectedSeed = InitCond.ProtectedSeed
-    InitCond_CCxAct = InitCond.CCxAct
-    InitCond_CropDead = InitCond.CropDead
-    InitCond_tEarlySen = InitCond.tEarlySen
-    InitCond_CCxW = InitCond.CCxW
+    InitCond_CC_NS = InitCond.canopy_cover_ns
+    InitCond_CC = InitCond.canopy_cover
+    InitCond_ProtectedSeed = InitCond.protected_seed
+    InitCond_CCxAct = InitCond.ccx_act
+    InitCond_CropDead = InitCond.crop_dead
+    InitCond_tEarlySen = InitCond.t_early_sen
+    InitCond_CCxW = InitCond.ccx_w
 
     ## Store initial conditions in a new structure for updating ##
     NewCond = InitCond
-    NewCond.CCprev = InitCond.CC
+    NewCond.cc_prev = InitCond.canopy_cover
 
     ## Calculate canopy development (if in growing season) ##
-    if GrowingSeason == True:
+    if growing_season == True:
         # Calculate root zone water content
-        TAW = TAWClass()
+        taw = TAWClass()
         Dr = DrClass()
         # thRZ = thRZClass()
-        _, Dr.Zt, Dr.Rz, TAW.Zt, TAW.Rz, _,_,_,_,_,_ = root_zone_water(
+        _, Dr.Zt, Dr.Rz, taw.Zt, taw.Rz, _,_,_,_,_,_ = root_zone_water(
             prof,
-            float(NewCond.Zroot),
+            float(NewCond.z_root),
             NewCond.th,
             Soil_zTop,
             float(Crop.Zmin),
             Crop.Aer,
         )
 
-        # _,Dr,TAW,_ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+        # _,Dr,taw,_ = root_zone_water(Soil_Profile,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Check whether to use root zone or top soil depletions for calculating
         # water stress
-        if (Dr.Rz / TAW.Rz) <= (Dr.Zt / TAW.Zt):
+        if (Dr.Rz / taw.Rz) <= (Dr.Zt / taw.Zt):
             # Root zone is wetter than top soil, so use root zone value
             Dr = Dr.Rz
-            TAW = TAW.Rz
+            taw = taw.Rz
         else:
             # Top soil is wetter than root zone, so use top soil values
             Dr = Dr.Zt
-            TAW = TAW.Zt
+            taw = taw.Zt
 
         # Determine if water stress is occurring
         beta = True
@@ -115,91 +115,91 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
             Crop.ETadj,
             Crop.beta,
             Crop.fshape_w,
-            NewCond.tEarlySen,
+            NewCond.t_early_sen,
             Dr,
-            TAW,
-            Et0,
+            taw,
+            et0,
             beta,
         )
 
-        # water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
+        # water_stress(Crop, NewCond, Dr, taw, et0, beta)
 
         # Get canopy cover growth time
         if Crop.CalendarType == 1:
             dtCC = 1
-            tCCadj = NewCond.DAP - NewCond.DelayedCDs
+            tCCadj = NewCond.dap - NewCond.delayed_cds
         elif Crop.CalendarType == 2:
-            dtCC = GDD
-            tCCadj = NewCond.GDDcum - NewCond.DelayedGDDs
+            dtCC = gdd
+            tCCadj = NewCond.gdd_cum - NewCond.delayed_gdds
 
         ## Canopy development (potential) ##
         if (tCCadj < Crop.Emergence) or (round(tCCadj) > Crop.Maturity):
             # No canopy development before emergence/germination or after
             # maturity
-            NewCond.CC_NS = 0
+            NewCond.canopy_cover_ns = 0
         elif tCCadj < Crop.CanopyDevEnd:
             # Canopy growth can occur
             if InitCond_CC_NS <= Crop.CC0:
-                # Very small initial CC.
-                NewCond.CC_NS = Crop.CC0 * np.exp(Crop.CGC * dtCC)
+                # Very small initial canopy_cover.
+                NewCond.canopy_cover_ns = Crop.CC0 * np.exp(Crop.CGC * dtCC)
                 # print(Crop.CC0,np.exp(Crop.CGC*dtCC))
             else:
                 # Canopy growing
                 tmp_tCC = tCCadj - Crop.Emergence
-                NewCond.CC_NS = cc_development(
+                NewCond.canopy_cover_ns = cc_development(
                     Crop.CC0, 0.98 * Crop.CCx, Crop.CGC, Crop.CDC, tmp_tCC, "Growth", Crop.CCx
                 )
 
             # Update maximum canopy cover size in growing season
-            NewCond.CCxAct_NS = NewCond.CC_NS
+            NewCond.ccx_act_ns = NewCond.canopy_cover_ns
         elif tCCadj > Crop.CanopyDevEnd:
             # No more canopy growth is possible or canopy in decline
             # Set CCx for calculation of withered canopy effects
-            NewCond.CCxW_NS = NewCond.CCxAct_NS
+            NewCond.ccx_w_ns = NewCond.ccx_act_ns
             if tCCadj < Crop.Senescence:
                 # Mid-season stage - no canopy growth
-                NewCond.CC_NS = InitCond_CC_NS
+                NewCond.canopy_cover_ns = InitCond_CC_NS
                 # Update maximum canopy cover size in growing season
-                NewCond.CCxAct_NS = NewCond.CC_NS
+                NewCond.ccx_act_ns = NewCond.canopy_cover_ns
             else:
                 # Late-season stage - canopy decline
                 tmp_tCC = tCCadj - Crop.Senescence
-                NewCond.CC_NS = cc_development(
+                NewCond.canopy_cover_ns = cc_development(
                     Crop.CC0,
-                    NewCond.CCxAct_NS,
+                    NewCond.ccx_act_ns,
                     Crop.CGC,
                     Crop.CDC,
                     tmp_tCC,
                     "Decline",
-                    NewCond.CCxAct_NS,
+                    NewCond.ccx_act_ns,
                 )
 
         ## Canopy development (actual) ##
         if (tCCadj < Crop.Emergence) or (round(tCCadj) > Crop.Maturity):
             # No canopy development before emergence/germination or after
             # maturity
-            NewCond.CC = 0
-            NewCond.CC0adj = Crop.CC0
+            NewCond.canopy_cover = 0
+            NewCond.cc0_adj = Crop.CC0
         elif tCCadj < Crop.CanopyDevEnd:
             # Canopy growth can occur
-            if InitCond_CC <= NewCond.CC0adj or (
-                (InitCond_ProtectedSeed == True) and (InitCond_CC <= (1.25 * NewCond.CC0adj))
+            if InitCond_CC <= NewCond.cc0_adj or (
+                (InitCond_ProtectedSeed == True) and (InitCond_CC <= (1.25 * NewCond.cc0_adj))
             ):
-                # Very small initial CC or seedling in protected phase of
+                # Very small initial canopy_cover or seedling in protected phase of
                 # growth. In this case, assume no leaf water expansion stress
                 if InitCond_ProtectedSeed == True:
                     tmp_tCC = tCCadj - Crop.Emergence
-                    NewCond.CC = cc_development(
+                    NewCond.canopy_cover = cc_development(
                         Crop.CC0, Crop.CCx, Crop.CGC, Crop.CDC, tmp_tCC, "Growth", Crop.CCx
                     )
                     # Check if seed protection should be turned off
-                    if NewCond.CC > (1.25 * NewCond.CC0adj):
+                    if NewCond.canopy_cover > (1.25 * NewCond.cc0_adj):
                         # Turn off seed protection - lead expansion stress can
                         # occur on future time steps.
-                        NewCond.ProtectedSeed = False
+                        NewCond.protected_seed = False
 
                 else:
-                    NewCond.CC = NewCond.CC0adj * np.exp(Crop.CGC * dtCC)
+                    NewCond.canopy_cover = NewCond.cc0_adj * np.exp(Crop.CGC * dtCC)
 
             else:
                 # Canopy growing
@@ -213,7 +213,7 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
                         # Adjust CCx for change in CGC
                         CCXadj = adjust_CCx(
                             InitCond_CC,
-                            NewCond.CC0adj,
+                            NewCond.cc0_adj,
                             Crop.CCx,
                             CGCadj,
                             Crop.CDC,
@@ -224,28 +224,28 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
                         )
                         if CCXadj < 0:
 
-                            NewCond.CC = InitCond_CC
+                            NewCond.canopy_cover = InitCond_CC
                         elif abs(InitCond_CC - (0.9799 * Crop.CCx)) < 0.001:
 
                             # Approaching maximum canopy cover size
                             tmp_tCC = tCCadj - Crop.Emergence
-                            NewCond.CC = cc_development(
+                            NewCond.canopy_cover = cc_development(
                                 Crop.CC0, Crop.CCx, Crop.CGC, Crop.CDC, tmp_tCC, "Growth", Crop.CCx
                             )
                         else:
 
-                            # Determine time required to reach CC on previous,
+                            # Determine time required to reach canopy_cover on previous,
                             # day, given CGCAdj value
                             tReq = cc_required_time(
-                                InitCond_CC, NewCond.CC0adj, CCXadj, CGCadj, Crop.CDC, "CGC"
+                                InitCond_CC, NewCond.cc0_adj, CCXadj, CGCadj, Crop.CDC, "CGC"
                             )
                             if tReq > 0:
 
-                                # Calclate GDD's for canopy growth
+                                # Calclate gdd's for canopy growth
                                 tmp_tCC = tReq + dtCC
                                 # Determine new canopy size
-                                NewCond.CC = cc_development(
-                                    NewCond.CC0adj,
+                                NewCond.canopy_cover = cc_development(
+                                    NewCond.cc0_adj,
                                     CCXadj,
                                     CGCadj,
                                     Crop.CDC,
@@ -253,67 +253,67 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
                                     "Growth",
                                     Crop.CCx,
                                 )
-                                # print(NewCond.DAP,CCXadj,tReq)
+                                # print(NewCond.dap,CCXadj,tReq)
 
                             else:
                                 # No canopy growth
-                                NewCond.CC = InitCond_CC
+                                NewCond.canopy_cover = InitCond_CC
 
                     else:
 
                         # No canopy growth
-                        NewCond.CC = InitCond_CC
+                        NewCond.canopy_cover = InitCond_CC
                         # Update CC0
-                        if NewCond.CC > NewCond.CC0adj:
-                            NewCond.CC0adj = Crop.CC0
+                        if NewCond.canopy_cover > NewCond.cc0_adj:
+                            NewCond.cc0_adj = Crop.CC0
                         else:
-                            NewCond.CC0adj = NewCond.CC
+                            NewCond.cc0_adj = NewCond.canopy_cover
 
                 else:
                     # Canopy approaching maximum size
                     tmp_tCC = tCCadj - Crop.Emergence
-                    NewCond.CC = cc_development(
+                    NewCond.canopy_cover = cc_development(
                         Crop.CC0, Crop.CCx, Crop.CGC, Crop.CDC, tmp_tCC, "Growth", Crop.CCx
                     )
-                    NewCond.CC0adj = Crop.CC0
+                    NewCond.cc0_adj = Crop.CC0
 
-            if NewCond.CC > InitCond_CCxAct:
+            if NewCond.canopy_cover > InitCond_CCxAct:
                 # Update actual maximum canopy cover size during growing season
-                NewCond.CCxAct = NewCond.CC
+                NewCond.ccx_act = NewCond.canopy_cover
 
         elif tCCadj > Crop.CanopyDevEnd:
 
             # No more canopy growth is possible or canopy is in decline
             if tCCadj < Crop.Senescence:
                 # Mid-season stage - no canopy growth
-                NewCond.CC = InitCond_CC
-                if NewCond.CC > InitCond_CCxAct:
+                NewCond.canopy_cover = InitCond_CC
+                if NewCond.canopy_cover > InitCond_CCxAct:
                     # Update actual maximum canopy cover size during growing
                     # season
-                    NewCond.CCxAct = NewCond.CC
+                    NewCond.ccx_act = NewCond.canopy_cover
 
             else:
                 # Late-season stage - canopy decline
                 # Adjust canopy decline coefficient for difference between actual
                 # and potential CCx
-                CDCadj = Crop.CDC * ((NewCond.CCxAct + 2.29) / (Crop.CCx + 2.29))
+                CDCadj = Crop.CDC * ((NewCond.ccx_act + 2.29) / (Crop.CCx + 2.29))
                 # Determine new canopy size
                 tmp_tCC = tCCadj - Crop.Senescence
-                NewCond.CC = cc_development(
-                    NewCond.CC0adj,
-                    NewCond.CCxAct,
+                NewCond.canopy_cover = cc_development(
+                    NewCond.cc0_adj,
+                    NewCond.ccx_act,
                     Crop.CGC,
                     CDCadj,
                     tmp_tCC,
                     "Decline",
-                    NewCond.CCxAct,
+                    NewCond.ccx_act,
                 )
 
             # Check for crop growth termination
-            if (NewCond.CC < 0.001) and (InitCond_CropDead == False):
+            if (NewCond.canopy_cover < 0.001) and (InitCond_CropDead == False):
                 # Crop has died
-                NewCond.CC = 0
-                NewCond.CropDead = True
+                NewCond.canopy_cover = 0
+                NewCond.crop_dead = True
 
         ## Canopy senescence due to water stress (actual) ##
         if tCCadj >= Crop.Emergence:
@@ -323,13 +323,13 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
                 if (Ksw.Sen < 1) and (InitCond_ProtectedSeed == False):
 
                     # Early canopy senescence
-                    NewCond.PrematSenes = True
+                    NewCond.premat_senes = True
                     if InitCond_tEarlySen == 0:
                         # No prior early senescence
-                        NewCond.CCxEarlySen = InitCond_CC
+                        NewCond.ccx_early_sen = InitCond_CC
 
-                    # Increment early senescence GDD counter
-                    NewCond.tEarlySen = InitCond_tEarlySen + dtCC
+                    # Increment early senescence gdd counter
+                    NewCond.t_early_sen = InitCond_tEarlySen + dtCC
                     # Adjust canopy decline coefficient for water stress
                     beta = False
 
@@ -340,36 +340,36 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
                         Crop.ETadj,
                         Crop.beta,
                         Crop.fshape_w,
-                        NewCond.tEarlySen,
+                        NewCond.t_early_sen,
                         Dr,
-                        TAW,
-                        Et0,
+                        taw,
+                        et0,
                         beta,
                     )
 
-                    # Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
+                    # Ksw = water_stress(Crop, NewCond, Dr, taw, et0, beta)
                     if Ksw.Sen > 0.99999:
                         CDCadj = 0.0001
                     else:
                         CDCadj = (1 - (Ksw.Sen ** 8)) * Crop.CDC
 
                     # Get new canpy cover size after senescence
-                    if NewCond.CCxEarlySen < 0.001:
+                    if NewCond.ccx_early_sen < 0.001:
                         CCsen = 0
                     else:
-                        # Get time required to reach CC at end of previous day, given
+                        # Get time required to reach canopy_cover at end of previous day, given
                         # CDCadj
-                        tReq = (np.log(1 + (1 - InitCond_CC / NewCond.CCxEarlySen) / 0.05)) / (
-                            (CDCadj * 3.33) / (NewCond.CCxEarlySen + 2.29)
+                        tReq = (np.log(1 + (1 - InitCond_CC / NewCond.ccx_early_sen) / 0.05)) / (
+                            (CDCadj * 3.33) / (NewCond.ccx_early_sen + 2.29)
                         )
-                        # Calculate GDD's for canopy decline
+                        # Calculate gdd's for canopy decline
                         tmp_tCC = tReq + dtCC
                         # Determine new canopy size
-                        CCsen = NewCond.CCxEarlySen * (
+                        CCsen = NewCond.ccx_early_sen * (
                             1
                             - 0.05
                             * (
-                                np.exp(tmp_tCC * ((CDCadj * 3.33) / (NewCond.CCxEarlySen + 2.29)))
+                                np.exp(tmp_tCC * ((CDCadj * 3.33) / (NewCond.ccx_early_sen + 2.29)))
                                 - 1
                             )
                         )
@@ -378,87 +378,87 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, GDD, Et0, GrowingSeason):
 
                     # Update canopy cover size
                     if tCCadj < Crop.Senescence:
-                        # Limit CC to CCx
+                        # Limit canopy_cover to CCx
                         if CCsen > Crop.CCx:
                             CCsen = Crop.CCx
 
-                        # CC cannot be greater than value on previous day
-                        NewCond.CC = CCsen
-                        if NewCond.CC > InitCond_CC:
-                            NewCond.CC = InitCond_CC
+                        # canopy_cover cannot be greater than value on previous day
+                        NewCond.canopy_cover = CCsen
+                        if NewCond.canopy_cover > InitCond_CC:
+                            NewCond.canopy_cover = InitCond_CC
 
                         # Update maximum canopy cover size during growing
                         # season
-                        NewCond.CCxAct = NewCond.CC
-                        # Update CC0 if current CC is less than initial canopy
+                        NewCond.ccx_act = NewCond.canopy_cover
+                        # Update CC0 if current canopy_cover is less than initial canopy
                         # cover size at planting
-                        if NewCond.CC < Crop.CC0:
-                            NewCond.CC0adj = NewCond.CC
+                        if NewCond.canopy_cover < Crop.CC0:
+                            NewCond.cc0_adj = NewCond.canopy_cover
                         else:
-                            NewCond.CC0adj = Crop.CC0
+                            NewCond.cc0_adj = Crop.CC0
 
                     else:
-                        # Update CC to account for canopy cover senescence due
+                        # Update canopy_cover to account for canopy cover senescence due
                         # to water stress
-                        if CCsen < NewCond.CC:
-                            NewCond.CC = CCsen
+                        if CCsen < NewCond.canopy_cover:
+                            NewCond.canopy_cover = CCsen
 
                     # Check for crop growth termination
-                    if (NewCond.CC < 0.001) and (InitCond_CropDead == False):
+                    if (NewCond.canopy_cover < 0.001) and (InitCond_CropDead == False):
                         # Crop has died
-                        NewCond.CC = 0
-                        NewCond.CropDead = True
+                        NewCond.canopy_cover = 0
+                        NewCond.crop_dead = True
 
                 else:
                     # No water stress
-                    NewCond.PrematSenes = False
+                    NewCond.premat_senes = False
                     if (tCCadj > Crop.Senescence) and (InitCond_tEarlySen > 0):
                         # Rewatering of canopy in late season
                         # Get new values for CCx and CDC
                         tmp_tCC = tCCadj - dtCC - Crop.Senescence
                         CCXadj, CDCadj = update_CCx_CDC(InitCond_CC, Crop.CDC, Crop.CCx, tmp_tCC)
-                        NewCond.CCxAct = CCXadj
-                        # Get new CC value for end of current day
+                        NewCond.ccx_act = CCXadj
+                        # Get new canopy_cover value for end of current day
                         tmp_tCC = tCCadj - Crop.Senescence
-                        NewCond.CC = cc_development(
-                            NewCond.CC0adj, CCXadj, Crop.CGC, CDCadj, tmp_tCC, "Decline", CCXadj
+                        NewCond.canopy_cover = cc_development(
+                            NewCond.cc0_adj, CCXadj, Crop.CGC, CDCadj, tmp_tCC, "Decline", CCXadj
                         )
                         # Check for crop growth termination
-                        if (NewCond.CC < 0.001) and (InitCond_CropDead == False):
-                            NewCond.CC = 0
-                            NewCond.CropDead = True
+                        if (NewCond.canopy_cover < 0.001) and (InitCond_CropDead == False):
+                            NewCond.canopy_cover = 0
+                            NewCond.crop_dead = True
 
                     # Reset early senescence counter
-                    NewCond.tEarlySen = 0
+                    NewCond.t_early_sen = 0
 
                 # Adjust CCx for effects of withered canopy
-                if NewCond.CC > InitCond_CCxW:
-                    NewCond.CCxW = NewCond.CC
+                if NewCond.canopy_cover > InitCond_CCxW:
+                    NewCond.ccx_w = NewCond.canopy_cover
 
         ## Calculate canopy size adjusted for micro-advective effects ##
-        # Check to ensure potential CC is not slightly lower than actual
-        if NewCond.CC_NS < NewCond.CC:
-            NewCond.CC_NS = NewCond.CC
+        # Check to ensure potential canopy_cover is not slightly lower than actual
+        if NewCond.canopy_cover_ns < NewCond.canopy_cover:
+            NewCond.canopy_cover_ns = NewCond.canopy_cover
             if tCCadj < Crop.CanopyDevEnd:
-                NewCond.CCxAct_NS = NewCond.CC_NS
+                NewCond.ccx_act_ns = NewCond.canopy_cover_ns
 
         # Actual (with water stress)
-        NewCond.CCadj = (1.72 * NewCond.CC) - (NewCond.CC ** 2) + (0.3 * (NewCond.CC ** 3))
+        NewCond.canopy_cover_adj = (1.72 * NewCond.canopy_cover) - (NewCond.canopy_cover ** 2) + (0.3 * (NewCond.canopy_cover ** 3))
         # Potential (without water stress)
-        NewCond.CCadj_NS = (
-            (1.72 * NewCond.CC_NS) - (NewCond.CC_NS ** 2) + (0.3 * (NewCond.CC_NS ** 3))
+        NewCond.canopy_cover_adj_ns = (
+            (1.72 * NewCond.canopy_cover_ns) - (NewCond.canopy_cover_ns ** 2) + (0.3 * (NewCond.canopy_cover_ns ** 3))
         )
 
     else:
         # No canopy outside growing season - set various values to zero
-        NewCond.CC = 0
-        NewCond.CCadj = 0
-        NewCond.CC_NS = 0
-        NewCond.CCadj_NS = 0
-        NewCond.CCxW = 0
-        NewCond.CCxAct = 0
-        NewCond.CCxW_NS = 0
-        NewCond.CCxAct_NS = 0
+        NewCond.canopy_cover = 0
+        NewCond.canopy_cover_adj = 0
+        NewCond.canopy_cover_ns = 0
+        NewCond.canopy_cover_adj_ns = 0
+        NewCond.ccx_w = 0
+        NewCond.ccx_act = 0
+        NewCond.ccx_w_ns = 0
+        NewCond.ccx_act_ns = 0
 
     return NewCond
 

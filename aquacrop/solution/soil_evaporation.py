@@ -64,11 +64,11 @@ def soil_evaporation(
     NewCond_SurfaceStorage,
     NewCond_Wstage2,
     NewCond_Epot,
-    Et0,
+    et0,
     Infl,
     Rain,
     Irr,
-    GrowingSeason,
+    growing_season,
 ):
 
     """
@@ -93,7 +93,7 @@ def soil_evaporation(
 
     `InitCond`: `InitCondClass` : InitCond object containing model paramaters
 
-    `Et0`: `float` : daily reference evapotranspiration
+    `et0`: `float` : daily reference evapotranspiration
 
     `Infl`: `float` : Infiltration on current day
 
@@ -101,7 +101,7 @@ def soil_evaporation(
 
     `Irr`: `float` : Irrigation applied on current day
 
-    `GrowingSeason`:: `bool` : is growing season (True or Flase)
+    `growing_season`:: `bool` : is growing season (True or Flase)
 
 
     *Returns:*
@@ -167,7 +167,7 @@ def soil_evaporation(
             NewCond_Stage2 = False
 
     ## Calculate potential soil evaporation rate (mm/day) ##
-    if GrowingSeason == True:
+    if growing_season == True:
         # Adjust time for any delayed development
         if Crop_CalendarType == 1:
             tAdj = NewCond_DAP - NewCond_DelayedCDs
@@ -175,10 +175,10 @@ def soil_evaporation(
             tAdj = NewCond_GDDcum - NewCond_DelayedGDDs
 
         # Calculate maximum potential soil evaporation
-        EsPotMax = Soil_Kex * Et0 * (1 - NewCond_CCxW * (Soil_fwcc / 100))
+        EsPotMax = Soil_Kex * et0 * (1 - NewCond_CCxW * (Soil_fwcc / 100))
         # Calculate potential soil evaporation (given current canopy cover
         # size)
-        EsPot = Soil_Kex * (1 - NewCond_CCadj) * Et0
+        EsPot = Soil_Kex * (1 - NewCond_CCadj) * et0
 
         # Adjust potential soil evaporation for effects of withered canopy
         if (tAdj > Crop_Senescence) and (NewCond_CCxAct > 0):
@@ -195,7 +195,7 @@ def soil_evaporation(
             CCxActAdj = (
                 (1.72 * NewCond_CCxAct) - (NewCond_CCxAct ** 2) + 0.3 * (NewCond_CCxAct ** 3)
             )
-            EsPotMin = Soil_Kex * (1 - CCxActAdj) * Et0
+            EsPotMin = Soil_Kex * (1 - CCxActAdj) * et0
             if EsPotMin < 0:
                 EsPotMin = 0
 
@@ -211,7 +211,7 @@ def soil_evaporation(
     else:
         # No canopy cover outside of growing season so potential soil
         # evaporation only depends on reference evapotranspiration
-        EsPot = Soil_Kex * Et0
+        EsPot = Soil_Kex * et0
 
     ## Adjust potential soil evaporation for mulches and/or partial wetting ##
     # mulches
@@ -267,7 +267,7 @@ def soil_evaporation(
             NewCond_EvapZ = Soil_EvapZmin
             NewCond_Stage2 = False
 
-    ## Stage 1 evaporation ##
+    ## stage 1 evaporation ##
     # Determine total water to be extracted
     ToExtract = EsPot - EsAct
     # Determine total water to be extracted in stage one (limited by surface
@@ -340,7 +340,7 @@ def soil_evaporation(
             if NewCond_Wstage2 < 0:
                 NewCond_Wstage2 = 0
 
-    ## Stage 2 evaporation ##
+    ## stage 2 evaporation ##
     # Extract water
     if ToExtract > 0:
         # Start stage 2

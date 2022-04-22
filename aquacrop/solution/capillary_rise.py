@@ -37,7 +37,7 @@ def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, water_ta
     """
 
     ## Get groundwater table elevation on current day ##
-    zGW = NewCond.zGW
+    z_gw = NewCond.z_gw
 
     ## Calculate capillary rise ##
     if water_table_presence == 0:  # No water table present
@@ -48,11 +48,11 @@ def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, water_ta
         zBot = prof.dzsum[-1]
         zBotMid = prof.zMid[-1]
         prof = prof
-        if (prof.Ksat[-1] > 0) and (zGW > 0) and ((zGW - zBotMid) < 4):
-            if zBotMid >= zGW:
+        if (prof.Ksat[-1] > 0) and (z_gw > 0) and ((z_gw - zBotMid) < 4):
+            if zBotMid >= z_gw:
                 MaxCR = 99
             else:
-                MaxCR = np.exp((np.log(zGW - zBotMid) - prof.bCR[-1]) / prof.aCR[-1])
+                MaxCR = np.exp((np.log(z_gw - zBotMid) - prof.bCR[-1]) / prof.aCR[-1])
                 if MaxCR > 99:
                     MaxCR = 99
 
@@ -76,16 +76,16 @@ def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, water_ta
 
         #         assert layeri == Soil_nLayer
 
-        #         while (zTopLayer < zGW) and (layeri < Soil_nLayer):
+        #         while (zTopLayer < z_gw) and (layeri < Soil_nLayer):
         #             # this needs fixing, will currently break
 
         #             layeri = layeri+1
         #             compdf = prof.Layer[layeri]
-        #             if (compdf.Ksat > 0) and (zGW > 0) and ((zGW-zTopLayer) < 4):
-        #                 if zTopLayer >= zGW:
+        #             if (compdf.Ksat > 0) and (z_gw > 0) and ((z_gw-zTopLayer) < 4):
+        #                 if zTopLayer >= z_gw:
         #                     LimCR = 99
         #                 else:
-        #                     LimCR = np.exp((np.log(zGW-zTopLayer)-compdf.bCR)/compdf.aCR)
+        #                     LimCR = np.exp((np.log(z_gw-zTopLayer)-compdf.bCR)/compdf.aCR)
         #                     if LimCR > 99:
         #                         LimCR = 99
 
@@ -139,7 +139,7 @@ def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, water_ta
             dth = NewCond.th_fc_Adj[compi] - NewCond.th[compi]
 
             # Store water if room is available
-            if (dth > 0) and ((zBot - prof.dz[compi] / 2) < zGW):
+            if (dth > 0) and ((zBot - prof.dz[compi] / 2) < z_gw):
                 dthMax = Krel * Df * MaxCR / (1000 * prof.dz[compi])
                 if dth >= dthMax:
                     NewCond.th[compi] = NewCond.th[compi] + dthMax
@@ -160,11 +160,11 @@ def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, water_ta
             if compi > -1:
 
                 zBotMid = zBot - (prof.dz[compi] / 2)
-                if (prof.Ksat[compi] > 0) and (zGW > 0) and ((zGW - zBotMid) < 4):
-                    if zBotMid >= zGW:
+                if (prof.Ksat[compi] > 0) and (z_gw > 0) and ((z_gw - zBotMid) < 4):
+                    if zBotMid >= z_gw:
                         LimCR = 99
                     else:
-                        LimCR = np.exp((np.log(zGW - zBotMid) - prof.bCR[compi]) / prof.aCR[compi])
+                        LimCR = np.exp((np.log(z_gw - zBotMid) - prof.bCR[compi]) / prof.aCR[compi])
                         if LimCR > 99:
                             LimCR = 99
 

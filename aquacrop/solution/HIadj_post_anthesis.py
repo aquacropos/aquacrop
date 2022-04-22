@@ -62,9 +62,9 @@ def HIadj_post_anthesis(
     ## Calculate harvest index adjustment ##
     # 1. Adjustment for leaf expansion
     tmax1 = Crop.CanopyDevEndCD - Crop.HIstartCD
-    DAP = NewCond_DAP - InitCond_DelayedCDs
+    dap = NewCond_DAP - InitCond_DelayedCDs
     if (
-        (DAP <= (Crop.CanopyDevEndCD + 1))
+        (dap <= (Crop.CanopyDevEndCD + 1))
         and (tmax1 > 0)
         and (NewCond_Fpre > 0.99)
         and (NewCond_CC > 0.001)
@@ -72,14 +72,14 @@ def HIadj_post_anthesis(
     ):
         dCor = 1 + (1 - Ksw.Exp) / Crop.a_HI
         NewCond_sCor1 = InitCond_sCor1 + (dCor / tmax1)
-        DayCor = DAP - 1 - Crop.HIstartCD
+        DayCor = dap - 1 - Crop.HIstartCD
         NewCond_fpost_upp = (tmax1 / DayCor) * NewCond_sCor1
 
     # 2. Adjustment for stomatal closure
     tmax2 = Crop.YldFormCD
-    DAP = NewCond_DAP - InitCond_DelayedCDs
+    dap = NewCond_DAP - InitCond_DelayedCDs
     if (
-        (DAP <= (Crop.HIendCD + 1))
+        (dap <= (Crop.HIendCD + 1))
         and (tmax2 > 0)
         and (NewCond_Fpre > 0.99)
         and (NewCond_CC > 0.001)
@@ -88,7 +88,7 @@ def HIadj_post_anthesis(
         # print(Ksw.Sto)
         dCor = np.power(Ksw.Sto, 0.1) * (1 - (1 - Ksw.Sto) / Crop.b_HI)
         NewCond_sCor2 = InitCond_sCor2 + (dCor / tmax2)
-        DayCor = DAP - 1 - Crop.HIstartCD
+        DayCor = dap - 1 - Crop.HIstartCD
         NewCond_fpost_dwn = (tmax2 / DayCor) * NewCond_sCor2
 
     # Determine total multiplier

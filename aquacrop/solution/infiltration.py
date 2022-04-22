@@ -27,7 +27,7 @@ def infiltration(
      FluxOut, 
      DeepPerc0, 
      Runoff0, 
-     GrowingSeason
+     growing_season
 ):
     """
     Function to infiltrate incoming water (rainfall and irrigation)
@@ -58,7 +58,7 @@ def infiltration(
 
     `Runoff0`: `float` : initial Surface Runoff
 
-    `GrowingSeason`:: `bool` : is growing season (True or Flase)
+    `growing_season`:: `bool` : is growing season (True or Flase)
 
 
     *Returns:*
@@ -91,7 +91,7 @@ def infiltration(
 
     ## Update infiltration rate for irrigation ##
     # Note: irrigation amount adjusted for specified application efficiency
-    if GrowingSeason == True:
+    if growing_season == True:
         Infl = Infl + (Irr * (IrrMngt_AppEff / 100))
 
     assert Infl >= 0

@@ -1,7 +1,7 @@
 
 
 
-def growth_stage(Crop, InitCond, GrowingSeason):
+def growth_stage(Crop, InitCond, growing_season):
     """
     Function to determine current growth stage of crop
 
@@ -15,7 +15,7 @@ def growth_stage(Crop, InitCond, GrowingSeason):
 
     `InitCond`: `InitCondClass` : InitCond object containing model paramaters
 
-    `GrowingSeason`:: `bool` : is growing season (True or Flase)
+    `growing_season`:: `bool` : is growing season (True or Flase)
 
 
     *Returns:*
@@ -33,26 +33,26 @@ def growth_stage(Crop, InitCond, GrowingSeason):
     NewCond = InitCond
 
     ## Get growth stage (if in growing season) ##
-    if GrowingSeason == True:
+    if growing_season == True:
         # Adjust time for any delayed growth
         if Crop.CalendarType == 1:
-            tAdj = NewCond.DAP - NewCond.DelayedCDs
+            tAdj = NewCond.dap - NewCond.delayed_cds
         elif Crop.CalendarType == 2:
-            tAdj = NewCond.GDDcum - NewCond.DelayedGDDs
+            tAdj = NewCond.gdd_cum - NewCond.delayed_gdds
 
         # Update growth stage
         if tAdj <= Crop.Canopy10Pct:
-            NewCond.GrowthStage = 1
+            NewCond.growth_stage = 1
         elif tAdj <= Crop.MaxCanopy:
-            NewCond.GrowthStage = 2
+            NewCond.growth_stage = 2
         elif tAdj <= Crop.Senescence:
-            NewCond.GrowthStage = 3
+            NewCond.growth_stage = 3
         elif tAdj > Crop.Senescence:
-            NewCond.GrowthStage = 4
+            NewCond.growth_stage = 4
 
     else:
         # Not in growing season so growth stage is set to dummy value
-        NewCond.GrowthStage = 0
+        NewCond.growth_stage = 0
 
     return NewCond
 

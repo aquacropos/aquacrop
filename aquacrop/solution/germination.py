@@ -3,7 +3,7 @@ import numpy as np
 
 
 
-def germination(InitCond, Soil_zGerm, prof, Crop_GermThr, Crop_PlantMethod, GDD, GrowingSeason):
+def germination(InitCond, Soil_zGerm, prof, Crop_GermThr, Crop_PlantMethod, gdd, growing_season):
     """
     Function to check if crop has germinated
 
@@ -24,9 +24,9 @@ def germination(InitCond, Soil_zGerm, prof, Crop_GermThr, Crop_PlantMethod, GDD,
 
     `Crop_PlantMethod`: `bool` : sown as seedling True or False
 
-    `GDD`: `float` : Number of Growing Degree Days on current day
+    `gdd`: `float` : Number of Growing Degree Days on current day
 
-    `GrowingSeason`:: `bool` : is growing season (True or Flase)
+    `growing_season`:: `bool` : is growing season (True or Flase)
 
 
     *Returns:*
@@ -46,9 +46,9 @@ def germination(InitCond, Soil_zGerm, prof, Crop_GermThr, Crop_PlantMethod, GDD,
     NewCond = InitCond
 
     ## Check for germination (if in growing season) ##
-    if GrowingSeason == True:
+    if growing_season == True:
 
-        if (NewCond.Germination == False):
+        if (NewCond.germination == False):
             # Find compartments covered by top soil layer affecting germination
             comp_sto = np.argwhere(prof.dzsum >= Soil_zGerm).flatten()[0]
             # Calculate water content in top soil layer
@@ -80,27 +80,27 @@ def germination(InitCond, Soil_zGerm, prof, Crop_GermThr, Crop_PlantMethod, GDD,
             # Check if water content is above germination threshold
             if (WcProp >= Crop_GermThr):
                 # Crop has germinated
-                NewCond.Germination = True
+                NewCond.germination = True
                 # If crop sown as seedling, turn on seedling protection
                 if Crop_PlantMethod == True:
-                    NewCond.ProtectedSeed = True
+                    NewCond.protected_seed = True
                 else:
                     # Crop is transplanted so no protection
-                    NewCond.ProtectedSeed = False
+                    NewCond.protected_seed = False
 
             # Increment delayed growth time counters if germination is yet to
             # occur, and also set seed protection to False if yet to germinate
             else:
-                NewCond.DelayedCDs = InitCond.DelayedCDs + 1
-                NewCond.DelayedGDDs = InitCond.DelayedGDDs + GDD
-                NewCond.ProtectedSeed = False
+                NewCond.delayed_cds = InitCond.delayed_cds + 1
+                NewCond.delayed_gdds = InitCond.delayed_gdds + gdd
+                NewCond.protected_seed = False
 
     else:
         # Not in growing season so no germination calculation is performed.
-        NewCond.Germination = False
-        NewCond.ProtectedSeed = False
-        NewCond.DelayedCDs = 0
-        NewCond.DelayedGDDs = 0
+        NewCond.germination = False
+        NewCond.protected_seed = False
+        NewCond.delayed_cds = 0
+        NewCond.delayed_gdds = 0
 
     return NewCond
 

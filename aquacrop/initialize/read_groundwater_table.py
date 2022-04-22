@@ -28,10 +28,10 @@ def read_groundwater_table(ParamStruct, GwStruct, ClockStruct):
     # check if water table present
     if WT == "N":
         ParamStruct.water_table = 0
-        ParamStruct.zGW = 999 * np.ones(len(ClockStruct.time_span))
+        ParamStruct.z_gw = 999 * np.ones(len(ClockStruct.time_span))
         ParamStruct.zGW_dates = ClockStruct.time_span
         ParamStruct.WTMethod = "None"
-    elif WT == "Y":
+    elif WT == "yield_":
         ParamStruct.water_table = 1
 
         df = pd.DataFrame([GwStruct.dates, GwStruct.values]).T
@@ -44,7 +44,7 @@ def read_groundwater_table(ParamStruct, GwStruct, ClockStruct):
 
             # if only 1 watertable depth then set that value to be constant
             # accross whole simulation
-            zGW = df.reindex(ClockStruct.time_span, fill_value=df["Depth(mm)"].iloc[0],).drop(
+            z_gw = df.reindex(ClockStruct.time_span, fill_value=df["Depth(mm)"].iloc[0],).drop(
                 "Date", axis=1
             )["Depth(mm)"]
 
@@ -55,7 +55,7 @@ def read_groundwater_table(ParamStruct, GwStruct, ClockStruct):
                 # No interpolation between dates
 
                 # create daily depths for each simulation day
-                zGW = pd.Series(
+                z_gw = pd.Series(
                     np.nan * np.ones(len(ClockStruct.time_span)), index=ClockStruct.time_span
                 )
 
@@ -63,9 +63,9 @@ def read_groundwater_table(ParamStruct, GwStruct, ClockStruct):
                 for row in range(len(df)):
                     date = df.Date.iloc[row]
                     depth = df["Depth(mm)"].iloc[row]
-                    zGW.loc[zGW.index >= date] = depth
+                    z_gw.loc[z_gw.index >= date] = depth
                     if row == 0:
-                        zGW.loc[zGW.index <= date] = depth
+                        z_gw.loc[z_gw.index <= date] = depth
 
             elif WTMethod == "Variable":
 
@@ -73,21 +73,21 @@ def read_groundwater_table(ParamStruct, GwStruct, ClockStruct):
 
                 # create daily depths for each simulation day
                 # fill unspecified days with NaN
-                zGW = pd.Series(
+                z_gw = pd.Series(
                     np.nan * np.ones(len(ClockStruct.time_span)), index=ClockStruct.time_span
                 )
 
                 for row in range(len(df)):
                     date = df.Date.iloc[row]
                     depth = df["Depth(mm)"].iloc[row]
-                    zGW.loc[date] = depth
+                    z_gw.loc[date] = depth
 
                 # Interpolate daily groundwater depths
-                zGW = zGW.interpolate()
+                z_gw = z_gw.interpolate()
 
         # assign values to Paramstruct object
-        ParamStruct.zGW = zGW.values
-        ParamStruct.zGW_dates = zGW.index.values
+        ParamStruct.z_gw = z_gw.values
+        ParamStruct.zGW_dates = z_gw.index.values
         ParamStruct.WTMethod = WTMethod
 
     return ParamStruct

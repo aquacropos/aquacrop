@@ -35,10 +35,10 @@ def transpiration(
     IrrMngt_IrrMethod,
     IrrMngt_NetIrrSMT,
     InitCond,
-    Et0,
+    et0,
     CO2,
-    GrowingSeason,
-    GDD,
+    growing_season,
+    gdd,
 ):
 
     """
@@ -59,13 +59,13 @@ def transpiration(
 
     `InitCond`: `InitCondClass` : InitCond object
 
-    `Et0`: `float` : reference evapotranspiration
+    `et0`: `float` : reference evapotranspiration
 
     `CO2`: `CO2class` : CO2
 
-    `GDD`: `float` : Growing Degree Days
+    `gdd`: `float` : Growing Degree Days
 
-    `GrowingSeason`:: `bool` : is it currently within the growing season (True, Flase)
+    `growing_season`:: `bool` : is it currently within the growing season (True, Flase)
 
     *Returns:*
 
@@ -96,17 +96,17 @@ def transpiration(
     prof = Soil_Profile
 
     ## Calculate transpiration (if in growing season) ##
-    if GrowingSeason == True:
+    if growing_season == True:
         ## Calculate potential transpiration ##
         # 1. No prior water stress
         # Update ageing days counter
-        DAPadj = NewCond.DAP - NewCond.DelayedCDs
+        DAPadj = NewCond.dap - NewCond.delayed_cds
         if DAPadj > Crop.MaxCanopyCD:
-            NewCond.AgeDays_NS = DAPadj - Crop.MaxCanopyCD
+            NewCond.age_days_ns = DAPadj - Crop.MaxCanopyCD
 
         # Update crop coefficient for ageing of canopy
-        if NewCond.AgeDays_NS > 5:
-            Kcb_NS = Crop.Kcb - ((NewCond.AgeDays_NS - 5) * (Crop.fage / 100)) * NewCond.CCxW_NS
+        if NewCond.age_days_ns > 5:
+            Kcb_NS = Crop.Kcb - ((NewCond.age_days_ns - 5) * (Crop.fage / 100)) * NewCond.ccx_w_ns
         else:
             Kcb_NS = Crop.Kcb
 
@@ -117,22 +117,22 @@ def transpiration(
             Kcb_NS = Kcb_NS * (1 - 0.05 * ((CO2CurrentConc - CO2RefConc) / (550 - CO2RefConc)))
 
         # Determine potential transpiration rate (no water stress)
-        TrPot_NS = Kcb_NS * (NewCond.CCadj_NS) * Et0
+        TrPot_NS = Kcb_NS * (NewCond.canopy_cover_adj_ns) * et0
 
         # Correct potential transpiration for dying green canopy effects
-        if NewCond.CC_NS < NewCond.CCxW_NS:
-            if (NewCond.CCxW_NS > 0.001) and (NewCond.CC_NS > 0.001):
-                TrPot_NS = TrPot_NS * ((NewCond.CC_NS / NewCond.CCxW_NS) ** Crop.a_Tr)
+        if NewCond.canopy_cover_ns < NewCond.ccx_w_ns:
+            if (NewCond.ccx_w_ns > 0.001) and (NewCond.canopy_cover_ns > 0.001):
+                TrPot_NS = TrPot_NS * ((NewCond.canopy_cover_ns / NewCond.ccx_w_ns) ** Crop.a_Tr)
 
         # 2. Potential prior water stress and/or delayed development
         # Update ageing days counter
-        DAPadj = NewCond.DAP - NewCond.DelayedCDs
+        DAPadj = NewCond.dap - NewCond.delayed_cds
         if DAPadj > Crop.MaxCanopyCD:
-            NewCond.AgeDays = DAPadj - Crop.MaxCanopyCD
+            NewCond.age_days = DAPadj - Crop.MaxCanopyCD
 
         # Update crop coefficient for ageing of canopy
-        if NewCond.AgeDays > 5:
-            Kcb = Crop.Kcb - ((NewCond.AgeDays - 5) * (Crop.fage / 100)) * NewCond.CCxW
+        if NewCond.age_days > 5:
+            Kcb = Crop.Kcb - ((NewCond.age_days - 5) * (Crop.fage / 100)) * NewCond.ccx_w
         else:
             Kcb = Crop.Kcb
 
@@ -141,11 +141,11 @@ def transpiration(
             Kcb = Kcb * (1 - 0.05 * ((CO2CurrentConc - CO2RefConc) / (550 - CO2RefConc)))
 
         # Determine potential transpiration rate
-        TrPot0 = Kcb * (NewCond.CCadj) * Et0
+        TrPot0 = Kcb * (NewCond.canopy_cover_adj) * et0
         # Correct potential transpiration for dying green canopy effects
-        if NewCond.CC < NewCond.CCxW:
-            if (NewCond.CCxW > 0.001) and (NewCond.CC > 0.001):
-                TrPot0 = TrPot0 * ((NewCond.CC / NewCond.CCxW) ** Crop.a_Tr)
+        if NewCond.canopy_cover < NewCond.ccx_w:
+            if (NewCond.ccx_w > 0.001) and (NewCond.canopy_cover > 0.001):
+                TrPot0 = TrPot0 * ((NewCond.canopy_cover / NewCond.ccx_w) ** Crop.a_Tr)
 
         # 3. Adjust potential transpiration for cold stress effects
         # Check if cold stress occurs on current day
@@ -154,10 +154,10 @@ def transpiration(
             KsCold = 1
         elif Crop.TrColdStress == 1:
             # Transpiration can be affected by cold temperature stress
-            if GDD >= Crop.GDD_up:
+            if gdd >= Crop.GDD_up:
                 # No cold temperature stress
                 KsCold = 1
-            elif GDD <= Crop.GDD_lo:
+            elif gdd <= Crop.GDD_lo:
                 # Transpiration fully inhibited by cold temperature stress
                 KsCold = 0
             else:
@@ -169,7 +169,7 @@ def transpiration(
                     np.log(((KsTr_lo * KsTr_up) - 0.98 * KsTr_lo) / (0.98 * (KsTr_up - KsTr_lo)))
                 )
                 # Calculate cold stress level
-                GDDrel = (GDD - Crop.GDD_lo) / (Crop.GDD_up - Crop.GDD_lo)
+                GDDrel = (gdd - Crop.GDD_lo) / (Crop.GDD_up - Crop.GDD_lo)
                 KsCold = (KsTr_up * KsTr_lo) / (
                     KsTr_lo + (KsTr_up - KsTr_lo) * np.exp(-fshapeb * GDDrel)
                 )
@@ -179,26 +179,26 @@ def transpiration(
         TrPot0 = TrPot0 * KsCold
         TrPot_NS = TrPot_NS * KsCold
 
-        # print(TrPot0,NewCond.DAP)
+        # print(TrPot0,NewCond.dap)
 
         ## Calculate surface layer transpiration ##
-        if (NewCond.SurfaceStorage > 0) and (NewCond.DaySubmerged < Crop.LagAer):
+        if (NewCond.surface_storage > 0) and (NewCond.day_submerged < Crop.LagAer):
 
             # Update submergence days counter
-            NewCond.DaySubmerged = NewCond.DaySubmerged + 1
+            NewCond.day_submerged = NewCond.day_submerged + 1
             # Update anerobic conditions counter for each compartment
             for ii in range(int(Soil_nComp)):
                 # Increment aeration days counter for compartment ii
-                NewCond.AerDaysComp[ii] = NewCond.AerDaysComp[ii] + 1
-                if NewCond.AerDaysComp[ii] > Crop.LagAer:
-                    NewCond.AerDaysComp[ii] = Crop.LagAer
+                NewCond.aer_days_comp[ii] = NewCond.aer_days_comp[ii] + 1
+                if NewCond.aer_days_comp[ii] > Crop.LagAer:
+                    NewCond.aer_days_comp[ii] = Crop.LagAer
 
             # Reduce actual transpiration that is possible to account for
             # aeration stress due to extended submergence
-            fSub = 1 - (NewCond.DaySubmerged / Crop.LagAer)
-            if NewCond.SurfaceStorage > (fSub * TrPot0):
+            fSub = 1 - (NewCond.day_submerged / Crop.LagAer)
+            if NewCond.surface_storage > (fSub * TrPot0):
                 # Transpiration occurs from surface storage
-                NewCond.SurfaceStorage = NewCond.SurfaceStorage - (fSub * TrPot0)
+                NewCond.surface_storage = NewCond.surface_storage - (fSub * TrPot0)
                 TrAct0 = fSub * TrPot0
             else:
                 # No transpiration from surface storage
@@ -220,21 +220,21 @@ def transpiration(
             TrPot = TrPot0
             TrAct0 = 0
 
-        # print(TrPot,NewCond.DAP)
+        # print(TrPot,NewCond.dap)
 
         ## Update potential root zone transpiration for water stress ##
         # Determine root zone and top soil depletion, and root zone water
         # content
 
-        TAW = TAWClass()
+        taw = TAWClass()
         Dr = DrClass()
         thRZ = thRZClass()
         (
             _,
             Dr.Zt,
             Dr.Rz,
-            TAW.Zt,
-            TAW.Rz,
+            taw.Zt,
+            taw.Rz,
             thRZ.Act,
             thRZ.S,
             thRZ.FC,
@@ -243,7 +243,7 @@ def transpiration(
             thRZ.Aer,
         ) = root_zone_water(
             prof,
-            float(NewCond.Zroot),
+            float(NewCond.z_root),
             NewCond.th,
             Soil_zTop,
             float(Crop.Zmin),
@@ -253,17 +253,17 @@ def transpiration(
         class_args = {key:value for key, value in thRZ.__dict__.items() if not key.startswith('__') and not callable(key)}
         thRZ = thRZNT(**class_args)
 
-        # _,Dr,TAW,thRZ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+        # _,Dr,taw,thRZ = root_zone_water(Soil_Profile,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Check whether to use root zone or top soil depletions for calculating
         # water stress
-        if (Dr.Rz / TAW.Rz) <= (Dr.Zt / TAW.Zt):
+        if (Dr.Rz / taw.Rz) <= (Dr.Zt / taw.Zt):
             # Root zone is wetter than top soil, so use root zone value
             Dr = Dr.Rz
-            TAW = TAW.Rz
+            taw = taw.Rz
         else:
             # Top soil is wetter than root zone, so use top soil values
             Dr = Dr.Zt
-            TAW = TAW.Zt
+            taw = taw.Zt
 
         # Calculate water stress coefficients
         beta = True
@@ -274,16 +274,16 @@ def transpiration(
             Crop.ETadj,
             Crop.beta,
             Crop.fshape_w,
-            NewCond.tEarlySen,
+            NewCond.t_early_sen,
             Dr,
-            TAW,
-            Et0,
+            taw,
+            et0,
             beta,
         )
-        # Ksw = water_stress(Crop, NewCond, Dr, TAW, Et0, beta)
+        # Ksw = water_stress(Crop, NewCond, Dr, taw, et0, beta)
 
         # Calculate aeration stress coefficients
-        Ksa_Aer, NewCond.AerDays = aeration_stress(NewCond.AerDays, Crop.LagAer, thRZ)
+        Ksa_Aer, NewCond.aer_days = aeration_stress(NewCond.aer_days, Crop.LagAer, thRZ)
         # Maximum stress effect
         Ks = min(Ksw.StoLin, Ksa_Aer)
         # Update potential transpiration in root zone
@@ -293,7 +293,7 @@ def transpiration(
 
         ## Determine compartments covered by root zone ##
         # Compartments covered by the root zone
-        rootdepth = round(max(float(NewCond.Zroot), float(Crop.Zmin)), 2)
+        rootdepth = round(max(float(NewCond.z_root), float(Crop.Zmin)), 2)
         comp_sto = min(np.sum(Soil_Profile.dzsum < rootdepth) + 1, int(Soil_nComp))
         RootFact = np.zeros(int(Soil_nComp))
         # Determine fraction of each compartment covered by root zone
@@ -316,16 +316,16 @@ def transpiration(
             for ii in range(comp_sto):
                 SxCompTop = SxCompBot
                 if Soil_Profile.dzsum[ii] <= rootdepth:
-                    SxCompBot = Crop.SxBot * NewCond.rCor + (
-                        (Crop.SxTop - Crop.SxBot * NewCond.rCor)
+                    SxCompBot = Crop.SxBot * NewCond.r_cor + (
+                        (Crop.SxTop - Crop.SxBot * NewCond.r_cor)
                         * ((rootdepth - Soil_Profile.dzsum[ii]) / rootdepth)
                     )
                 else:
-                    SxCompBot = Crop.SxBot * NewCond.rCor
+                    SxCompBot = Crop.SxBot * NewCond.r_cor
 
                 SxComp[ii] = (SxCompTop + SxCompBot) / 2
 
-        # print(TrPot,NewCond.DAP)
+        # print(TrPot,NewCond.dap)
         ## Extract water ##
         ToExtract = TrPot
         comp = -1
@@ -335,11 +335,11 @@ def transpiration(
             comp = comp + 1
             # Specify layer number
 
-            # Determine TAW (m3/m3) for compartment
+            # Determine taw (m3/m3) for compartment
             thTAW = prof.th_fc[comp] - prof.th_wp[comp]
             if Crop.ETadj == 1:
-                # Adjust stomatal stress threshold for Et0 on current day
-                p_up_sto = Crop.p_up[1] + (0.04 * (5 - Et0)) * (np.log10(10 - 9 * Crop.p_up[1]))
+                # Adjust stomatal stress threshold for et0 on current day
+                p_up_sto = Crop.p_up[1] + (0.04 * (5 - et0)) * (np.log10(10 - 9 * Crop.p_up[1]))
 
             # Determine critical water content at which stomatal closure will
             # occur in compartment
@@ -373,15 +373,15 @@ def transpiration(
                 KsComp = 0
 
             # Adjust compartment stress factor for aeration stress
-            if NewCond.DaySubmerged >= Crop.LagAer:
+            if NewCond.day_submerged >= Crop.LagAer:
                 # Full aeration stress - no transpiration possible from
                 # compartment
                 AerComp = 0
             elif NewCond.th[comp] > (prof.th_s[comp] - (Crop.Aer / 100)):
                 # Increment aeration stress days counter
-                NewCond.AerDaysComp[comp] = NewCond.AerDaysComp[comp] + 1
-                if NewCond.AerDaysComp[comp] >= Crop.LagAer:
-                    NewCond.AerDaysComp[comp] = Crop.LagAer
+                NewCond.aer_days_comp[comp] = NewCond.aer_days_comp[comp] + 1
+                if NewCond.aer_days_comp[comp] >= Crop.LagAer:
+                    NewCond.aer_days_comp[comp] = Crop.LagAer
                     fAer = 0
                 else:
                     fAer = 1
@@ -393,14 +393,14 @@ def transpiration(
                 if AerComp < 0:
                     AerComp = 0
 
-                AerComp = (fAer + (NewCond.AerDaysComp[comp] - 1) * AerComp) / (
-                    fAer + NewCond.AerDaysComp[comp] - 1
+                AerComp = (fAer + (NewCond.aer_days_comp[comp] - 1) * AerComp) / (
+                    fAer + NewCond.aer_days_comp[comp] - 1
                 )
             else:
                 # No aeration stress as number of submerged days does not
                 # exceed threshold for initiation of aeration stress
                 AerComp = 1
-                NewCond.AerDaysComp[comp] = 0
+                NewCond.aer_days_comp[comp] = 0
 
             # Extract water
             ThToExtract = (ToExtract / 1000) / Soil_Profile.dz[comp]
@@ -441,15 +441,15 @@ def transpiration(
             IrrNet = 0
             # Get root zone water content
 
-            TAW = TAWClass()
+            taw = TAWClass()
             Dr = DrClass()
             thRZ = thRZClass()
             (
                 _,
                 Dr.Zt,
                 Dr.Rz,
-                TAW.Zt,
-                TAW.Rz,
+                taw.Zt,
+                taw.Rz,
                 thRZ.Act,
                 thRZ.S,
                 thRZ.FC,
@@ -458,16 +458,16 @@ def transpiration(
                 thRZ.Aer,
             ) = root_zone_water(
                 prof,
-                float(NewCond.Zroot),
+                float(NewCond.z_root),
                 NewCond.th,
                 Soil_zTop,
                 float(Crop.Zmin),
                 Crop.Aer,
             )
 
-            # _,_Dr,_TAW,thRZ = root_zone_water(Soil_Profile,float(NewCond.Zroot),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
-            NewCond.Depletion = Dr.Rz
-            NewCond.TAW = TAW.Rz
+            # _,_Dr,_TAW,thRZ = root_zone_water(Soil_Profile,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+            NewCond.depletion = Dr.Rz
+            NewCond.taw = taw.Rz
             # Determine critical water content for net irrigation
             thCrit = thRZ.WP + ((IrrMngt_NetIrrSMT / 100) * (thRZ.FC - thRZ.WP))
             # Check if root zone water content is below net irrigation trigger
@@ -495,37 +495,37 @@ def transpiration(
                     IrrNet = IrrNet + dWC
 
             # Update net irrigation counter for the growing season
-            NewCond.IrrNetCum = NewCond.IrrNetCum + IrrNet
+            NewCond.irr_net_cum = NewCond.irr_net_cum + IrrNet
         elif (IrrMngt_IrrMethod == 4) and (TrPot <= 0):
             # No net irrigation as potential transpiration is zero
             IrrNet = 0
         else:
             # No net irrigation as not in net irrigation mode
             IrrNet = 0
-            NewCond.IrrNetCum = 0
+            NewCond.irr_net_cum = 0
 
         ## Add any surface transpiration to root zone total ##
         TrAct = TrAct + TrAct0
 
         ## Feedback with canopy cover development ##
         # If actual transpiration is zero then no canopy cover growth can occur
-        if ((NewCond.CC - NewCond.CCprev) > 0.005) and (TrAct == 0):
-            NewCond.CC = NewCond.CCprev
+        if ((NewCond.canopy_cover - NewCond.cc_prev) > 0.005) and (TrAct == 0):
+            NewCond.canopy_cover = NewCond.cc_prev
 
         ## Update transpiration ratio ##
         if TrPot0 > 0:
             if TrAct < TrPot0:
-                NewCond.TrRatio = TrAct / TrPot0
+                NewCond.tr_ratio = TrAct / TrPot0
             else:
-                NewCond.TrRatio = 1
+                NewCond.tr_ratio = 1
 
         else:
-            NewCond.TrRatio = 1
+            NewCond.tr_ratio = 1
 
-        if NewCond.TrRatio < 0:
-            NewCond.TrRatio = 0
-        elif NewCond.TrRatio > 1:
-            NewCond.TrRatio = 1
+        if NewCond.tr_ratio < 0:
+            NewCond.tr_ratio = 0
+        elif NewCond.tr_ratio > 1:
+            NewCond.tr_ratio = 1
 
     else:
         # No transpiration if not in growing season
@@ -534,9 +534,9 @@ def transpiration(
         TrPot_NS = 0
         # No irrigation if not in growing season
         IrrNet = 0
-        NewCond.IrrNetCum = 0
+        NewCond.irr_net_cum = 0
 
     ## Store potential transpiration for irrigation calculations on next day ##
-    NewCond.Tpot = TrPot0
+    NewCond.t_pot = TrPot0
 
     return TrAct, TrPot_NS, TrPot0, NewCond, IrrNet

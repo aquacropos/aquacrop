@@ -25,7 +25,7 @@ def update_time(ClockStruct, InitCond, ParamStruct, weather):
     """
     # Update time
     if ClockStruct.model_is_finished is False:
-        if (InitCond.HarvestFlag is True) and ((ClockStruct.sim_off_season is False)):
+        if (InitCond.harvest_flag is True) and ((ClockStruct.sim_off_season is False)):
             # End of growing season has been reached and not simulating
             # off-season soil water balance. Advance time to the start of the
             # next growing season.

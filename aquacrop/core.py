@@ -357,7 +357,7 @@ class AquaCropModel:
             self._clock_struct.model_is_finished,
             self._clock_struct.season_counter,
             self._clock_struct.n_seasons,
-            new_cond.HarvestFlag,
+            new_cond.harvest_flag,
         )
 
         # Update time step

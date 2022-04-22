@@ -33,15 +33,15 @@ def groundwater_inflow(prof, NewCond):
     GwIn = 0
 
     ## Perform calculations ##
-    if NewCond.WTinSoil == True:
+    if NewCond.wt_in_soil == True:
         # Water table in soil profile. Calculate horizontal inflow.
         # Get groundwater table elevation on current day
-        zGW = NewCond.zGW
+        z_gw = NewCond.z_gw
 
         # Find compartment mid-points
         zMid = prof.zMid
         # For compartments below water table, set to saturation #
-        idx = np.argwhere(zMid >= zGW).flatten()[0]
+        idx = np.argwhere(zMid >= z_gw).flatten()[0]
         for ii in range(idx, len(prof.Comp)):
             # Get soil layer
             if NewCond.th[ii] < prof.th_s[ii]:

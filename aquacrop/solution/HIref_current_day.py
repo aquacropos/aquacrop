@@ -22,7 +22,7 @@ def HIref_current_day(
     NewCond_PctLagPhase,
     NewCond_CCprev,
     Crop,
-    GrowingSeason):
+    growing_season):
     """
     Function to calculate reference (no adjustment for stress effects)
     harvest index on current day
@@ -39,7 +39,7 @@ def HIref_current_day(
 
     `Crop`: `CropClass` : Crop object containing Crop paramaters
 
-    `GrowingSeason`: `bool` : is growing season (True or Flase)
+    `growing_season`: `bool` : is growing season (True or Flase)
 
 
     *Returns:*
@@ -57,11 +57,11 @@ def HIref_current_day(
 
     InitCond_HIref = NewCond_HIref*1
 
-    # NewCond.HIref = 0.
+    # NewCond.hi_ref = 0.
 
     ## Calculate reference harvest index (if in growing season) ##
-    if GrowingSeason == True:
-        # Check if in yield formation period
+    if growing_season == True:
+        # Check if in yield_ formation period
         tAdj = NewCond_DAP - NewCond_DelayedCDs
         if tAdj > Crop.HIstartCD:
 
@@ -73,12 +73,12 @@ def HIref_current_day(
         HIt = NewCond_DAP - NewCond_DelayedCDs - Crop.HIstartCD - 1
 
         if HIt <= 0:
-            # Yet to reach time for HI build-up
+            # Yet to reach time for harvest_index build-up
             NewCond_HIref = 0
             NewCond_PctLagPhase = 0
         else:
             if NewCond_CCprev <= (Crop.CCmin * Crop.CCx):
-                # HI cannot develop further as canopy cover is too small
+                # harvest_index cannot develop further as canopy cover is too small
                 NewCond_HIref = InitCond_HIref
             else:
                 # Check crop type
@@ -118,7 +118,7 @@ def HIref_current_day(
                         # (total - logistic portion + linear portion)
                         NewCond_HIref = NewCond_HIref + (Crop.dHILinear * (HIt - Crop.tLinSwitch))
 
-                # Limit HIref and round off computed value
+                # Limit hi_ref and round off computed value
                 if NewCond_HIref > Crop.HI0:
                     NewCond_HIref = Crop.HI0
                 elif NewCond_HIref <= (Crop.HIini + 0.004):
