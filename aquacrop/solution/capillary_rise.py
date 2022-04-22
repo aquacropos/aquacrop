@@ -20,7 +20,7 @@ def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, water_ta
 
     `FluxOut`: `np.array` : FLux of water out of each soil compartment
 
-    `water_table_presence`: `int` : WaterTable present (1:yes, 0:no)
+    `water_table_presence`: `int` : water_table present (1:yes, 0:no)
 
 
     *Returns:*

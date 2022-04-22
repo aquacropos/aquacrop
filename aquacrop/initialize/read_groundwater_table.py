@@ -22,17 +22,17 @@ def read_groundwater_table(ParamStruct, GwStruct, ClockStruct):
     """
 
     # assign water table value and method
-    WT = GwStruct.WaterTable
-    WTMethod = GwStruct.Method
+    WT = GwStruct.water_table
+    WTMethod = GwStruct.method
 
     # check if water table present
     if WT == "N":
-        ParamStruct.WaterTable = 0
+        ParamStruct.water_table = 0
         ParamStruct.zGW = 999 * np.ones(len(ClockStruct.time_span))
         ParamStruct.zGW_dates = ClockStruct.time_span
         ParamStruct.WTMethod = "None"
     elif WT == "Y":
-        ParamStruct.WaterTable = 1
+        ParamStruct.water_table = 1
 
         df = pd.DataFrame([GwStruct.dates, GwStruct.values]).T
         df.columns = ["Date", "Depth(mm)"]

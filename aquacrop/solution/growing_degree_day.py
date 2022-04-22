@@ -39,13 +39,13 @@ def growing_degree_day(GDDmethod, Tupp, Tbase, Tmax, Tmin):
 
     ## Calculate GDDs ##
     if GDDmethod == 1:
-        # Method 1
+        # method 1
         Tmean = (Tmax + Tmin) / 2
         Tmean = min(Tmean, Tupp)
         Tmean = max(Tmean, Tbase)
         GDD = Tmean - Tbase
     elif GDDmethod == 2:
-        # Method 2
+        # method 2
         Tmax = min(Tmax, Tupp)
         Tmax = max(Tmax, Tbase)
 
@@ -55,7 +55,7 @@ def growing_degree_day(GDDmethod, Tupp, Tbase, Tmax, Tmin):
         Tmean = (Tmax + Tmin) / 2
         GDD = Tmean - Tbase
     elif GDDmethod == 3:
-        # Method 3
+        # method 3
         Tmax = min(Tmax, Tupp)
         Tmax = max(Tmax, Tbase)
 

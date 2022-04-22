@@ -41,7 +41,7 @@ def compute_variables(
 
     """
 
-    if param_struct.WaterTable == 1:
+    if param_struct.water_table == 1:
 
         param_struct.Soil.add_capillary_rise_params()
 

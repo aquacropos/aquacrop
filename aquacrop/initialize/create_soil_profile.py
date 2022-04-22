@@ -42,7 +42,7 @@ def create_soil_profile(param_struct):
     profile.tau = pdf.tau.values
     profile.th_fc_Adj = pdf.th_fc_Adj.values
 
-    if param_struct.WaterTable == 1:
+    if param_struct.water_table == 1:
         profile.aCR = pdf.aCR.values
         profile.bCR = pdf.bCR.values
     else:

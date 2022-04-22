@@ -21,9 +21,9 @@ class ParamStruct:
 
     `CO2` : `CO2Class` : object containing reference and current co2 concentration
 
-    `WaterTable` : `int` : Water table present (1=yes, 0=no)
+    `water_table` : `int` : Water table present (1=yes, 0=no)
 
-    `zGW` : `np.array` : WaterTable depth (mm) for each day of simulation
+    `zGW` : `np.array` : water_table depth (mm) for each day of simulation
 
     `zGW_dates` : `np.array` : Corresponding dates to the zGW values
 
@@ -63,7 +63,7 @@ class ParamStruct:
         self.CO2 = 0
 
         # water table
-        self.WaterTable = 0
+        self.water_table = 0
         self.zGW = []
         self.zGW_dates = []
         self.WTMethod = ""

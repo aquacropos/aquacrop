@@ -82,13 +82,13 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
     profile = ParamStruct.Soil.profile
 
     # Check for presence of groundwater table
-    if ParamStruct.WaterTable == 0:  # No water table present
+    if ParamStruct.water_table == 0:  # No water table present
         # Set initial groundwater level to dummy value
         InitCond.zGW = ModelConstants.NO_VALUE
         InitCond.WTinSoil = False
         # Set adjusted field capacity to default field capacity
         InitCond.th_fc_Adj = profile.th_fc.values
-    elif ParamStruct.WaterTable == 1:  # Water table is present
+    elif ParamStruct.water_table == 1:  # Water table is present
         # Set initial groundwater level
         InitCond.zGW = float(ParamStruct.zGW[ClockStruct.time_step_counter])
         # Find compartment mid-points
@@ -275,7 +275,7 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
     # If groundwater table is present and calculating water contents based on
     # field capacity, then reset value to account for possible changes in field
     # capacity caused by capillary rise effects
-    if ParamStruct.WaterTable == 1:
+    if ParamStruct.water_table == 1:
         if (typestr == "Prop") and (datapoints[-1] == "FC"):
             InitCond.th = InitCond.th_fc_Adj
 

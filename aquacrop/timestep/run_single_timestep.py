@@ -71,7 +71,7 @@ def solution_single_time_step(
     # Unpack structures
     Soil = param_struct.Soil
     CO2 = param_struct.CO2
-    if param_struct.WaterTable == 1:
+    if param_struct.water_table == 1:
         Groundwater = param_struct.zGW[clock_struct.time_step_counter]
     else:
         Groundwater = 0
@@ -167,7 +167,7 @@ def solution_single_time_step(
         NewCond.zGW,
         NewCond.th,
         NewCond.th_fc_Adj,
-        param_struct.WaterTable,
+        param_struct.water_table,
         Groundwater,
     )
 
@@ -190,7 +190,7 @@ def solution_single_time_step(
         NewCond.zGW,
         GDD,
         GrowingSeason,
-        param_struct.WaterTable,
+        param_struct.water_table,
     )
 
     # 3. Pre-irrigation
@@ -278,7 +278,7 @@ def solution_single_time_step(
         Soil.fshape_cr,
         NewCond,
         FluxOut,
-        param_struct.WaterTable,
+        param_struct.water_table,
     )
 
     # 9. Check germination

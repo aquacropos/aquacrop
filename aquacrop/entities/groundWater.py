@@ -7,9 +7,9 @@ class GroundWater:
     **Attributes:**\n
 
 
-    `WaterTable` : `str` :  Water table considered (Y or N)
+    `water_table` : `str` :  Water table considered (Y or N)
 
-    `Method` : `str` :  Water table input data ('Constant' or 'Variable')
+    `method` : `str` :  Water table input data ('Constant' or 'Variable')
 
     `dates` : `list` : water table observation dates
 
@@ -17,10 +17,10 @@ class GroundWater:
 
     """
 
-    def __init__(self, WaterTable="N", Method="Constant", dates=[], values=[]):
+    def __init__(self, water_table="N", method="Constant", dates=[], values=[]):
 
-        self.WaterTable = WaterTable
-        self.Method = Method
+        self.water_table = water_table
+        self.method = method
         self.dates = dates
         self.values = values
 
