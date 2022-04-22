@@ -1,22 +1,27 @@
 from subprocess import call
+from tqdm import tqdm
 
-call(["python", "-m", "aquacrop.solution.water_stress"])
-call(["python", "-m", "aquacrop.solution.evap_layer_water_content"])
-call(["python", "-m", "aquacrop.solution.root_zone_water"])
-call(["python", "-m", "aquacrop.solution.cc_development"])
-call(["python", "-m", "aquacrop.solution.update_CCx_CDC"])
-call(["python", "-m", "aquacrop.solution.cc_required_time"])
-call(["python", "-m", "aquacrop.solution.aeration_stress"])
-call(["python", "-m", "aquacrop.solution.HIadj_pre_anthesis"])
-call(["python", "-m", "aquacrop.solution.HIadj_post_anthesis"])
-call(["python", "-m", "aquacrop.solution.HIadj_pollination"])
-call(["python", "-m", "aquacrop.solution.growing_degree_day"])
-call(["python", "-m", "aquacrop.solution.drainage"])
-call(["python", "-m", "aquacrop.solution.rainfall_partition"])
-call(["python", "-m", "aquacrop.solution.check_groundwater_table"])
-call(["python", "-m", "aquacrop.solution.soil_evaporation"])
-call(["python", "-m", "aquacrop.solution.root_development"])
-call(["python", "-m", "aquacrop.solution.infiltration"])
-call(["python", "-m", "aquacrop.solution.HIref_current_day"])
-call(["python", "-m", "aquacrop.solution.temperature_stress"])
-call(["python", "-m", "aquacrop.solution.biomass_accumulation"])
+modules_to_compile = [
+    "aquacrop.solution.water_stress",
+    "aquacrop.solution.evap_layer_water_content",
+    "aquacrop.solution.root_zone_water",
+    "aquacrop.solution.cc_development",
+    "aquacrop.solution.update_CCx_CDC",
+    "aquacrop.solution.cc_required_time",
+    "aquacrop.solution.aeration_stress",
+    "aquacrop.solution.HIadj_pre_anthesis",
+    "aquacrop.solution.HIadj_post_anthesis",
+    "aquacrop.solution.HIadj_pollination",
+    "aquacrop.solution.growing_degree_day",
+    "aquacrop.solution.drainage",
+    "aquacrop.solution.rainfall_partition",
+    "aquacrop.solution.check_groundwater_table",
+    "aquacrop.solution.soil_evaporation",
+    "aquacrop.solution.root_development",
+    "aquacrop.solution.infiltration",
+    "aquacrop.solution.HIref_current_day",
+    "aquacrop.solution.temperature_stress",
+    "aquacrop.solution.biomass_accumulation"]
+
+for mod in tqdm(modules_to_compile):
+    call(["python", "-m", mod])
