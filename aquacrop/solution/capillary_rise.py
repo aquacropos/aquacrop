@@ -136,7 +136,7 @@ def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, water_ta
                 Krel = 1
 
             # Check if room is available to store water from capillary rise
-            dth = NewCond.th_fc_Adj[compi] - NewCond.th[compi]
+            dth = round(NewCond.th_fc_Adj[compi] - NewCond.th[compi],4)
 
             # Store water if room is available
             if (dth > 0) and ((zBot - prof.dz[compi] / 2) < z_gw):

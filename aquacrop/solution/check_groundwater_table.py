@@ -84,7 +84,7 @@ def check_groundwater_table(
                     Xmax = (np.exp(pF * np.log(10))) / 100
 
             if (NewCond_zGW < 0) or ((NewCond_zGW - zMid[compi]) >= Xmax):
-                for ii in range(compi):
+                for ii in range(compi + 1):
 
                     thfcAdj[ii] = prof.th_fc[ii]
 
