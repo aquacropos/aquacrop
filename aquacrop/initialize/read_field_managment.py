@@ -1,4 +1,4 @@
-from ..entities.fieldManagement import  FieldMngtStruct
+from ..entities.fieldManagement import FieldMngtStruct
 
 
 def read_field_management(ParamStruct, FieldMngt, FallowFieldMngt):
@@ -34,4 +34,3 @@ def read_field_management(ParamStruct, FieldMngt, FallowFieldMngt):
     ParamStruct.FallowFieldMngt = fallow_field_mngt_struct
 
     return ParamStruct
-

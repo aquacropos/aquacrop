@@ -281,7 +281,7 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
 
     # If groundwater table is present in soil profile then set all water
     # contents below the water table to saturation
-    if InitCond.wt_in_soil == True:
+    if InitCond.wt_in_soil is True:
         # Find compartment mid-points
         SoilDepths = profile.dzsum.values
         comp_top = np.append([0], SoilDepths[:-1])

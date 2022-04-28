@@ -1,5 +1,5 @@
 import numpy as np
-from numba import float64, int64, boolean, types
+from numba import float64, int64, boolean
 
 from ..entities.modelConstants import ModelConstants
 
@@ -80,8 +80,7 @@ InitCond_spec = [
 ]
 
 
-
-class InitialCondition():
+class InitialCondition:
     """
     The InitCond Class contains all Paramaters and variables used in the simulation
 
@@ -161,7 +160,7 @@ class InitialCondition():
         self.protected_seed = 0
         self.yield_ = 0
 
-        self.z_root = 0.
+        self.z_root = 0.0
         self.cc0_adj = 0
         self.surface_storage = 0
         self.z_gw = ModelConstants.NO_VALUE

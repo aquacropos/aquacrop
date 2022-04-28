@@ -30,7 +30,7 @@ class TestModelExceptions(unittest.TestCase):
     _initial_water_content = InitialWaterContent(value=["FC"])
     _model_os = AquaCropModel(
         sim_start_time=f"{1979}/10/01",
-        sim_end_time=f"{1980}/05/30",
+        sim_end_time=f"{1981}/05/30",
         weather_df=_weather_data,
         soil=_sandy_loam,
         crop=_wheat,
@@ -39,6 +39,7 @@ class TestModelExceptions(unittest.TestCase):
             water_table="Y", dates=[f"{1979}/10/01"], values=[2.66]
         ),
     )
+    _model_os.run_model(till_termination=True)
 
     def test_anything(self):
         """
