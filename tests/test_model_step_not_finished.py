@@ -22,7 +22,7 @@ class TestModelByStepNotFinished(unittest.TestCase):
     _initial_water_content = InitialWaterContent(value=["FC"])
     _model_os = AquaCropModel(
         sim_start_time=f"{1979}/10/01",
-        sim_end_time=f"{1986}/05/30",
+        sim_end_time=f"{1980}/05/30",
         weather_df=_weather_data,
         soil=_sandy_loam,
         crop=_wheat,
@@ -36,9 +36,6 @@ class TestModelByStepNotFinished(unittest.TestCase):
         """
         final_statistics_returned = self._model_os.get_simulation_results()
         final_statistics_expected = False
-        
-        
-        print(self._model_os.weather_df)
 
         self.assertEqual(final_statistics_expected, final_statistics_returned)
 

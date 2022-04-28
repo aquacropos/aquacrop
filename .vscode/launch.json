@@ -23,7 +23,22 @@
       "request": "launch",
       "module": "unittest",
       "args": [
-        "${workspaceFolder}/test/test_speed.py",
+        "${workspaceFolder}/tests/test_speed.py",
+       ],
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "DEVELOPMENT": "TRUE"
+      }
+    },
+    {
+      "name": "Python bug Test: AQUACROP MODEL",
+      "python": "${workspaceFolder}/venv/bin/python3",
+      "type": "python",
+      "request": "launch",
+      "module": "unittest",
+      "args": [
+        "${workspaceFolder}/tests/test_bug.py",
        ],
       "console": "integratedTerminal",
       "justMyCode": true,

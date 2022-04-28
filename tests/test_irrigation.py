@@ -1,3 +1,6 @@
+'''
+Test file for irrigation
+'''
 import unittest
 import pandas as pd
 
@@ -16,7 +19,7 @@ class TestIrrigation(unittest.TestCase):
     """
 
     _sim_start = "1982/05/01"
-    _sim_end = "2018/10/30"
+    _sim_end = "1983/10/30"
 
     weather_file_path = get_filepath("champion_climate.txt")
 
@@ -43,20 +46,12 @@ class TestIrrigation(unittest.TestCase):
         )
         # run model till termination
         model_os.run_model(till_termination=True)
-        
+
         final_statistics = model_os.get_simulation_results().head(10)
-        print(final_statistics)
+        yield_expected = 10.78
+        yield_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
 
-        print(final_statistics)
-
-        yied_1_result = 10.782165097906882
-        yield1 = final_statistics["Yield (tonne/ha)"][0]
-
-        yied_10_result = 9.905317889844312
-        yield10 = final_statistics["Yield (tonne/ha)"][9]
-
-        self.assertEqual(yield1, yied_1_result)
-        self.assertEqual(yield10, yied_10_result)
+        self.assertEqual(yield_expected, yield_returned)
 
     def test_threshold4_irrigate_strategy(self):
         """
@@ -75,18 +70,18 @@ class TestIrrigation(unittest.TestCase):
         )
         # run model till termination
         model_os.run_model(till_termination=True)
-        
+
         final_statistics = model_os.get_simulation_results().head(10)
-        print(final_statistics)
-        print(final_statistics)
-        yied_1_result = 12.650076726957787
-        yield1 = final_statistics["Yield (tonne/ha)"][0]
+      
+        yied_1_expected = 12.65
+        yield_1_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
 
-        yied_10_result = 13.974969216935104
-        yield10 = final_statistics["Yield (tonne/ha)"][9]
+        yied_2_expected = 12.956
+        yield_2_retruned = round(final_statistics["Yield (tonne/ha)"][1], 3)
 
-        self.assertEqual(yield1, yied_1_result)
-        self.assertEqual(yield10, yied_10_result)
+        self.assertEqual(yied_1_expected, yield_1_returned)
+
+        self.assertEqual(yied_2_expected, yield_2_retruned)
 
     def test_interval_7days__strategy(self):
         """
@@ -106,18 +101,17 @@ class TestIrrigation(unittest.TestCase):
         )
         # run model till termination
         model_os.run_model(till_termination=True)
-        
+
         final_statistics = model_os.get_simulation_results().head(10)
-        print(final_statistics)
 
-        yield_1_result = 12.646543675646381
-        yield1 = final_statistics["Yield (tonne/ha)"][0]
+        yield_1_expected = 12.65
+        yield_1_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
 
-        yield_10_result = 14.018772249158092
-        yield10 = final_statistics["Yield (tonne/ha)"][9]
+        yield_2_expected = 12.98
+        yield_2_returned = round(final_statistics["Yield (tonne/ha)"][1], 2)
 
-        self.assertEqual(yield1, yield_1_result)
-        self.assertEqual(yield10, yield_10_result)
+        self.assertEqual(yield_1_expected, yield_1_returned)
+        self.assertEqual(yield_2_expected, yield_2_returned)
 
     def test_predefined_schedule_strategy(self):
         """
@@ -127,7 +121,9 @@ class TestIrrigation(unittest.TestCase):
             self._sim_start, self._sim_end
         )
         # print(irrigationSchedule)
-        irrigate_schedule = IrrMngtClass(irrigation_method=3, Schedule=irrigation_schedule_df)
+        irrigate_schedule = IrrMngtClass(
+            irrigation_method=3, Schedule=irrigation_schedule_df
+        )
 
         model_os = AquaCropModel(
             sim_start_time=self._sim_start,
@@ -141,18 +137,17 @@ class TestIrrigation(unittest.TestCase):
 
         # run model till termination
         model_os.run_model(till_termination=True)
-        
+
         final_statistics = model_os.get_simulation_results().head(10)
-        print(final_statistics)
 
-        yield_1_result = 12.128998898669153
-        yield1 = final_statistics["Yield (tonne/ha)"][0]
+        yield_1_expected = 12.13
+        yield_1_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
 
-        yield_10_result = 11.997890714696235
-        yield10 = final_statistics["Yield (tonne/ha)"][9]
+        yield_2_expected = 9.46
+        yield_2_returned = round(final_statistics["Yield (tonne/ha)"][1], 2)
 
-        self.assertEqual(yield1, yield_1_result)
-        self.assertEqual(yield10, yield_10_result)
+        self.assertEqual(yield_1_expected, yield_1_returned)
+        self.assertEqual(yield_2_expected, yield_2_returned)
 
     def test_net_irrigation_strategy(self):
         """
@@ -172,18 +167,17 @@ class TestIrrigation(unittest.TestCase):
 
         # run model till termination
         model_os.run_model(till_termination=True)
-        
+
         final_statistics = model_os.get_simulation_results().head(10)
-        print(final_statistics)
 
-        yield_1_result = 12.657670494485089
-        yield1 = final_statistics["Yield (tonne/ha)"][0]
+        yield_1_expected = 12.66
+        yield_1_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
 
-        yield_10_result = 13.981859189056273
-        yield10 = final_statistics["Yield (tonne/ha)"][9]
+        yield_2_expected = 12.97
+        yield_2_returned = round(final_statistics["Yield (tonne/ha)"][1], 2)
 
-        self.assertEqual(yield1, yield_1_result)
-        self.assertEqual(yield10, yield_10_result)
+        self.assertEqual(yield_1_expected, yield_1_returned)
+        self.assertEqual(yield_2_expected, yield_2_returned)
 
 
 def create_pandas_irrigation_schedule(sim_start, sim_end):

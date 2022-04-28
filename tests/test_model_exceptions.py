@@ -1,6 +1,6 @@
-'''
+"""
 Test exeptions in the model.
-'''
+"""
 import unittest
 
 from aquacrop.utils.data import get_filepath
@@ -62,7 +62,7 @@ class TestModelExceptions(unittest.TestCase):
 
         with self.assertRaises(Exception) as context:
             self._model_os.sim_start_time = f"{1970}/10/01"
-            self._model_os.sim_end_time = f"{1985}/05/30"
+            self._model_os.sim_end_time = f"{1971}/05/30"
             self._model_os.run_model()
 
         self.assertTrue(

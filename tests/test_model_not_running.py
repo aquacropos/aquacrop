@@ -21,8 +21,8 @@ class TestModelByStepNotFinished(unittest.TestCase):
     _wheat = Crop("Wheat", planting_date="10/01")
     _initial_water_content = InitialWaterContent(value=["FC"])
     _model_os = AquaCropModel(
-        sim_start_time=f"{1979}/10/01",
-        sim_end_time=f"{1985}/05/30",
+        sim_start_time=f"{1980}/10/01",
+        sim_end_time=f"{1981}/05/30",
         weather_df=_weather_data,
         soil=_sandy_loam,
         crop=_wheat,

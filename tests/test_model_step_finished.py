@@ -21,8 +21,8 @@ class TestModelByStepNotFinished(unittest.TestCase):
     _wheat = Crop("Wheat", planting_date="10/01")
     _initial_water_content = InitialWaterContent(value=["FC"])
     _model_os = AquaCropModel(
-        sim_start_time=f"{1979}/10/01",
-        sim_end_time=f"{1985}/05/30",
+        sim_start_time=f"{1982}/10/01",
+        sim_end_time=f"{1983}/05/30",
         weather_df=_weather_data,
         soil=_sandy_loam,
         crop=_wheat,
@@ -35,28 +35,26 @@ class TestModelByStepNotFinished(unittest.TestCase):
         Test final statistics
         """
         final_statistics = self._model_os.get_simulation_results().head()
-        yied_1_result = 8.940139992051638
-        yield1 = final_statistics["Yield (tonne/ha)"][0]
+        yied_1_expected = 8.81
+        yield_1_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
 
-        yied_5_result = 8.682660046213236
-        yield5 = final_statistics["Yield (tonne/ha)"][4]
-
-        self.assertEqual(yield1, yied_1_result)
-        self.assertEqual(yield5, yied_5_result)
+        self.assertEqual(yied_1_expected, yield_1_returned)
 
     def test_crop_growth(self):
         """
-        Test Crop Growth
+        Test Crop Growth.
+
+        TODO: This test proves nothing relevant
         """
         crop_growth = self._model_os.get_crop_growth().head()
 
-        gdd_4_expected = 22.5
+        gdd_4_expected = 19
         gdd_4_returned = crop_growth["gdd"][4]
         self.assertEqual(gdd_4_expected, gdd_4_returned)
 
-        gd_cum_d_4_expected = 104
-        gdd_4_cum_returned = crop_growth["gdd_cum"][4]
-        self.assertEqual(gd_cum_d_4_expected, gdd_4_cum_returned)
+        gd_cum_4_expected = 106.35
+        gdd_cum_4_returned = crop_growth["gdd_cum"][4]
+        self.assertEqual(gd_cum_4_expected, gdd_cum_4_returned)
 
     def test_water_flux(self):
         """
@@ -64,12 +62,12 @@ class TestModelByStepNotFinished(unittest.TestCase):
         """
         water_flux = self._model_os.get_water_flux().head()
 
-        wr_4_expected = 57.56
+        wr_4_expected = 56.06
         wr_4_returned = water_flux["Wr"][4]
 
         self.assertEqual(wr_4_expected, wr_4_returned)
 
-        es_pot_4_expected = 3.96
+        es_pot_4_expected = 4.29
         es_pot_4_returned = round(water_flux["EsPot"][4], 2)
         self.assertEqual(es_pot_4_expected, es_pot_4_returned)
 
@@ -79,7 +77,7 @@ class TestModelByStepNotFinished(unittest.TestCase):
         """
         water_storage = self._model_os.get_water_storage().head()
 
-        th1_3_expected = 0.146497
+        th1_3_expected = 0.146171
         th1_3_returned = round(water_storage["th1"][3], 6)
         self.assertEqual(th1_3_expected, th1_3_returned)
 

@@ -22,7 +22,7 @@ class TestModelTillTermination(unittest.TestCase):
     _initial_water_content = InitialWaterContent(value=["FC"])
     _model_os = AquaCropModel(
         sim_start_time=f"{1979}/10/01",
-        sim_end_time=f"{1985}/05/30",
+        sim_end_time=f"{1980}/05/30",
         weather_df=_weather_data,
         soil=_sandy_loam,
         crop=_wheat,
@@ -35,14 +35,9 @@ class TestModelTillTermination(unittest.TestCase):
         Test final statistics
         """
         final_statistics = self._model_os.get_simulation_results().head()
-        yied_1_result = 8.940139992051638
-        yield1 = final_statistics["Yield (tonne/ha)"][0]
-
-        yied_5_result = 8.682660046213236
-        yield5 = final_statistics["Yield (tonne/ha)"][4]
-
-        self.assertEqual(yield1, yied_1_result)
-        self.assertEqual(yield5, yied_5_result)
+        yied_expected = 8.94
+        yield_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
+        self.assertEqual(yied_expected, yield_returned)
 
     def test_crop_growth(self):
         """
