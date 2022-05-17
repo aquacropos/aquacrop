@@ -18,6 +18,7 @@ __all__ = [
     "transpiration",
     "groundwater_inflow",
     "harvest_index",
+    "water_stressp"
 ]
 
 # Cell
@@ -2059,6 +2060,61 @@ def water_stress(
 
     return Ksw_Exp, Ksw_Sto, Ksw_Sen, Ksw_Pol, Ksw_StoLin
 
+def water_stressp(Crop,InitCond,Dr,TAW,Et0,beta):
+    """
+    Function to calculate water stress coefficients
+
+    <a href="../pdfs/ac_ref_man_3.pdf#page=18" target="_blank">Reference Manual: water stress equations</a> (pg. 9-13)
+
+
+    *Arguments:*
+
+
+    `Crop`: `CropClass` : Crop Object
+
+    `InitCond`: `InitCondClass` : InitCond object
+
+    `Dr`: `DrClass` : Depletion object (contains rootzone and top soil depletion totals)
+
+    `TAW`: `TAWClass` : TAW object (contains rootzone and top soil total available water)
+
+    `Et0`: `float` : Reference Evapotranspiration
+
+    `beta`: `float` : Adjust senescence threshold if early sensescence is triggered
+
+
+    *Returns:*
+
+    psto: stress value indicating stomatal closure and psen stress value for canopy senescence
+    """
+
+    ## Calculate relative root zone water depletion for each stress type ##
+    # Number of stress variables
+    nstress = len(Crop.p_up)
+
+    # Store stress thresholds
+    p_up = np.ones(nstress)*Crop.p_up
+
+    if Crop.ETadj == 1:
+        # Adjust stress thresholds for Et0 on currentbeta day (don't do this for
+        # pollination water stress coefficient)
+
+        for ii in range(3):
+            fAdj = (np.exp(InitCond.TrRatio * Crop.fshape_ex) - 1) / (np.exp(Crop.fshape_ex) - 1)
+            p_up[ii] = p_up[ii]+fAdj*(0.04*(5-Et0))*(np.log10(10-9*p_up[ii]))
+
+
+    # Adjust senescence threshold if early sensescence is triggered
+    if (beta == True) and (InitCond.tEarlySen > 0):
+        p_up[2] = p_up[2]*(1-Crop.beta/100)
+    # Limit values
+    p_up = np.maximum(p_up,np.zeros(4))
+    p_up = np.minimum(p_up,np.ones(4))
+
+    # Limit values
+    p_sto=p_up[1]
+    p_sen=p_up[2]
+    return p_sto, p_sen
 
 # Cell
 # @njit()
