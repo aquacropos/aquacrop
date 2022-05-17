@@ -1,4 +1,4 @@
-__all__ = ["list_data", "get_filepath", "get_data", "prepare_weather", "AquaCropModel"]
+__all__ = ["list_data", "get_filepath", "get_data", "prepare_weather",'prepare_weatherfromfile', "AquaCropModel"]
 
 import numpy as np
 import os
@@ -81,6 +81,44 @@ def prepare_weather(weatherFilePath):
 
     return weather_df
 
+def prepare_weatherfromfile(weatherFile):
+    """
+    function to read in weather data from file and return a dataframe containing
+    the weather data
+
+    *Arguments:*\n
+
+    `FileLocations` : `FileLocationsClass`:  input File Locations
+
+    `weatherFilePath` : pandas dataframe with weather data
+
+
+
+    *Returns:*
+
+    `weather_df`: `pandas.DataFrame` :  weather data for simulation period
+
+    """
+
+
+    weather_df = weatherFile
+
+    #assert len(weather_df.columns) == 7
+
+    # rename the columns
+    weather_df.columns = str("Day Month Year MinTemp MaxTemp Precipitation ReferenceET").split()
+
+    # put the weather dates into datetime format
+    weather_df["Date"] = pd.to_datetime(weather_df[['Year','Month','Day']])
+
+    # drop the day month year columns
+    weather_df = weather_df.drop(["Day","Month","Year"],axis=1)
+
+    # set limit on ET0 to avoid divide by zero errors
+    weather_df.ReferenceET.clip(lower=0.1,inplace=True)
+
+
+    return weather_df
 
 # Cell
 class AquaCropModel:
