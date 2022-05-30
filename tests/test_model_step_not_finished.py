@@ -28,7 +28,7 @@ class TestModelByStepNotFinished(unittest.TestCase):
         crop=_wheat,
         initial_water_content=_initial_water_content,
     )
-    _model_os.run_model(num_steps=3)
+    _model_os.run_model(num_steps=3,process_outputs=True)
 
     def test_final_statistics(self):
         """
