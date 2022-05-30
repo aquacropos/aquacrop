@@ -104,6 +104,8 @@ def rainfall_partition(
             else:
                 comp_sto = int(Soil_nComp - comp_sto_array.shape[0])
 
+            comp_sto+=1
+            
             # Calculate weighting factors by compartment
             xx = 0
             wrel = np.zeros(comp_sto)
