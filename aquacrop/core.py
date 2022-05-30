@@ -265,7 +265,11 @@ class AquaCropModel:
         # save model _weather to _init_cond
         self._weather = self.weather_df.values
 
-    def run_model(self, num_steps=1, till_termination=False):
+    def run_model(self,
+     num_steps=1,
+     till_termination=False,
+     initialize_model=True,
+     process_outputs=False):
         """
         This function is responsible for executing the model.
 
@@ -287,7 +291,8 @@ class AquaCropModel:
                         All results of the simulation
         """
 
-        self._initialize()
+        if initialize_model:
+            self._initialize()
 
         if till_termination:
             self.__start_model_execution = time.time()
@@ -309,8 +314,9 @@ class AquaCropModel:
             self.__start_model_execution = time.time()
             for i in range(num_steps):
 
-                if i == range(num_steps)[-1]:
+                if (i == range(num_steps)[-1]) and (process_outputs is True):
                     self.__steps_are_finished = True
+
                 (
                     self._clock_struct,
                     self._init_cond,
