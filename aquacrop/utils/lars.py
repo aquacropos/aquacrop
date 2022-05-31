@@ -60,7 +60,7 @@ def prepare_lars_weather(
 
     else:
         df.columns = order
-        df["date"] = pd.to_datetime(df.year, format="%yield_") + pd.to_timedelta(df.jday - 1, unit="d")
+        df["date"] = pd.to_datetime(df.year, format="%Y") + pd.to_timedelta(df.jday - 1, unit="d")
 
         psyc = 0.054  # sychometric constant
         tmean = (df.maxTemp + df.minTemp) / 2
