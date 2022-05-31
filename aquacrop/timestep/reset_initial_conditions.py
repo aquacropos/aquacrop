@@ -107,8 +107,8 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
     # Update CO2 concentration ##
     # Get CO2 concentration
 
-    if ParamStruct.CO2concAdj is not None:
-        CO2.current_concentration = ParamStruct.CO2concAdj
+    if ParamStruct.co2_concentration_adj is not None:
+        CO2.current_concentration = ParamStruct.co2_concentration_adj
     else:
         Yri = pd.DatetimeIndex([ClockStruct.step_start_time]).year[0]
         CO2.current_concentration = CO2_data.loc[Yri]

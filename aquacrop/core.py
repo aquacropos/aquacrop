@@ -5,9 +5,19 @@ import time
 import datetime
 import os
 import logging
-
-
+from typing import Dict, Union, Optional, Tuple, TYPE_CHECKING
 from .scripts.checkIfPackageIsCompiled import compile_all_AOT_files
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from pandas import DataFrame
+    from aquacrop.entities.clockStruct import ClockStruct
+    from aquacrop.entities.co2 import CO2
+    from aquacrop.entities.crop import Crop
+    from aquacrop.entities.initParamVariables import InitialCondition
+    from aquacrop.entities.inititalWaterContent import InitialWaterContent
+    from aquacrop.entities.paramStruct import ParamStruct
+    from aquacrop.entities.soil import Soil
 
 
 # Important: This code is necessary to check if the AOT files are compiled.
@@ -79,11 +89,6 @@ class AquaCropModel:
     groundwater: GroundWater object
             Stores information on water table params
 
-    planting_dates:
-            TODO: This is not used.
-
-    harvest_dates:
-            TODO: This is not used.
 
     co2_concentration: CO2 object
             Defines CO2 concentrations
@@ -105,34 +110,32 @@ class AquaCropModel:
     """
 
     # Model parameters
-    __steps_are_finished = False  # True if all steps of the simulation are done.
-    __has_model_executed = False  # Determines if the model has been run
-    __has_model_finished = False  # Determines if the model is finished
-    __start_model_execution = None  # Time when the execution start
-    __end_model_execution = None  # Time when the execution end
+    __steps_are_finished: bool = False  # True if all steps of the simulation are done.
+    __has_model_executed: bool = False  # Determines if the model has been run
+    __has_model_finished: bool = False  # Determines if the model is finished
+    __start_model_execution: float = 0.0  # Time when the execution start
+    __end_model_execution: float = 0.0  # Time when the execution end
     # Attributes initialised later
-    _clock_struct = None
-    _param_struct = None
-    _init_cond = None
-    _outputs = None
-    _weather = None
+    _clock_struct: "ClockStruct"
+    _param_struct: "ParamStruct"
+    _init_cond: "InitialCondition"
+    _outputs: "Output"
+    _weather: "DataFrame"
 
     def __init__(
         self,
-        sim_start_time,
-        sim_end_time,
-        weather_df,
-        soil,
-        crop,
-        initial_water_content,
-        irrigation_management=None,
-        field_management=None,
-        fallow_field_management=None,
-        groundwater=None,
-        planting_dates=None,
-        harvest_dates=None,
-        co2_concentration=None,
-    ):
+        sim_start_time: str,
+        sim_end_time: str,
+        weather_df: "DataFrame",
+        soil: "Soil",
+        crop: "Crop",
+        initial_water_content: "InitialWaterContent",
+        irrigation_management: Optional["IrrigationManagement"] = None,
+        field_management: Optional["FieldMngt"] = None,
+        fallow_field_management: Optional["FieldMngt"] = None,
+        groundwater: Optional["GroundWater"] = None,
+        co2_concentration: Optional["CO2"] = None,
+    ) -> None:
 
         self.sim_start_time = sim_start_time
         self.sim_end_time = sim_end_time
@@ -140,8 +143,6 @@ class AquaCropModel:
         self.soil = soil
         self.crop = crop
         self.initial_water_content = initial_water_content
-        self.planting_dates = planting_dates
-        self.harvest_dates = harvest_dates
         self.co2_concentration = co2_concentration
 
         self.irrigation_management = irrigation_management
@@ -159,14 +160,14 @@ class AquaCropModel:
             self.groundwater = GroundWater()
 
     @property
-    def sim_start_time(self):
+    def sim_start_time(self) -> str:
         """
         Return sim start date
         """
         return self._sim_start_time
 
     @sim_start_time.setter
-    def sim_start_time(self, value):
+    def sim_start_time(self, value: str) -> None:
         """
         Check if sim start date is in a correct format.
         """
@@ -177,14 +178,14 @@ class AquaCropModel:
             raise ValueError("sim_start_time format must be 'YYYY/MM/DD'")
 
     @property
-    def sim_end_time(self):
+    def sim_end_time(self) -> str:
         """
         Return sim end date
         """
         return self._sim_end_time
 
     @sim_end_time.setter
-    def sim_end_time(self, value):
+    def sim_end_time(self, value: str) -> None:
         """
         Check if sim end date is in a correct format.
         """
@@ -194,14 +195,14 @@ class AquaCropModel:
             raise ValueError("sim_end_time format must be 'YYYY/MM/DD'")
 
     @property
-    def weather_df(self):
+    def weather_df(self) -> "DataFrame":
         """
         Return weather dataframe
         """
         return self._weather_df
 
     @weather_df.setter
-    def weather_df(self, value):
+    def weather_df(self, value: "DataFrame"):
         """
         Check if weather dataframe is in a correct format.
         """
@@ -214,7 +215,7 @@ class AquaCropModel:
 
         self._weather_df = value
 
-    def _initialize(self):
+    def _initialize(self) -> None:
         """
         Initialise all model variables
         """
@@ -248,7 +249,7 @@ class AquaCropModel:
         )
 
         # Compute additional variables
-        self._param_struct.CO2concAdj = self.co2_concentration
+        self._param_struct.co2_concentration_adj = self.co2_concentration
         self._param_struct = compute_variables(
             self._param_struct, self.weather_df, self._clock_struct
         )
@@ -266,11 +267,13 @@ class AquaCropModel:
         # save model _weather to _init_cond
         self._weather = self.weather_df.values
 
-    def run_model(self,
-     num_steps=1,
-     till_termination=False,
-     initialize_model=True,
-     process_outputs=False):
+    def run_model(
+        self,
+        num_steps: int = 1,
+        till_termination: bool = False,
+        initialize_model: bool = True,
+        process_outputs: bool = False,
+    ) -> bool:
         """
         This function is responsible for executing the model.
 
@@ -283,13 +286,7 @@ class AquaCropModel:
                     Run the simulation to completion
 
         Returns:
-            Dictionary:
-
-                finished: boolean:
-                        Informs if the simulation is finished
-
-                results: Output object:
-                        All results of the simulation
+            bool -> True if finished
         """
 
         if initialize_model:
@@ -336,7 +333,9 @@ class AquaCropModel:
             self.__has_model_finished = False
             return True
 
-    def _perform_timestep(self):
+    def _perform_timestep(
+        self,
+    ) -> Tuple["ClockStruct", "InitialCondition", "ParamStruct", "Output"]:
 
         """
         Function to run a single time-step (day) calculation of AquaCrop-OS
@@ -441,7 +440,7 @@ class AquaCropModel:
                 + "Please execute the run_model() method."
             )
 
-    def get_additional_information(self):
+    def get_additional_information(self) -> Dict[str, Union[bool, float]]:
         """
         Additional model information.
 
@@ -466,7 +465,7 @@ class AquaCropModel:
             )
 
 
-def _sim_date_format_is_correct(date):
+def _sim_date_format_is_correct(date: str) -> bool:
     """
     This function checks if the start or end date of the simulation is in the correct format.
 

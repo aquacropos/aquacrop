@@ -130,9 +130,11 @@ def solution_single_time_step(
         NewCond.dap = NewCond.dap + 1
         # Growing degree days after planting
 
-        gdd = growing_degree_day(Crop_.GDDmethod, Crop_.Tupp, Crop_.Tbase, temp_max, temp_min)
+        gdd = growing_degree_day(
+            Crop_.GDDmethod, Crop_.Tupp, Crop_.Tbase, temp_max, temp_min
+        )
 
-        ## Update cumulative gdd counter ##
+        # Update cumulative gdd counter
         NewCond.gdd = gdd
         NewCond.gdd_cum = NewCond.gdd_cum + gdd
 
@@ -482,7 +484,7 @@ def solution_single_time_step(
         Es,
         EsPot,
         Tr,
-        TrPot
+        TrPot,
     ]
 
     # Crop growth

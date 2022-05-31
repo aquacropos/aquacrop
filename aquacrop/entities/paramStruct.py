@@ -61,6 +61,7 @@ class ParamStruct:
         # calculated Co2 variables
         self.CO2data = []
         self.CO2 = 0
+        self.co2_concentration_adj = None
 
         # water table
         self.water_table = 0

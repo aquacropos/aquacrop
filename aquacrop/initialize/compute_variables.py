@@ -133,8 +133,8 @@ def compute_variables(
 
     param_struct.CO2 = CO2Class()
 
-    if param_struct.CO2concAdj != None:
-        CO2conc = param_struct.CO2concAdj
+    if param_struct.co2_concentration_adj != None:
+        CO2conc = param_struct.co2_concentration_adj
 
     param_struct.CO2.current_concentration = CO2conc
 
