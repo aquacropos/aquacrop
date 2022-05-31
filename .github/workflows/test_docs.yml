@@ -11,5 +11,5 @@ jobs:
       - uses: actions/setup-python@v2
       - name: check docs
         run: |
-          pip install --upgrade pip && pip install mkdocs-material mkdocstrings mkdocs-jupyter
+          pip install --upgrade pip && pip install mkdocs-material mkdocstrings mkdocs-jupyter mkdocstrings-python
           mkdocs build
