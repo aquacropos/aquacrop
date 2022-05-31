@@ -1,14 +1,8 @@
-name: Documentation
-
+name: docs
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - "**.md"
-      - "mkdocs.yml"
-  workflow_dispatch:
-  
+    push:
+        branches:
+            - master
 jobs:
   docs:
     runs-on: ubuntu-latest
