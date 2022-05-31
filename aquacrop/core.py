@@ -3,6 +3,21 @@ This file contains the AquacropModel class that runs the simulation.
 """
 import time
 import datetime
+import os
+import logging
+
+
+from .scripts.checkIfPackageIsCompiled import compile_all_AOT_files
+
+
+# Important: This code is necessary to check if the AOT files are compiled.
+if os.getenv("DEVELOPMENT"):
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    logging.info("Running the simulation in development mode.")
+else:
+    compile_all_AOT_files()
+
 
 # pylint: disable=wrong-import-position
 
