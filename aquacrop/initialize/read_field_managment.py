@@ -7,15 +7,15 @@ def read_field_management(ParamStruct, FieldMngt, FallowFieldMngt):
 
     *Arguments:*\n
 
-    `ParamStruct` : `ParamStructClass` :  Contains model crop and soil paramaters
+    `ParamStruct` : `ParamStruct` :  Contains model crop and soil paramaters
 
-    `FieldMngt` : `FieldMngtClass` :  irr mngt params object
+    `FieldMngt` : `FieldMngt` :  irr mngt params object
 
-    `FallowFieldMngt` : `FieldMngtClass` :  irr mngt params object
+    `FallowFieldMngt` : `FieldMngt` :  irr mngt params object
 
     *Returns:*
 
-    `ParamStruct` : `ParamStructClass` :  updated with field management info
+    `ParamStruct` : `ParamStruct` :  updated with field management info
 
 
     """

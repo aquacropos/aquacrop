@@ -48,6 +48,5 @@ class RootZoneWater(object):
         self.Dry = 0.0
         self.Aer = 0.0
 
-thRZClass = RootZoneWater
 thRZNT = typing.NamedTuple("thRZNT", thRZ_spec)
 thRZNT_type_sig= types.NamedTuple(tuple(dict(thRZ_spec).values()),thRZNT)

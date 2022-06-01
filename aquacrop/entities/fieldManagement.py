@@ -91,4 +91,3 @@ class FieldMngtStruct:
         self.bund_water = 0.0
         self.curve_number_adj_pct = 0.0
 
-FieldMngtClass = FieldMngt

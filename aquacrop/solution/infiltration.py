@@ -40,9 +40,9 @@ def infiltration(
 
 
 
-    `prof`: `SoilProfileClass` : Soil object containing soil paramaters
+    `prof`: `SoilProfile` : Soil object containing soil paramaters
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
     `Infl`: `float` : Infiltration so far
 
@@ -64,7 +64,7 @@ def infiltration(
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
     `DeepPerc`:: `float` : Total Deep Percolation
 

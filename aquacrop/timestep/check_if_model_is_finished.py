@@ -12,13 +12,13 @@ def check_model_is_finished(
 
     *Arguments:*\n
 
-    `ClockStruct` : `ClockStructClass` :  model time paramaters
+    `ClockStruct` : `ClockStruct` :  model time paramaters
 
-    `InitCond` : `InitCondClass` :  containing current model paramaters
+    `InitCond` : `InitialCondition` :  containing current model paramaters
 
     *Returns:*
 
-    `ClockStruct` : `ClockStructClass` : updated clock paramaters
+    `ClockStruct` : `ClockStruct` : updated clock paramaters
 
 
     """

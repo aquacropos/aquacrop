@@ -7,9 +7,9 @@ class ParamStruct:
 
     **Attributes**:\n
 
-    `Soil` : `SoilClass` : Soil object contains data and paramaters related to the soil
+    `Soil` : `Soil` : Soil object contains data and paramaters related to the soil
 
-    `FallowFieldMngt` : `FieldMngtClass` : Object containing field management variables for the off season (fallow periods)
+    `FallowFieldMngt` : `FieldMngt` : Object containing field management variables for the off season (fallow periods)
 
     `NCrops` : `int` : Number of crop types to be simulated
 
@@ -19,7 +19,7 @@ class ParamStruct:
 
     `CO2data` : `pd.Series` : CO2 data indexed by year
 
-    `CO2` : `CO2Class` : object containing reference and current co2 concentration
+    `CO2` : `CO2` : object containing reference and current co2 concentration
 
     `water_table` : `int` : Water table present (1=yes, 0=no)
 
@@ -33,7 +33,7 @@ class ParamStruct:
 
     `python_crop_list` : `list` : List of Crop Objects, one for each season
 
-    `python_fallow_crop` : `CropClass` : Crop object for off season
+    `python_fallow_crop` : `Crop` : Crop object for off season
 
     `Seasonal_Crop_List` : `list` : List of CropStructs, one for each season (jit class objects)
 
@@ -77,6 +77,3 @@ class ParamStruct:
         self.crop_name_list = []
         self.Fallow_Crop = 0
         self.Fallow_Crop_Name = ""
-
-
-ParamStructClass = ParamStruct

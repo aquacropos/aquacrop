@@ -27,7 +27,7 @@ def aeration_stress(NewCond_AerDays, Crop_LagAer, thRZ):
 
     `Crop_LagAer`: `int` : lag days before aeration stress
 
-    `thRZ`: `thRZClass` : object that contains information on the total water in the root zone
+    `thRZ`: `RootZoneWater` : object that contains information on the total water in the root zone
 
 
 

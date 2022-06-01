@@ -44,4 +44,3 @@ class WaterEvaporation(object):
         self.Dry = 0.0
         self.Act = 0.0
 
-WevapClass = WaterEvaporation

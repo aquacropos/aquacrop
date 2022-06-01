@@ -23,7 +23,3 @@ class GroundWater:
         self.method = method
         self.dates = dates
         self.values = values
-
-
-
-GwClass = GroundWater

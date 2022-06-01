@@ -26,7 +26,7 @@ def temperature_stress(Crop, temp_max, temp_min):
 
 
 
-    `Crop`: `CropClass` : Crop object containing Crop paramaters
+    `Crop`: `Crop` : Crop object containing Crop paramaters
 
     `temp_max`: `float` : max tempatature on current day (celcius)
 
@@ -36,7 +36,7 @@ def temperature_stress(Crop, temp_max, temp_min):
     *Returns:*
 
 
-    `Kst`: `KstClass` : Kst object containing tempature stress paramators
+    `Kst`: `Kst` : Kst object containing tempature stress paramators
 
 
 
@@ -51,7 +51,7 @@ def temperature_stress(Crop, temp_max, temp_min):
     KsPol_up = 1
     KsPol_lo = 0.001
 
-    # Kst = KstClass()
+    # Kst = Kst()
 
     # Calculate effects of heat stress on pollination
     if Crop.PolHeatStress == 0:

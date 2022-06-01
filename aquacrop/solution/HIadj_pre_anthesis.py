@@ -25,15 +25,15 @@ def HIadj_pre_anthesis(
 
 
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
-    `Crop`: `CropClass` : Crop object containing Crop paramaters
+    `Crop`: `Crop` : Crop object containing Crop paramaters
 
 
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
 
     """

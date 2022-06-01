@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from ..entities.paramStruct import ParamStructClass
+from ..entities.paramStruct import ParamStruct
 from .compute_crop_calendar import compute_crop_calendar
 
 
@@ -12,11 +12,11 @@ def read_model_parameters(clock_struct, soil, crop, weather_df):
 
     *Arguments:*\n
 
-    `clock_struct` : `ClockStructClass`:  time params
+    `clock_struct` : `ClockStruct`:  time params
 
-    `soil` : `SoilClass` :  soil object
+    `soil` : `Soil` :  soil object
 
-    `crop` : `CropClass` :  crop object
+    `crop` : `Crop` :  crop object
 
     `planting_dates` : `list` :  list of datetimes
 
@@ -24,13 +24,13 @@ def read_model_parameters(clock_struct, soil, crop, weather_df):
 
     *Returns:*
 
-    `clock_struct` : `ClockStructClass` : updated time paramaters
+    `clock_struct` : `ClockStruct` : updated time paramaters
 
-    `param_struct` : `ParamStructClass` :  Contains model crop and soil paramaters
+    `param_struct` : `ParamStruct` :  Contains model crop and soil paramaters
 
     """
     # create param_struct object
-    param_struct = ParamStructClass()
+    param_struct = ParamStruct()
 
     soil.fill_nan()
 

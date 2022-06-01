@@ -14,15 +14,15 @@ def groundwater_inflow(prof, NewCond):
 
 
 
-    `Soil`: `SoilClass` : Soil object containing soil paramaters
+    `Soil`: `Soil` : Soil object containing soil paramaters
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
 
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
     `GwIn`: `float` : Groundwater inflow
 

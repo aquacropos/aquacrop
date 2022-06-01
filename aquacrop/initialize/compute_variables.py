@@ -6,7 +6,7 @@ import pandas as pd
 from .compute_crop_calendar import compute_crop_calendar
 from .calculate_HIGC import calculate_HIGC
 from .calculate_HI_linear import calculate_HI_linear
-from ..entities.co2 import CO2Class
+from ..entities.co2 import CO2
 from ..entities.crop import CropStruct
 from copy import deepcopy
 from os.path import dirname, abspath
@@ -26,17 +26,17 @@ def compute_variables(
 
     *Arguments:*\n
 
-    `param_struct` : `ParamStructClass` :  Contains model paramaters
+    `param_struct` : `ParamStruct` :  Contains model paramaters
 
     `weather_df` : `pd.DataFrame` :  weather data
 
-    `clock_struct` : `ClockStructClass` :  time params
+    `clock_struct` : `ClockStruct` :  time params
 
     `acfp` : `Path` :  path to aquacrop directory containing co2 data
 
     *Returns:*
 
-    `param_struct` : `ParamStructClass` :  updated model params
+    `param_struct` : `ParamStruct` :  updated model params
 
 
     """
@@ -131,7 +131,7 @@ def compute_variables(
     # Get CO2 concentration for first year
     CO2conc = param_struct.CO2data.iloc[0]
 
-    param_struct.CO2 = CO2Class()
+    param_struct.CO2 = CO2()
 
     if param_struct.co2_concentration_adj != None:
         CO2conc = param_struct.co2_concentration_adj

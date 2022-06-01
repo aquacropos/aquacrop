@@ -1,7 +1,7 @@
 import numpy as np
 
 
-from ..entities.initParamVariables import InitCondClass
+from ..entities.initParamVariables import InitialCondition
 from ..entities.modelConstants import ModelConstants
 
 
@@ -11,18 +11,18 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
 
     *Arguments:*\n
 
-    `ParamStruct` : `ParamStructClass` :  Contains model paramaters
+    `ParamStruct` : `ParamStruct` :  Contains model paramaters
 
-    `ClockStruct` : `ClockStructClass` :  model time paramaters
+    `ClockStruct` : `ClockStruct` :  model time paramaters
 
-    `InitWC` : `InitWCClass`:  initial water content
+    `InitWC` : `InitialWaterContent`:  initial water content
 
 
     *Returns:*
 
-    `ParamStruct` : `ParamStructClass` :  updated ParamStruct object
+    `ParamStruct` : `ParamStruct` :  updated ParamStruct object
 
-    `InitCond` : `InitCondClass` :  containing initial model conditions/counters
+    `InitCond` : `InitialCondition` :  containing initial model conditions/counters
 
 
     """
@@ -31,7 +31,7 @@ def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
     # creat initial condition class
     ###################
 
-    InitCond = InitCondClass(len(ParamStruct.Soil.profile))
+    InitCond = InitialCondition(len(ParamStruct.Soil.profile))
 
     # class_args = {key:value for key, value in InitCond_class.__dict__.items() if not key.startswith('__') and not callable(key)}
     # InitCond = InitCondStruct(**class_args)

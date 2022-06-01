@@ -27,5 +27,3 @@ class TAW:
     def __init__(self):
         self.Rz = 0.0
         self.Zt = 0.0
-
-TAWClass = TAW

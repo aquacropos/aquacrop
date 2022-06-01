@@ -11,11 +11,11 @@ def pre_irrigation(prof, Crop, InitCond, growing_season, IrrMngt):
 
     *Arguments:*
 
-    `prof`: `SoilProfileClass` : Soil object containing soil paramaters
+    `prof`: `SoilProfile` : Soil object containing soil paramaters
 
     `Crop`: `CropStruct` : Crop object containing Crop paramaters
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
     `growing_season`: `bool` : is growing season (True or Flase)
 
@@ -25,7 +25,7 @@ def pre_irrigation(prof, Crop, InitCond, growing_season, IrrMngt):
 
     *Returns:*
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
     `PreIrr`: `float` : Pre-Irrigaiton applied on current day mm
 

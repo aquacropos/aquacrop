@@ -32,6 +32,5 @@ class Kst(object):
         self.PolH = 1.0
         self.PolC = 1.0
 
-KstClass =Kst
 KstNT = typing.NamedTuple("KstNT", Kst_spec)
 KstNT_type_sig= types.NamedTuple(tuple(dict(Kst_spec).values()),KstNT)

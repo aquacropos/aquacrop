@@ -43,13 +43,13 @@ def irrigation(
     *Arguments:*
 
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
     `IrrMngt`: `IrrMngtStruct`: jit class object containing irrigation management paramaters
 
-    `Crop`: `CropClass` : Crop object containing Crop paramaters
+    `Crop`: `Crop` : Crop object containing Crop paramaters
 
-    `Soil`: `SoilClass` : Soil object containing soil paramaters
+    `Soil`: `Soil` : Soil object containing soil paramaters
 
     `growing_season`: `bool` : is growing season (True or Flase)
 
@@ -61,7 +61,7 @@ def irrigation(
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
     `Irr`: `float` : Irrigaiton applied on current day mm
 
@@ -72,9 +72,9 @@ def irrigation(
     ## Determine irrigation depth (mm/day) to be applied ##
     if growing_season == True:
         # Calculate root zone water content and depletion
-        # TAW_ = TAWClass()
-        # Dr_ = DrClass()
-        # thRZ = thRZClass()
+        # TAW_ = TAW()
+        # Dr_ = Dr()
+        # thRZ = RootZoneWater()
         (
             WrAct,
             Dr_Zt,

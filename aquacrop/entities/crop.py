@@ -489,7 +489,6 @@ class CropStruct(object):
         self.FloweringEnd = 0.0
 
 
-CropClass = Crop
 CropStructNT = typing.NamedTuple("CropStructNT", crop_spec)
 CropStructNT_type_sig = types.NamedTuple(
     tuple(dict(crop_spec).values()), CropStructNT

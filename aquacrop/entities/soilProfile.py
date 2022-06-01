@@ -66,6 +66,5 @@ class SoilProfile:
         self.aCR = np.zeros(length, dtype=np.float64)
         self.bCR = np.zeros(length, dtype=np.float64)
 
-SoilProfileClass = SoilProfile
 SoilProfileNT = typing.NamedTuple("SoilProfileNT", SoilProfileNT_spec)
 SoilProfileNT_typ_sig= types.NamedTuple(tuple(dict(SoilProfileNT_spec).values()),SoilProfileNT)

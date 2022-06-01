@@ -24,5 +24,3 @@ class InitialWaterContent:
         self.method = method
         self.depth_layer = depth_layer
         self.value = value
-
-InitWCClass = InitialWaterContent

@@ -34,6 +34,3 @@ class Output:
                 "Seasonal irrigation (mm)",
             ]
         )
-
-
-OutputClass = Output

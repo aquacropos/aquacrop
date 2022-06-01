@@ -38,13 +38,13 @@ def HIadj_pollination(
 
 
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
-    `Crop`: `CropClass` : Crop object containing Crop paramaters
+    `Crop`: `Crop` : Crop object containing Crop paramaters
 
-    `Ksw`: `KswClass` : Ksw object containing water stress paramaters
+    `Ksw`: `Ksw` : Ksw object containing water stress paramaters
 
-    `Kst`: `KstClass` : Kst object containing tempature stress paramaters
+    `Kst`: `Kst` : Kst object containing tempature stress paramaters
 
     `HIt`: `float` : time for harvest index build-up (calander days)
 
@@ -52,7 +52,7 @@ def HIadj_pollination(
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
 
 

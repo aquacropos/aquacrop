@@ -29,7 +29,7 @@ def root_zone_water(
 
     *Arguments:*
 
-    `prof`: `SoilProfileClass` : jit class Object containing soil paramaters
+    `prof`: `SoilProfile` : jit class Object containing soil paramaters
 
     `InitCond_Zroot`: `float` : Initial rooting depth
 
@@ -45,11 +45,11 @@ def root_zone_water(
 
      `WrAct`: `float` :  Actual rootzone water content
 
-     `Dr`: `DrClass` :  depletion objection containing rootzone and topsoil depletion
+     `Dr`: `Dr` :  depletion objection containing rootzone and topsoil depletion
 
-     `taw`: `TAWClass` :  `TAWClass` containing rootzone and topsoil total avalable water
+     `taw`: `TAW` :  `TAW` containing rootzone and topsoil total avalable water
 
-     `thRZ`: `thRZClass` :  thRZ object conaining rootzone water content paramaters
+     `thRZ`: `RootZoneWater` :  thRZ object conaining rootzone water content paramaters
 
 
 
@@ -91,9 +91,9 @@ def root_zone_water(
         WrAct = 0
 
     # define total available water, depletion, root zone water content
-    # taw = TAWClass()
-    # Dr = DrClass()
-    # thRZ = thRZClass()
+    # taw = TAW()
+    # Dr = Dr()
+    # thRZ = RootZoneWater()
 
     # Calculate total available water (m3/m3)
     TAW_Rz = max(WrFC - WrWP, 0.0)

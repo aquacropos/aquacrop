@@ -29,18 +29,18 @@ def check_groundwater_table(
 
     *Arguments:*
 
-    `Soil`: `SoilClass` : Soil object containing soil paramaters
+    `Soil`: `Soil` : Soil object containing soil paramaters
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
     `water_table_presence`: int :  indicates if water table is present or not
 
 
     *Returns:*
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
-    `Soil`: `SoilClass` : Soil object containing updated soil paramaters
+    `Soil`: `Soil` : Soil object containing updated soil paramaters
 
 
 

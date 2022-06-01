@@ -13,7 +13,7 @@ class Soil:
 
     `profile` : `pandas.DataFrame` : holds soil profile information
 
-    `Profile` : `SoilProfileClass` : jit class object holdsing soil profile information
+    `Profile` : `SoilProfile` : jit class object holdsing soil profile information
 
     `Hydrology` : `pandas.DataFrame`: holds soil layer hydrology informaiton
 
@@ -478,6 +478,3 @@ class Soil:
             prof.loc[prof.Layer == layer, "bCR"] = prof.Layer.map({layer: bCR})
 
         self.profile = prof
-
-
-SoilClass = Soil

@@ -71,6 +71,3 @@ class ClockStruct:
         self.harvest_dates = []  # list of crop planting dates during simulation
         self.n_seasons = 0  # total number of seasons (plant and harvest)
         self.season_counter = -1  # running counter of seasons
-
-
-ClockStructClass = ClockStruct

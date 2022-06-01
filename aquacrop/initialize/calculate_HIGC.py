@@ -11,12 +11,12 @@ def calculate_HIGC(
 
     *Arguments:*\n
 
-    `crop` : `CropClass` :  Crop object containing crop paramaters
+    `crop` : `Crop` :  Crop object containing crop paramaters
 
 
     *Returns:*
 
-    `crop` : `CropClass` : updated Crop object
+    `crop` : `Crop` : updated Crop object
 
 
     """

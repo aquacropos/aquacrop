@@ -26,7 +26,7 @@ def drainage(prof, th_init, th_fc_Adj_init):
 
 
 
-    `prof`: `SoilProfileClass` : jit class object object containing soil paramaters
+    `prof`: `SoilProfile` : jit class object object containing soil paramaters
 
     `th_init`: `np.array` : initial water content
 
@@ -36,7 +36,7 @@ def drainage(prof, th_init, th_fc_Adj_init):
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
     `DeepPerc`:: `float` : Total Deep Percolation
 

@@ -1,6 +1,6 @@
 import numpy as np
 
-from ..entities.soilProfile import SoilProfileClass, SoilProfileNT
+from ..entities.soilProfile import SoilProfile, SoilProfileNT
 
 
 def create_soil_profile(param_struct):
@@ -10,16 +10,16 @@ def create_soil_profile(param_struct):
 
     *Arguments:*\n
 
-    `param_struct` : `ParamStructClass` :  Contains model crop and soil paramaters
+    `param_struct` : `ParamStruct` :  Contains model crop and soil paramaters
 
     *Returns:*
 
-    `param_struct` : `ParamStructClass` :  updated with soil profile
+    `param_struct` : `ParamStruct` :  updated with soil profile
 
 
     """
 
-    profile = SoilProfileClass(int(param_struct.Soil.profile.shape[0]))
+    profile = SoilProfile(int(param_struct.Soil.profile.shape[0]))
 
     pdf = param_struct.Soil.profile.astype("float64")
 

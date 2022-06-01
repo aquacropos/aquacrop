@@ -42,8 +42,6 @@ class Ksw(object):
         self.sto_lin = 1.0
 
 
-
-KswClass = Ksw
 KswNT = typing.NamedTuple("KswNT", Ksw_spec)
 KswNT_type_sig= types.NamedTuple(tuple(dict(Ksw_spec).values()),KswNT)
 

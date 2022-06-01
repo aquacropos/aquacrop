@@ -40,7 +40,7 @@ def rainfall_partition(
 
     `precipitation`: `float` : Percipitation on current day
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
     `FieldMngt`: `FieldMngtStruct` : field management params
 
@@ -52,7 +52,7 @@ def rainfall_partition(
 
     `Soil_nComp`: `float` : number of compartments
 
-    `prof`: `SoilProfileClass` : Soil object
+    `prof`: `SoilProfile` : Soil object
 
 
     *Returns:*
@@ -61,7 +61,7 @@ def rainfall_partition(
 
     `Infl`: `float` : Total Infiltration
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
 
 

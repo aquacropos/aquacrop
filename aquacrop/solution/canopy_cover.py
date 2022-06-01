@@ -2,10 +2,10 @@
 import os
 import numpy as np
 
-from ..entities.totalAvailableWater import TAWClass
-from ..entities.moistureDepletion import DrClass
+from ..entities.totalAvailableWater import TAW
+from ..entities.moistureDepletion import Dr
 
-from ..entities.waterStressCoefficients import  KswClass
+from ..entities.waterStressCoefficients import  Ksw
 from .adjust_CCx import adjust_CCx
 
 if __name__ != "__main__":
@@ -43,13 +43,13 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
     *Arguments:*
 
 
-    `Crop`: `CropClass` : Crop object
+    `Crop`: `Crop` : Crop object
 
-    `prof`: `SoilProfileClass` : Soil object
+    `prof`: `SoilProfile` : Soil object
 
     `Soil_zTop`: `float` : top soil depth
 
-    `InitCond`: `InitCondClass` : InitCond object
+    `InitCond`: `InitialCondition` : InitCond object
 
     `gdd`: `float` : Growing Degree Days
 
@@ -60,7 +60,7 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : updated InitCond object
+    `NewCond`: `InitialCondition` : updated InitCond object
 
 
     """
@@ -82,10 +82,10 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
     ## Calculate canopy development (if in growing season) ##
     if growing_season == True:
         # Calculate root zone water content
-        taw = TAWClass()
-        Dr = DrClass()
-        # thRZ = thRZClass()
-        _, Dr.Zt, Dr.Rz, taw.Zt, taw.Rz, _,_,_,_,_,_ = root_zone_water(
+        taw = TAW()
+        root_zone_depletion = Dr()
+        # thRZ = RootZoneWater()
+        _, root_zone_depletion.Zt, root_zone_depletion.Rz, taw.Zt, taw.Rz, _,_,_,_,_,_ = root_zone_water(
             prof,
             float(NewCond.z_root),
             NewCond.th,
@@ -94,35 +94,35 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
             Crop.Aer,
         )
 
-        # _,Dr,taw,_ = root_zone_water(Soil_Profile,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+        # _,root_zone_depletion,taw,_ = root_zone_water(Soil_Profile,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Check whether to use root zone or top soil depletions for calculating
         # water stress
-        if (Dr.Rz / taw.Rz) <= (Dr.Zt / taw.Zt):
+        if (root_zone_depletion.Rz / taw.Rz) <= (root_zone_depletion.Zt / taw.Zt):
             # Root zone is wetter than top soil, so use root zone value
-            Dr = Dr.Rz
+            root_zone_depletion = root_zone_depletion.Rz
             taw = taw.Rz
         else:
             # Top soil is wetter than root zone, so use top soil values
-            Dr = Dr.Zt
+            root_zone_depletion = root_zone_depletion.Zt
             taw = taw.Zt
 
         # Determine if water stress is occurring
         beta = True
-        Ksw = KswClass()
-        Ksw.exp, Ksw.sto, Ksw.sen, Ksw.pol, Ksw.sto_lin = water_stress(
+        water_stress_coef = Ksw()
+        water_stress_coef.exp, water_stress_coef.sto, water_stress_coef.sen, water_stress_coef.pol, water_stress_coef.sto_lin = water_stress(
             Crop.p_up,
             Crop.p_lo,
             Crop.ETadj,
             Crop.beta,
             Crop.fshape_w,
             NewCond.t_early_sen,
-            Dr,
+            root_zone_depletion,
             taw,
             et0,
             beta,
         )
 
-        # water_stress(Crop, NewCond, Dr, taw, et0, beta)
+        # water_stress(Crop, NewCond, root_zone_depletion, taw, et0, beta)
 
         # Get canopy cover growth time
         if Crop.CalendarType == 1:
@@ -207,7 +207,7 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
                 if InitCond_CC < (0.9799 * Crop.CCx):
                     # Adjust canopy growth coefficient for leaf expansion water
                     # stress effects
-                    CGCadj = Crop.CGC * Ksw.exp
+                    CGCadj = Crop.CGC * water_stress_coef.exp
                     if CGCadj > 0:
 
                         # Adjust CCx for change in CGC
@@ -320,7 +320,7 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
             if (tCCadj < Crop.Senescence) or (InitCond_tEarlySen > 0):
                 # Check for early canopy senescence  due to severe water
                 # stress.
-                if (Ksw.sen < 1) and (InitCond_ProtectedSeed == False):
+                if (water_stress_coef.sen < 1) and (InitCond_ProtectedSeed == False):
 
                     # Early canopy senescence
                     NewCond.premat_senes = True
@@ -333,25 +333,25 @@ def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
                     # Adjust canopy decline coefficient for water stress
                     beta = False
 
-                    Ksw = KswClass()
-                    Ksw.exp, Ksw.sto, Ksw.sen, Ksw.pol, Ksw.sto_lin = water_stress(
+                    water_stress_coef = Ksw()
+                    water_stress_coef.exp, water_stress_coef.sto, water_stress_coef.sen, water_stress_coef.pol, water_stress_coef.sto_lin = water_stress(
                         Crop.p_up,
                         Crop.p_lo,
                         Crop.ETadj,
                         Crop.beta,
                         Crop.fshape_w,
                         NewCond.t_early_sen,
-                        Dr,
+                        root_zone_depletion,
                         taw,
                         et0,
                         beta,
                     )
 
-                    # Ksw = water_stress(Crop, NewCond, Dr, taw, et0, beta)
-                    if Ksw.sen > 0.99999:
+                    # water_stress_coef = water_stress(Crop, NewCond, root_zone_depletion, taw, et0, beta)
+                    if water_stress_coef.sen > 0.99999:
                         CDCadj = 0.0001
                     else:
-                        CDCadj = (1 - (Ksw.sen ** 8)) * Crop.CDC
+                        CDCadj = (1 - (water_stress_coef.sen ** 8)) * Crop.CDC
 
                     # Get new canpy cover size after senescence
                     if NewCond.ccx_early_sen < 0.001:

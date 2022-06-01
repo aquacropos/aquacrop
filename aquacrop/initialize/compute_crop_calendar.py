@@ -18,16 +18,16 @@ def compute_crop_calendar(
 
     *Arguments:*\n
 
-    `crop` : `CropClass` :  Crop object containing crop paramaters
+    `crop` : `Crop` :  Crop object containing crop paramaters
 
-    `clock_struct` : `ClockStructClass` :  model time paramaters
+    `clock_struct` : `ClockStruct` :  model time paramaters
 
     `weather_df`: `pandas.DataFrame` :  weather data for simulation period
 
 
     *Returns:*
 
-    `crop` : `CropClass` : updated Crop object
+    `crop` : `Crop` : updated Crop object
 
 
 

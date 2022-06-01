@@ -14,16 +14,16 @@ def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
 
     *Arguments:*\n
 
-    `ClockStruct` : `ClockStructClass` :  model time paramaters
+    `ClockStruct` : `ClockStruct` :  model time paramaters
 
-    `InitCond` : `InitCondClass` :  containing current model paramaters
+    `InitCond` : `InitialCondition` :  containing current model paramaters
 
     `weather`: `np.array` :  weather data for simulation period
 
 
     *Returns:*
 
-    `InitCond` : `InitCondClass` :  containing reset model paramaters
+    `InitCond` : `InitialCondition` :  containing reset model paramaters
 
 
 

@@ -2,7 +2,7 @@
 Inititalize clocks parameters
 """
 import pandas as pd
-from ..entities.clockStruct import ClockStructClass
+from ..entities.clockStruct import ClockStruct
 
 
 def read_clock_paramaters(sim_start_time, sim_end_time, off_season=False):
@@ -34,7 +34,7 @@ def read_clock_paramaters(sim_start_time, sim_end_time, off_season=False):
     pandas_sim_end_time = pd.to_datetime(sim_end_time)
 
     # create ClockStruct object
-    clock_sctruct = ClockStructClass()
+    clock_sctruct = ClockStruct()
 
     # Add variables
     clock_sctruct.simulation_start_date = pandas_sim_start_time

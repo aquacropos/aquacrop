@@ -14,9 +14,9 @@ def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, water_ta
 
 
 
-    `Soil`: `SoilClass` : Soil object
+    `Soil`: `Soil` : Soil object
 
-    `NewCond`: `InitCondClass` : InitCond object containing model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing model paramaters
 
     `FluxOut`: `np.array` : FLux of water out of each soil compartment
 
@@ -26,7 +26,7 @@ def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, water_ta
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
     `CrTot`: `float` : Total Capillary rise
 

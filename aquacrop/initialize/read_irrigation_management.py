@@ -11,16 +11,16 @@ def read_irrigation_management(ParamStruct, IrrMngt, ClockStruct):
 
     *Arguments:*\n
 
-    `ParamStruct` : `ParamStructClass` :  Contains model crop and soil paramaters
+    `ParamStruct` : `ParamStruct` :  Contains model crop and soil paramaters
 
     `IrrMngt` : `IrrMngtClass` :  irr mngt params object
 
-    `ClockStruct` : `ClockStructClass` :  time paramaters
+    `ClockStruct` : `ClockStruct` :  time paramaters
 
 
     *Returns:*
 
-    `ParamStruct` : `ParamStructClass` :  updated model paramaters
+    `ParamStruct` : `ParamStruct` :  updated model paramaters
 
 
 

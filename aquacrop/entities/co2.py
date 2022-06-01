@@ -25,4 +25,3 @@ class CO2(object):
         self.current_concentration = 0.0
 
 
-CO2Class = CO2

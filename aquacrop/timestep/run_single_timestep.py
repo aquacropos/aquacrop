@@ -2,8 +2,8 @@ import os
 import numpy as np
 
 
-from ..entities.totalAvailableWater import TAWClass
-from ..entities.moistureDepletion import DrClass
+from ..entities.totalAvailableWater import TAW
+from ..entities.moistureDepletion import Dr
 from ..entities.crop import CropStructNT
 
 from ..solution.pre_irrigation import pre_irrigation
@@ -50,19 +50,19 @@ def solution_single_time_step(
 
     *Arguments:*\n
 
-    `init_cond` : `InitCondClass` :  containing current model paramaters
+    `init_cond` : `InitialCondition` :  containing current model paramaters
 
-    `clock_struct` : `ClockStructClass` :  model time paramaters
+    `clock_struct` : `ClockStruct` :  model time paramaters
 
     `weather_step`: `np.array` :  containing precipitation,ET,temp_max,temp_min for current day
 
-    `outputs` : `OutputClass` :  object to store outputs
+    `outputs` : `Output` :  object to store outputs
 
     *Returns:*
 
-    `NewCond` : `InitCondClass` :  containing updated model paramaters
+    `NewCond` : `InitialCondition` :  containing updated model paramaters
 
-    `outputs` : `OutputClass` :  object to store outputs
+    `outputs` : `Output` :  object to store outputs
 
 
 
@@ -422,11 +422,11 @@ def solution_single_time_step(
         NewCond.yield_ = 0
 
     # 19. Root zone water
-    _TAW = TAWClass()
-    _Dr = DrClass()
-    # thRZ = thRZClass()
+    _TAW = TAW()
+    _water_root_depletion = Dr()
+    # thRZ = RootZoneWater()
 
-    Wr, _Dr.Zt, _Dr.Rz, _TAW.Zt, _TAW.Rz, _, _, _, _, _, _ = root_zone_water(
+    Wr, _water_root_depletion.Zt, _water_root_depletion.Rz, _TAW.Zt, _TAW.Rz, _, _, _, _, _, _ = root_zone_water(
         Soil.Profile,
         float(NewCond.z_root),
         NewCond.th,
@@ -458,7 +458,7 @@ def solution_single_time_step(
         IrrDay = 0
         IrrTot = 0
 
-        NewCond.depletion = _Dr.Rz
+        NewCond.depletion = _water_root_depletion.Rz
         NewCond.taw = _TAW.Rz
 
     # Water contents

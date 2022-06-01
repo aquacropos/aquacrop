@@ -29,13 +29,13 @@ def water_stress(
     *Arguments:*
 
 
-    `Crop`: `CropClass` : Crop Object
+    `Crop`: `Crop` : Crop Object
 
-    `InitCond`: `InitCondClass` : InitCond object
+    `InitCond`: `InitialCondition` : InitCond object
 
-    `Dr`: `DrClass` : depletion object (contains rootzone and top soil depletion totals)
+    `Dr`: `Dr` : depletion object (contains rootzone and top soil depletion totals)
 
-    `taw`: `TAWClass` : taw object (contains rootzone and top soil total available water)
+    `taw`: `TAW` : taw object (contains rootzone and top soil total available water)
 
     `et0`: `float` : Reference Evapotranspiration
 
@@ -44,7 +44,7 @@ def water_stress(
 
     *Returns:*
 
-    `Ksw`: `KswClass` : Ksw object containint water stress coefficients
+    `Ksw`: `Ksw` : Ksw object containint water stress coefficients
 
     """
 
@@ -91,7 +91,7 @@ def water_stress(
     for ii in range(3):
         Ks[ii] = 1 - ((np.exp(Drel[ii] * Crop_fshape_w[ii]) - 1) / (np.exp(Crop_fshape_w[ii]) - 1))
 
-    # Ksw = KswClass()
+    # Ksw = Ksw()
 
     # Water stress coefficient for leaf expansion
     Ksw_Exp = Ks[0]

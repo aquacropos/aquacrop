@@ -36,9 +36,9 @@ def biomass_accumulation(
 
 
 
-    `Crop`: `CropClass` : Crop object
+    `Crop`: `Crop` : Crop object
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
     `Tr`: `float` : Daily transpiration
 
@@ -51,7 +51,7 @@ def biomass_accumulation(
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
 
 

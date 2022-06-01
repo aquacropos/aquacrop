@@ -35,9 +35,9 @@ def HIref_current_day(
 
 
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
-    `Crop`: `CropClass` : Crop object containing Crop paramaters
+    `Crop`: `Crop` : Crop object containing Crop paramaters
 
     `growing_season`: `bool` : is growing season (True or Flase)
 
@@ -45,7 +45,7 @@ def HIref_current_day(
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
 
 

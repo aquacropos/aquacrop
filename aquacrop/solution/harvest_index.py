@@ -2,8 +2,8 @@
 
 import os
 import numpy as np
-from ..entities.totalAvailableWater import TAWClass
-from ..entities.moistureDepletion import DrClass
+from ..entities.totalAvailableWater import TAW
+from ..entities.moistureDepletion import Dr
 from ..entities.waterStressCoefficients import  KswNT
 from ..entities.temperatureStressCoefficients import   KstNT
 
@@ -45,11 +45,11 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, et0, temp_max, temp_min, grow
     *Arguments:*
 
 
-    `Soil`: `SoilClass` : Soil object containing soil paramaters
+    `Soil`: `Soil` : Soil object containing soil paramaters
 
-    `Crop`: `CropClass` : Crop object containing Crop paramaters
+    `Crop`: `Crop` : Crop object containing Crop paramaters
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
     `et0`: `float` : reference evapotranspiration on current day
 
@@ -63,7 +63,7 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, et0, temp_max, temp_min, grow
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
 
 
@@ -80,10 +80,10 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, et0, temp_max, temp_min, grow
     if growing_season == True:
         # Calculate root zone water content
 
-        taw = TAWClass()
-        Dr = DrClass()
-        # thRZ = thRZClass()
-        _, Dr.Zt, Dr.Rz, taw.Zt, taw.Rz, _,_,_,_,_,_, = root_zone_water(
+        taw = TAW()
+        water_root_depletion = Dr()
+        # thRZ = RootZoneWater()
+        _, water_root_depletion.Zt, water_root_depletion.Rz, taw.Zt, taw.Rz, _,_,_,_,_,_, = root_zone_water(
             prof,
             float(NewCond.z_root),
             NewCond.th,
@@ -92,22 +92,22 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, et0, temp_max, temp_min, grow
             Crop.Aer,
         )
 
-        # _,Dr,taw,_ = root_zone_water(Soil_Profile,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+        # _,water_root_depletion,taw,_ = root_zone_water(Soil_Profile,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Check whether to use root zone or top soil depletions for calculating
         # water stress
-        if (Dr.Rz / taw.Rz) <= (Dr.Zt / taw.Zt):
+        if (water_root_depletion.Rz / taw.Rz) <= (water_root_depletion.Zt / taw.Zt):
             # Root zone is wetter than top soil, so use root zone value
-            Dr = Dr.Rz
+            water_root_depletion = water_root_depletion.Rz
             taw = taw.Rz
         else:
             # Top soil is wetter than root zone, so use top soil values
-            Dr = Dr.Zt
+            water_root_depletion = water_root_depletion.Zt
             taw = taw.Zt
 
         # Calculate water stress
         beta = True
-        # Ksw = water_stress(Crop, NewCond, Dr, taw, et0, beta)
-        # Ksw = KswClass()
+        # Ksw = water_stress(Crop, NewCond, water_root_depletion, taw, et0, beta)
+        # Ksw = Ksw()
         Ksw_Exp, Ksw_Sto, Ksw_Sen, Ksw_Pol, Ksw_StoLin = water_stress(
             Crop.p_up,
             Crop.p_lo,
@@ -115,7 +115,7 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, et0, temp_max, temp_min, grow
             Crop.beta,
             Crop.fshape_w,
             NewCond.t_early_sen,
-            Dr,
+            water_root_depletion,
             taw,
             et0,
             beta,

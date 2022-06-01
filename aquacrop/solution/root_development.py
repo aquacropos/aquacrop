@@ -44,9 +44,9 @@ def root_development(Crop,
 
     `Crop`: `CropStruct` : jit class object containing Crop paramaters
 
-    `prof`: `SoilProfileClass` : jit class object containing soil paramaters
+    `prof`: `SoilProfile` : jit class object containing soil paramaters
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
     `gdd`: `float` : Growing degree days on current day
 
@@ -57,7 +57,7 @@ def root_development(Crop,
 
     *Returns:*
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
 
     """

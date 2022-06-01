@@ -14,11 +14,11 @@ def germination(InitCond, Soil_zGerm, prof, Crop_GermThr, Crop_PlantMethod, gdd,
     *Arguments:*
 
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
     `Soil_zGerm`: `float` : Soil depth affecting germination
 
-    `prof`: `SoilProfileClass` : Soil object containing soil paramaters
+    `prof`: `SoilProfile` : Soil object containing soil paramaters
 
     `Crop_GermThr`: `float` : Crop germination threshold
 
@@ -32,7 +32,7 @@ def germination(InitCond, Soil_zGerm, prof, Crop_GermThr, Crop_PlantMethod, gdd,
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
 
 

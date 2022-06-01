@@ -1,10 +1,10 @@
 
 import os
 import numpy as np
-from ..entities.totalAvailableWater import TAWClass
-from ..entities.moistureDepletion import DrClass
-from ..entities.rootZoneWaterContent import thRZClass, thRZNT
-from ..entities.waterStressCoefficients import  KswClass,  KswNT
+from ..entities.totalAvailableWater import TAW
+from ..entities.moistureDepletion import Dr
+from ..entities.rootZoneWaterContent import RootZoneWater, thRZNT
+from ..entities.waterStressCoefficients import  Ksw,  KswNT
 
 
 # This compiled function is called a few times inside other functions
@@ -51,17 +51,17 @@ def transpiration(
     *Arguments:*
 
 
-    `Soil`: `SoilClass` : Soil object
+    `Soil`: `Soil` : Soil object
 
-    `Crop`: `CropClass` : Crop object
+    `Crop`: `Crop` : Crop object
 
     `IrrMngt`: `IrrMngt`: object containing irrigation management params
 
-    `InitCond`: `InitCondClass` : InitCond object
+    `InitCond`: `InitialCondition` : InitCond object
 
     `et0`: `float` : reference evapotranspiration
 
-    `CO2`: `CO2class` : CO2
+    `CO2`: `CO2` : CO2
 
     `gdd`: `float` : Growing Degree Days
 
@@ -76,7 +76,7 @@ def transpiration(
 
     `TrPot0`: `float` : Potential Transpiration on current day
 
-    `NewCond`: `InitCondClass` : updated InitCond object
+    `NewCond`: `InitialCondition` : updated InitCond object
 
     `IrrNet`: `float` : Net Irrigation (if required)
 
@@ -226,13 +226,13 @@ def transpiration(
         # Determine root zone and top soil depletion, and root zone water
         # content
 
-        taw = TAWClass()
-        Dr = DrClass()
-        thRZ = thRZClass()
+        taw = TAW()
+        water_root_depletion = Dr()
+        thRZ = RootZoneWater()
         (
             _,
-            Dr.Zt,
-            Dr.Rz,
+            water_root_depletion.Zt,
+            water_root_depletion.Rz,
             taw.Zt,
             taw.Rz,
             thRZ.Act,
@@ -253,39 +253,39 @@ def transpiration(
         class_args = {key:value for key, value in thRZ.__dict__.items() if not key.startswith('__') and not callable(key)}
         thRZ = thRZNT(**class_args)
 
-        # _,Dr,taw,thRZ = root_zone_water(Soil_Profile,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
+        # _,water_root_depletion,taw,thRZ = root_zone_water(Soil_Profile,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Check whether to use root zone or top soil depletions for calculating
         # water stress
-        if (Dr.Rz / taw.Rz) <= (Dr.Zt / taw.Zt):
+        if (water_root_depletion.Rz / taw.Rz) <= (water_root_depletion.Zt / taw.Zt):
             # Root zone is wetter than top soil, so use root zone value
-            Dr = Dr.Rz
+            water_root_depletion = water_root_depletion.Rz
             taw = taw.Rz
         else:
             # Top soil is wetter than root zone, so use top soil values
-            Dr = Dr.Zt
+            water_root_depletion = water_root_depletion.Zt
             taw = taw.Zt
 
         # Calculate water stress coefficients
         beta = True
-        Ksw = KswClass()
-        Ksw.exp, Ksw.sto, Ksw.sen, Ksw.pol, Ksw.sto_lin = water_stress(
+        water_stress_coef = Ksw()
+        water_stress_coef.exp, water_stress_coef.sto, water_stress_coef.sen, water_stress_coef.pol, water_stress_coef.sto_lin = water_stress(
             Crop.p_up,
             Crop.p_lo,
             Crop.ETadj,
             Crop.beta,
             Crop.fshape_w,
             NewCond.t_early_sen,
-            Dr,
+            water_root_depletion,
             taw,
             et0,
             beta,
         )
-        # Ksw = water_stress(Crop, NewCond, Dr, taw, et0, beta)
+        # water_stress_coef = water_stress(Crop, NewCond, water_root_depletion, taw, et0, beta)
 
         # Calculate aeration stress coefficients
         Ksa_Aer, NewCond.aer_days = aeration_stress(NewCond.aer_days, Crop.LagAer, thRZ)
         # Maximum stress effect
-        Ks = min(Ksw.sto_lin, Ksa_Aer)
+        Ks = min(water_stress_coef.sto_lin, Ksa_Aer)
         # Update potential transpiration in root zone
         if IrrMngt_IrrMethod != 4:
             # No adjustment to TrPot for water stress when in net irrigation mode
@@ -441,13 +441,13 @@ def transpiration(
             IrrNet = 0
             # Get root zone water content
 
-            taw = TAWClass()
-            Dr = DrClass()
-            thRZ = thRZClass()
+            taw = TAW()
+            water_root_depletion = Dr()
+            thRZ = RootZoneWater()
             (
                 _,
-                Dr.Zt,
-                Dr.Rz,
+                water_root_depletion.Zt,
+                water_root_depletion.Rz,
                 taw.Zt,
                 taw.Rz,
                 thRZ.Act,
@@ -466,7 +466,7 @@ def transpiration(
             )
 
             # _,_Dr,_TAW,thRZ = root_zone_water(Soil_Profile,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
-            NewCond.depletion = Dr.Rz
+            NewCond.depletion = water_root_depletion.Rz
             NewCond.taw = taw.Rz
             # Determine critical water content for net irrigation
             thCrit = thRZ.WP + ((IrrMngt_NetIrrSMT / 100) * (thRZ.FC - thRZ.WP))

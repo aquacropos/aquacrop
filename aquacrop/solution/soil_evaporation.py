@@ -91,7 +91,7 @@ def soil_evaporation(
 
     `FieldMngt`: `FieldMngtStruct` : Field management paramaters
 
-    `InitCond`: `InitCondClass` : InitCond object containing model paramaters
+    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
 
     `et0`: `float` : daily reference evapotranspiration
 
@@ -107,7 +107,7 @@ def soil_evaporation(
     *Returns:*
 
 
-    `NewCond`: `InitCondClass` : InitCond object containing updated model paramaters
+    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
 
     `EsAct`: `float` : Actual surface evaporation current day
 
@@ -119,7 +119,7 @@ def soil_evaporation(
 
     """
 
-    # Wevap = WevapClass()
+    # Wevap = WaterEvaporation()
 
     ## Store initial conditions in new structure that will be updated ##
     # NewCond = InitCond
