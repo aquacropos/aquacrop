@@ -7,8 +7,8 @@ import pandas as pd
 from aquacrop.utils.data import get_filepath
 from aquacrop.core import AquaCropModel
 from aquacrop.utils.prepare_weather import prepare_weather
-from aquacrop.entities.soil import SoilClass
-from aquacrop.entities.crop import CropClass
+from aquacrop.entities.soil import Soil
+from aquacrop.entities.crop import Crop
 from aquacrop.entities.inititalWaterContent import InitialWaterContent
 from aquacrop.entities.irrigationManagement import IrrMngtClass
 
@@ -25,8 +25,8 @@ class TestIrrigation(unittest.TestCase):
 
     _weather_data = prepare_weather(weather_file_path)
 
-    _sandy_loam = SoilClass(soil_type="SandyLoam")
-    _wheat = CropClass("Maize", planting_date="05/01")
+    _sandy_loam = Soil(soil_type="SandyLoam")
+    _wheat = Crop("Maize", planting_date="05/01")
     _initial_water_content = InitialWaterContent(value=["FC"])
 
     def test_rainfed_strategy(self):
