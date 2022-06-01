@@ -57,55 +57,30 @@ class AquaCropModel:
 
     Arguments:
 
-    sim_start_time : date YYYY/MM/DD
-            Simulation start date
+        sim_start_time (str): YYYY/MM/DD, Simulation start date
 
-    sim_end_time : date YYYY/MM/DD
-            Simulation end date
+        sim_end_time (str): date YYYY/MM/DD, Simulation end date
 
-    weather_df: pandas.DataFrame
-            Weather data (TODO: SPECIFY DATA TYPE)
+        weather_df: daily weather data , created using prepare_weather
 
-    soil: Soil Object
-            Soil object contains paramaters and variables of the soil
-            used in the simulation
+        soil: Soil object contains paramaters and variables of the soil
+                used in the simulation
 
-    crop: Crop Object
-            Crop object contains Paramaters and variables of the crop used
-            in the simulation
+        crop: Crop object contains Paramaters and variables of the crop used
+                in the simulation
 
-    initial_water_content: InitialWaterContent Object
-            Defines water content at start of simulation
+        initial_water_content: Defines water content at start of simulation
 
-    irrigation_management: IrrigationManagement Object
-            Defines irrigation strategy
+        irrigation_management: Defines irrigation strategy
 
-    field_management: FieldMngt Obj
-            Defines field management options`
+        field_management: Defines field management options
 
-    fallow_field_management:
-            TODO: Define it.
+        fallow_field_management: Defines field management options during fallow period
 
-    groundwater: GroundWater object
-            Stores information on water table params
+        groundwater: Stores information on water table parameters
 
+        co2_concentration: Defines CO2 concentrations
 
-    co2_concentration: CO2 object
-            Defines CO2 concentrations
-
-    METHODS:
-
-    run_model(): Run the model.
-
-    get_simulation_results(): Get the final results.
-
-    get_water_storage(): Get the water storage values.
-
-    get_water_flux(): Get the water flux values.
-
-    get_crop_growth(): Get the crop growth values.
-
-    get_additional_information(): Get additional information of the model.
 
     """
 
@@ -279,14 +254,18 @@ class AquaCropModel:
 
         Arguments:
 
-            num_steps: int
-                    Number of stepts (Days) to be executed.
+            num_steps: Number of steps (Days) to be executed.
 
-            till_termination: boolean
-                    Run the simulation to completion
+            till_termination: Run the simulation to completion
+
+            initialize_model: Whether to initialize the model \
+            (i.e., go back to beginning of season)
+
+            process_outputs: process outputs into dataframe before \
+                simulation is finished
 
         Returns:
-            bool -> True if finished
+            True if finished
         """
 
         if initialize_model:
@@ -444,12 +423,8 @@ class AquaCropModel:
         """
         Additional model information.
 
-           Returns:
-               dict:
-
-                   has_model_finished (boolean): Determines if the model is finished
-
-                   execution_time : Time taken for the model to run
+        Returns:
+            dict: {has_model_finished,execution_time}
 
         """
         if self.__has_model_executed:
