@@ -22,9 +22,9 @@ nav:
 
   - API:
     - Core: core.md
-    # - Classes: classes.md
-    # - Initialize: initialize.md
-    # - Solution: solution.md
-    # - Timestep: timestep.md
-    # - Comparison: comparison.md
+    - Entities: entities.md
+    - Initialize: initialize.md
+    - Solution: solution.md
+    - Timestep: timestep.md
+    - Utils: utils.md
     # - Lars: lars.md
