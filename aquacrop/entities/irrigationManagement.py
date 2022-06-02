@@ -84,7 +84,6 @@ class IrrigationManagement:
 
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in allowed_keys)
 
-IrrMngtClass = IrrigationManagement
 
 spec = [
     ("irrigation_method", int64),

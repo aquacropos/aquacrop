@@ -7,5 +7,3 @@ if not '-m' in sys.argv:
     from .entities.irrigationManagement import IrrigationManagement
     from .entities.fieldManagement import FieldMngt
     from .entities.groundWater import  GroundWater
-    from .utils.prepare_weather import prepare_weather
-    from .utils.data import get_filepath

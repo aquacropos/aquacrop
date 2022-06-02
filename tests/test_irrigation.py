@@ -1,16 +1,17 @@
-'''
+"""
 Test file for irrigation
-'''
+"""
 import unittest
 import pandas as pd
 
-from aquacrop.utils.data import get_filepath
-from aquacrop.core import AquaCropModel
-from aquacrop.utils.prepare_weather import prepare_weather
-from aquacrop.entities.soil import Soil
-from aquacrop.entities.crop import Crop
-from aquacrop.entities.inititalWaterContent import InitialWaterContent
-from aquacrop.entities.irrigationManagement import IrrMngtClass
+from aquacrop import (
+    AquaCropModel,
+    Soil,
+    Crop,
+    InitialWaterContent,
+    IrrigationManagement,
+)
+from aquacrop.utils import prepare_weather, get_filepath
 
 
 class TestIrrigation(unittest.TestCase):
@@ -33,7 +34,7 @@ class TestIrrigation(unittest.TestCase):
         """
         Rainfed methodology
         """
-        irrigation = IrrMngtClass(irrigation_method=0)
+        irrigation = IrrigationManagement(irrigation_method=0)
 
         model_os = AquaCropModel(
             sim_start_time=self._sim_start,
@@ -57,7 +58,7 @@ class TestIrrigation(unittest.TestCase):
         """
         Threshold methodology
         """
-        irrigation = IrrMngtClass(irrigation_method=1, SMT=[40, 60, 70, 30] * 4)
+        irrigation = IrrigationManagement(irrigation_method=1, SMT=[40, 60, 70, 30] * 4)
 
         model_os = AquaCropModel(
             sim_start_time=self._sim_start,
@@ -72,7 +73,7 @@ class TestIrrigation(unittest.TestCase):
         model_os.run_model(till_termination=True)
 
         final_statistics = model_os.get_simulation_results().head(10)
-      
+
         yied_1_expected = 12.65
         yield_1_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
 
@@ -88,7 +89,7 @@ class TestIrrigation(unittest.TestCase):
         7 days interval methodology
         """
 
-        irrigation = IrrMngtClass(irrigation_method=2, IrrInterval=7)
+        irrigation = IrrigationManagement(irrigation_method=2, IrrInterval=7)
 
         model_os = AquaCropModel(
             sim_start_time=self._sim_start,
@@ -121,7 +122,7 @@ class TestIrrigation(unittest.TestCase):
             self._sim_start, self._sim_end
         )
         # print(irrigationSchedule)
-        irrigate_schedule = IrrMngtClass(
+        irrigate_schedule = IrrigationManagement(
             irrigation_method=3, Schedule=irrigation_schedule_df
         )
 
@@ -153,7 +154,7 @@ class TestIrrigation(unittest.TestCase):
         """
         Net methodology
         """
-        irrigation = IrrMngtClass(irrigation_method=4, NetIrrSMT=70)
+        irrigation = IrrigationManagement(irrigation_method=4, NetIrrSMT=70)
 
         model_os = AquaCropModel(
             sim_start_time=self._sim_start,

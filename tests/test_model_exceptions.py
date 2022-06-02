@@ -3,12 +3,8 @@ Test exeptions in the model.
 """
 import unittest
 
-from aquacrop.utils.data import get_filepath
-from aquacrop.utils.prepare_weather import prepare_weather
-from aquacrop.core import AquaCropModel
-from aquacrop.entities.soil import Soil
-from aquacrop.entities.crop import Crop
-from aquacrop.entities.inititalWaterContent import InitialWaterContent
+from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent
+from aquacrop.utils import prepare_weather, get_filepath
 
 
 class TestModelExceptions(unittest.TestCase):

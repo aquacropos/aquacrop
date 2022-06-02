@@ -13,7 +13,7 @@ def read_irrigation_management(ParamStruct, IrrMngt, ClockStruct):
 
     `ParamStruct` : `ParamStruct` :  Contains model crop and soil paramaters
 
-    `IrrMngt` : `IrrMngtClass` :  irr mngt params object
+    `IrrMngt` : `IrrigationManagement` :  irr mngt params object
 
     `ClockStruct` : `ClockStruct` :  time paramaters
 
