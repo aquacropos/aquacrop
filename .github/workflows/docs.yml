@@ -23,6 +23,5 @@ jobs:
             git remote rm origin
             git remote add origin "${remote_repo}"
             mkdocs gh-deploy --force
-            env:
         env: 
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
