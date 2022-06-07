@@ -4,7 +4,13 @@ theme:
 
 plugins:
     - search
-    - mkdocstrings
+    - mkdocstrings:
+        handlers:
+            python:
+                paths: [.]
+                options:
+                    show_root_heading: true
+
     - mkdocs-jupyter:
           include_source: True
           ignore_h1_titles: True

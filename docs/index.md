@@ -16,7 +16,7 @@ from aquacrop.utils import prepare_weather, get_filepath
 
 
 weather_file_path = get_filepath('tunis_climate.txt')
-modelOs = AquaCropModel(
+model_os = AquaCropModel(
             sim_start_time=f"{1979}/10/01",
             sim_end_time=f"{1985}/05/30",
             weather_df=prepare_weather(weather_file_path),
