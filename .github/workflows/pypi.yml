@@ -1,17 +1,18 @@
-name: pypi
+name: Publish Package to Pypi
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - "v*"
 jobs:
-  deploy:
+  build:
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: '3.9'
     - name: Install dependencies
@@ -23,19 +24,18 @@ jobs:
         TWINE_USERNAME: "__token__"
         TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
       run: |
-        pip install twine
+        pip3 install build
+        pip3 install twine
         rm -rf dist
-        python setup.py sdist --nocompile
-        twine upload --repository testpypi dist/*
-
+        python3 -m build
+        python3 -m twine upload --repository testpypi dist/* --verbose
     - name: Build and publish on pypi
       env:
         TWINE_USERNAME: "__token__"
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
       run: |
-        pip install twine
+        pip3 install build
+        pip3 install twine
         rm -rf dist
-        python setup.py sdist --nocompile
-        twine upload --repository pypi dist/*
-
-        
+        python3 -m build
+        python3 -m twine upload --repository pypi dist/* --verbose

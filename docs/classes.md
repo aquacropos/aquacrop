@@ -1,3 +1,0 @@
-# classes
-
-::: aquacrop.classes

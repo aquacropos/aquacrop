@@ -1,3 +1,0 @@
-# lars
-
-::: aquacrop.lars

@@ -2,11 +2,29 @@
 
 ## How to get started
 
-Before anything else, please install the git hooks that run automatic scripts during each commit and merge to strip the notebooks of superfluous metadata (and avoid merge conflicts). After cloning the repository, run the following command inside it:
-```
-nbdev_install_git_hooks
+Install a virtualenv enviroment to test the code before publishing it to github.
+
+Example:
+```bash
+virtualenv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
+Test the library before uploading changes
+
+example using numba:
+Note: You have to delete the compiled files if you want to retest the changes.
+```bash
+python -m unittest
+```
+
+example without using numba:
+```bash
+DEVELOPMENT="TRUE" python -m unittest 
+```
+
+It is very important to respect the lint rules. If you use VSCode, download the linting flake8 and pylint
 ## Did you find a bug?
 
 * Ensure the bug was not already reported by searching on GitHub under Issues.

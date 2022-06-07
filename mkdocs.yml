@@ -19,11 +19,12 @@ nav:
     - Optimizing Irrigation: notebooks/AquaCrop_OSPy_Notebook_3.ipynb
     - Climate Change Impacts: notebooks/AquaCrop_OSPy_Notebook_4.ipynb
     - Comparison with AquaCrop Windows: notebooks/05_comparison.ipynb
+
   - API:
     - Core: core.md
-    - Classes: classes.md
+    - Entities: entities.md
     - Initialize: initialize.md
     - Solution: solution.md
     - Timestep: timestep.md
-    - Comparison: comparison.md
-    - Lars: lars.md
+    - Utils: utils.md
+    # - Lars: lars.md
