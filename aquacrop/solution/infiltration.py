@@ -89,6 +89,8 @@ def infiltration(
 
     Soil_nComp = thnew.shape[0]
 
+    Infl = max(Infl,0.)
+
     ## Update infiltration rate for irrigation ##
     # Note: irrigation amount adjusted for specified application efficiency
     if growing_season == True:
