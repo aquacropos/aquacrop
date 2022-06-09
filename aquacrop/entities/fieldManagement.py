@@ -1,33 +1,29 @@
-
 from numba import float64, int64, boolean, types
 
 
 class FieldMngt:
     """
-    Field Management Class
+    Field Management Class containing mulches and bunds parameters
 
-    **Attributes:**\n
+    Attributes:
 
+        mulches (bool):  Soil surface covered by mulches (yield_ or N)
 
-    `mulches` : `bool` :  Soil surface covered by mulches (yield_ or N)
+        bunds (bool):  Surface bunds present (yield_ or N)
 
-    `bunds` : `bool` :  Surface bunds present (yield_ or N)
+        curve_number_adj (bool): Field conditions affect curve number (yield_ or N)
 
-    `curve_number_adj` : `bool` : Field conditions affect curve number (yield_ or N)
+        sr_inhb (bool): Management practices fully inhibit surface runoff (yield_ or N)
 
-    `sr_inhb` : `bool` : Management practices fully inhibit surface runoff (yield_ or N)
+        mulch_pct (float):  Area of soil surface covered by mulches (%)
 
+        f_mulch (float): Soil evaporation adjustment factor due to effect of mulches
 
+        z_bund (float): Bund height (m)
 
-    `mulch_pct` : `float` :  Area of soil surface covered by mulches (%)
+        bund_water (float): Initial water height in surface bunds (mm)
 
-    `f_mulch` : `float` : Soil evaporation adjustment factor due to effect of mulches
-
-    `z_bund` : `float` : Bund height (m)
-
-    `bund_water` : `float` : Initial water height in surface bunds (mm)
-
-    `curve_number_adj_pct` : `float` : Percentage change in curve number (positive or negative)
+        curve_number_adj_pct (float): Percentage change in curve number (positive or negative)
 
     """
 

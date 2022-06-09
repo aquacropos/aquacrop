@@ -11,12 +11,11 @@ class CO2(object):
 
     """
 
-    **Attributes:**\n
+    Attributes:
 
+        ref_concentration (float): reference CO2 concentration
 
-    `ref_concentration` : `float` : reference CO2 concentration
-
-    `current_concentration` : `float` : current CO2 concentration
+        current_concentration (float): current CO2 concentration
 
     """
 

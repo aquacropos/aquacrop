@@ -13,34 +13,26 @@ except:
 
 class Crop:
     """
-    The Crop Class contains Paramaters and variables of the crop used in the simulation
+    The Crop Class contains paramaters and variables of the crop used in the simulation
 
+    Most Crop attributes can be found in the `crops.crop_params.py` file
+    
+    A number of default program properties of type float are also specified during initialisation
 
-    **Attributes**:\n
+    ```
+    Initialization example:
+    
+    crop = Crop('Maize', planting_date='05/01')
+    ```
 
-    `c_name`: `str`: crop name ('custom' or one of built in defaults e.g. 'Maize')
+    Attributes:
 
-    `planting_date` : `str` : Planting Date (mm/dd)
+        c_name (str): crop name ('custom' or one of built in defaults e.g. 'Maize')
 
-    `harvest_date` : `str` : Latest Harvest Date (mm/dd)
+        planting_date (str): Planting Date (mm/dd)
 
-    `CropType` : `int` : Crop Type (1 = Leafy vegetable, 2 = Root/tuber, 3 = Fruit/grain)
+        harvest_date (str): Latest Harvest Date (mm/dd)
 
-    `PlantMethod` : `int` : Planting method (0 = Transplanted, 1 =  Sown)
-
-    `CalendarType` : `int` : Calendar Type (1 = Calendar days, 2 = Growing degree days)
-
-    `SwitchGDD` : `int` : Convert calendar to gdd mode if inputs are given in calendar days (0 = No; 1 = Yes)
-
-
-
-    `IrrMngt`: `dict` :  dictionary containting irrigation management information
-
-    `IrrSchd` : `pandas.DataFrame` :  pandas DataFrame containing the Irrigation Schedule if predefined
-
-    `FieldMngt` : `dict` :   Dictionary containing field management variables for the growing season of the crop
-
-     A number of default program properties of type float are also specified during initialisation
 
     """
 
@@ -336,11 +328,7 @@ crop_spec = [
 
 class CropStruct(object):
     """
-    The Crop Class contains Paramaters and variables of the crop used in the simulation
-
-
-    **Attributes**:\n
-
+    Duplicate crop object for Jit compilation
 
 
     """

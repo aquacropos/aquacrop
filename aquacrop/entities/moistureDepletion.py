@@ -9,14 +9,14 @@ spec = [
 
 
 class Dr:
-
     """
+    Depletion class to hold the rootzone and topsoil depletion
 
-    **Attributes:**\n
+    Attributes:
 
-    `Rz` : `float` : .
+    Rz (float): Root zone soil-water depletion
 
-    `Zt` : `float` : .
+    Zt (float): Top soil depletion
 
 
     """

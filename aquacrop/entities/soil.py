@@ -8,18 +8,18 @@ class Soil:
     """
     The Soil Class contains Paramaters and variables of the soil used in the simulation
 
+    More float attributes are specified in the initialisation of the class
 
-    **Attributes**:\n
+    Attributes:
 
-    `profile` : `pandas.DataFrame` : holds soil profile information
+        profile (pandas.DataFrame): holds soil profile information
 
-    `Profile` : `SoilProfile` : jit class object holdsing soil profile information
+        Profile (SoilProfile): jit class object holdsing soil profile information
 
-    `Hydrology` : `pandas.DataFrame`: holds soil layer hydrology informaiton
+        Hydrology (pandas.DataFrame): holds soil layer hydrology informaiton
 
-    `Comp` : `pandas.DataFrame` : holds soil compartment information
+        Comp (pandas.DataFrame): holds soil compartment information
 
-    A number of float attributes specified in the initialisation of the class
 
     """
 
