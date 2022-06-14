@@ -5,25 +5,24 @@ import pandas as pd
 from ..entities.clockStruct import ClockStruct
 
 
-def read_clock_paramaters(sim_start_time, sim_end_time, off_season=False):
+def read_clock_paramaters(
+    sim_start_time: str,
+    sim_end_time: str,
+    off_season: bool = False) -> ClockStruct:
     """
     Function to read in start and end simulaiton time and return a ClockStruct object
 
-        Arguments:
+    Arguments:
 
-            sim_start_time : `str`
-                    simulation start date
+        sim_start_time (str): simulation start date
 
-            sim_end_time : `str`
-                    simulation start date
+        sim_end_time (str): simulation start date
 
-            off_season : `bool`
-                    simulate off season true, false
+        off_season (bool): simulate off season
 
-        Returns:
+    Returns:
 
-            clock_sctruct : ClockStruct object
-                    time paramaters
+        clock_sctruct (ClockStruct): simulation time paramaters
 
 
     """
@@ -53,10 +52,19 @@ def read_clock_paramaters(sim_start_time, sim_end_time, off_season=False):
     return clock_sctruct
 
 
-def check_max_simulation_days(sim_start_time, sim_end_time):
+def check_max_simulation_days(
+    sim_start_time: str,
+    sim_end_time: str):
     """
     Check that the date range of the simulation is less than 580 years.
     In pandas this cannot happen due to the size of the variable
+
+    Arguments:
+
+        sim_start_time (str): simulation start date YYYY/MM/DD
+
+        sim_end_time (str): simulation start date YYYY/MM/DD
+
     """
     start_year = int(sim_start_time.split("/")[0])
     end_year = int(sim_end_time.split("/")[0])

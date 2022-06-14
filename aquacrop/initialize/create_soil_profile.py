@@ -1,20 +1,26 @@
 import numpy as np
 
 from ..entities.soilProfile import SoilProfile, SoilProfileNT
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.paramStruct import ParamStruct
 
 
-def create_soil_profile(param_struct):
+def create_soil_profile(param_struct: "ParamStruct") -> "ParamStruct":
     """
-    funciton to create soil profile class to store soil info. Its much faster to access
-    the info when its in a class compared to a dataframe
+    funciton to create soil profile namedTuple to store soil info.
+    Its much faster to access the info when its in a namedTuple
+    compared to a dataframe
 
-    *Arguments:*\n
+    Arguments:
 
-    `param_struct` : `ParamStruct` :  Contains model crop and soil paramaters
+        param_struct (ParamStruct):  Contains model crop and soil paramaters
 
-    *Returns:*
+    Returns:
 
-    `param_struct` : `ParamStruct` :  updated with soil profile
+        param_struct (ParamStruct):  updated with soil profile
 
 
     """

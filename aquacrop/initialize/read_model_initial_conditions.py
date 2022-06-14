@@ -1,28 +1,38 @@
 import numpy as np
 
-
 from ..entities.initParamVariables import InitialCondition
 from ..entities.modelConstants import ModelConstants
+from typing import Tuple, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.inititalWaterContent import InitialWaterContent
+    from aquacrop.entities.clockStruct import ClockStruct
+    from aquacrop.entities.paramStruct import ParamStruct
+    from aquacrop.entities.initParamVariables import InitialCondition
 
 
-def read_model_initial_conditions(ParamStruct, ClockStruct, InitWC):
+def read_model_initial_conditions(
+    ParamStruct: "ParamStruct",
+    ClockStruct: "ClockStruct",
+    InitWC: "InitialWaterContent") -> Tuple["InitialCondition", "InitialCondition"]:
     """
     Function to set up initial model conditions
 
-    *Arguments:*\n
+    Arguments:
 
-    `ParamStruct` : `ParamStruct` :  Contains model paramaters
+        ParamStruct (ParamStruct):  Contains model paramaters
 
-    `ClockStruct` : `ClockStruct` :  model time paramaters
+        ClockStruct (ClockStruct):  time paramaters
 
-    `InitWC` : `InitialWaterContent`:  initial water content
+        InitWC (InitialWaterContent):  initial water content
 
 
-    *Returns:*
+    Returns:
 
-    `ParamStruct` : `ParamStruct` :  updated ParamStruct object
+        ParamStruct (ParamStruct):  updated ParamStruct object
 
-    `InitCond` : `InitialCondition` :  containing initial model conditions/counters
+        InitCond (InitialCondition):  containing initial model conditions/counters
 
 
     """

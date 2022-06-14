@@ -2,32 +2,43 @@ import numpy as np
 import pandas as pd
 
 from ..entities.modelConstants import ModelConstants
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.crop import Crop
+    from pandas import DatetimeIndex, DataFrame
 
 
 def compute_crop_calendar(
-    crop,
-    clock_struct_planting_dates,
-    clock_struct_simulation_start_date,
-    clock_struct_time_span,
-    weather_df,
-):
+    crop: "Crop",
+    clock_struct_planting_dates: "DatetimeIndex",
+    clock_struct_simulation_start_date: str,
+    clock_struct_time_span: "DatetimeIndex",
+    weather_df: "DataFrame",
+) -> "Crop":
     """
     Function to compute additional parameters needed to define crop phenological calendar
 
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=28" target="_blank">Reference Manual</a> (pg. 19-20)
 
 
-    *Arguments:*\n
+    Arguments:
 
-    `crop` : `Crop` :  Crop object containing crop paramaters
+        crop (Crop):  Crop object containing crop paramaters
 
-    `clock_struct` : `ClockStruct` :  model time paramaters
+        clock_struct_planting_dates (DatetimeIndex):  list of planting dates
 
-    `weather_df`: `pandas.DataFrame` :  weather data for simulation period
+        clock_struct_simulation_start_date (str):  sim start date
+
+        clock_struct_time_span (DatetimeIndex):  all dates between sim start and end dates
+
+        weather_df (DataFrame):  weather data for simulation period
 
 
-    *Returns:*
+    Returns:
 
-    `crop` : `Crop` : updated Crop object
+        crop (Crop): updated Crop object
 
 
 

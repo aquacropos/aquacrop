@@ -7,6 +7,8 @@ Soil-Crop-Water model based on AquaCrop-OS.
 ![last-commit](https://badgen.net/github/last-commit/aquacropos/aquacrop)
 ![license](https://badgen.net/pypi/license/aquacrop)
 ![python-version](https://badgen.net/pypi/python/aquacrop)
+[![image](https://pepy.tech/badge/aquacrop)](https://pepy.tech/project/aquacrop)
+[![Downloads](https://pepy.tech/badge/aquacrop/month)](https://pepy.tech/project/aquacrop)
 
 
 ```python
@@ -27,7 +29,7 @@ model_results = model_os.get_simulation_results().head()
 print(model_results)
 ```
 
-## ABOUT
+## About
 
 AquaCrop-OSPy is a python implementation of the popular crop-water model AquaCrop, built from the AquaCrop-OS source code.
 

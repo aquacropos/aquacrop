@@ -2,6 +2,8 @@ site_name: AquaCrop-OSPy
 theme:
   name: material
 
+repo_url: https://github.com/aquacropos/aquacrop
+
 plugins:
     - search
     - mkdocstrings:
@@ -10,6 +12,7 @@ plugins:
                 paths: [.]
                 options:
                     show_root_heading: true
+                    heading_level: 2
 
     - mkdocs-jupyter:
           include_source: True

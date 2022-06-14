@@ -8,6 +8,8 @@
 
 ::: aquacrop.initialize.compute_crop_calendar
 
+::: aquacrop.initialize.compute_variables
+
 ::: aquacrop.initialize.create_soil_profile
 
 ::: aquacrop.initialize.read_clocks_parameters

@@ -1,8 +1,5 @@
 import numpy as np
 import pandas as pd
-
-# import pathlib
-# import os
 from .compute_crop_calendar import compute_crop_calendar
 from .calculate_HIGC import calculate_HIGC
 from .calculate_HI_linear import calculate_HI_linear
@@ -11,32 +8,41 @@ from ..entities.crop import CropStruct
 from copy import deepcopy
 from os.path import dirname, abspath
 
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from pandas import DataFrame
+    from aquacrop.entities.clockStruct import ClockStruct
+    from aquacrop.entities.paramStruct import ParamStruct
+
 # print("dirname = ", dirname(dirname(abspath(__file__))))
 
 
 def compute_variables(
-    param_struct,
-    weather_df,
-    clock_struct,
-    acfp=dirname(dirname(abspath(__file__))),
-):
+    param_struct: "ParamStruct",
+    weather_df: "DataFrame",
+    clock_struct: "ClockStruct",
+    acfp: str = dirname(dirname(abspath(__file__))),
+) -> "ParamStruct":
     """
     Function to compute additional variables needed to run the model eg. CO2
     Creates cropstruct jit class objects
 
-    *Arguments:*\n
+    Arguments:
 
-    `param_struct` : `ParamStruct` :  Contains model paramaters
+        param_struct (ParamStruct):  Contains model paramaters
 
-    `weather_df` : `pd.DataFrame` :  weather data
+        weather_df (DataFrame):  weather data
 
-    `clock_struct` : `ClockStruct` :  time params
+        clock_struct (ClockStruct):  time params
 
-    `acfp` : `Path` :  path to aquacrop directory containing co2 data
+        acfp (Path):  path to aquacrop directory containing co2 data
 
-    *Returns:*
+    Returns:
 
-    `param_struct` : `ParamStruct` :  updated model params
+        param_struct (ParamStruct):  updated model params
 
 
     """

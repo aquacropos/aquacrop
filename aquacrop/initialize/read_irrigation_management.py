@@ -2,25 +2,34 @@ import numpy as np
 import pandas as pd
 
 from ..entities.irrigationManagement import IrrMngtStruct
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.clockStruct import ClockStruct
+    from aquacrop.entities.irrigationManagement import IrrigationManagement, IrrMngtStruct
+    from aquacrop.entities.paramStruct import ParamStruct
 
 
-
-def read_irrigation_management(ParamStruct, IrrMngt, ClockStruct):
+def read_irrigation_management(
+    ParamStruct: "ParamStruct",
+    IrrMngt: "IrrigationManagement",
+    ClockStruct: "ClockStruct") -> "ParamStruct":
     """
-    initilize irr mngt and turn into jit classes
+    initilize irrigation management and store as IrrMngtStruct object
 
-    *Arguments:*\n
+    Arguments:
 
-    `ParamStruct` : `ParamStruct` :  Contains model crop and soil paramaters
+        ParamStruct (ParamStruct):  Contains model crop and soil paramaters
 
-    `IrrMngt` : `IrrigationManagement` :  irr mngt params object
+        IrrMngt (IrrigationManagement):  irr mngt params object
 
-    `ClockStruct` : `ClockStruct` :  time paramaters
+        ClockStruct (ClockStruct):  time paramaters
 
 
-    *Returns:*
+    Returns:
 
-    `ParamStruct` : `ParamStruct` :  updated model paramaters
+        ParamStruct (ParamStruct):  updated model paramaters
 
 
 

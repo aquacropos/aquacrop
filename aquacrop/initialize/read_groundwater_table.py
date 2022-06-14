@@ -1,23 +1,33 @@
 import numpy as np
 import pandas as pd
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.clockStruct import ClockStruct
+    from aquacrop.entities.paramStruct import ParamStruct
+    from aquacrop.entities.groundWater import GroundWater
 
 
 
-def read_groundwater_table(ParamStruct, GwStruct, ClockStruct):
+def read_groundwater_table(
+    ParamStruct: "ParamStruct",
+    GwStruct: "GroundWater",
+    ClockStruct: "ClockStruct") -> "ParamStruct":
     """
-    Function to read input files and initialise groundwater parameters
+    Function to initialise groundwater parameters
 
-    *Arguments:*\n
+    Arguments:
 
-    `ParamStruct` : `ParamStruct` :  Contains model paramaters
+        `ParamStruct` : `ParamStruct` :  Contains model paramaters
 
-    `GwStruct` : `GroundWater` :  groundwater params
+        `GwStruct` : `GroundWater` :  groundwater params
 
-    `ClockStruct` : `ClockStruct` :  time params
+        `ClockStruct` : `ClockStruct` :  time params
 
-    *Returns:*
+    Returns:
 
-    `ParamStruct` : `ParamStruct` :  updated with GW info
+        ParamStruct` : `ParamStruct` :  updated with GW info
 
     """
 

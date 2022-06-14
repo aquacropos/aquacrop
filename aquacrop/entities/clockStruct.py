@@ -22,18 +22,15 @@ class ClockStruct:
 
         n_steps (int): total number of days of simulation
 
-        time_span (np.array): all dates (np.Datetime64 that
-            lie within the start and end dates of simulation
+        time_span (np.array): all dates that lie within the start and end dates of simulation
 
         step_start_time (np.Datetime64): Date at start of timestep
 
         step_end_time (np.Datetime64): Date at end of timestep
 
-        evap_time_steps (int): Number of time-steps (per day for soil
-            evaporation calculation
+        evap_time_steps (int): Number of time-steps (per day) for soil evaporation calculation
 
-        sim_off_season (str): 'Y' if you want to simulate the off season,
-        'N' otherwise
+        sim_off_season (str): 'Y' if you want to simulate the off season,'N' otherwise
 
         planting_dates (list-like): list of planting dates in datetime format
 
@@ -41,8 +38,7 @@ class ClockStruct:
 
         n_seasons (int): Total number of seasons to be simulated
 
-        season_counter (int): counter to keep track of which season we are
-            currenlty simulating
+        season_counter (int): counter to keep track of which season we are currenlty simulating
 
 
     """
