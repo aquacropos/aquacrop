@@ -31,7 +31,7 @@ def rainfall_partition(
     Function to partition rainfall into surface runoff and infiltration using the curve number approach
 
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=57" target="_blank">Reference Manual: rainfall partition calculations</a> (pg. 48-51)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=57" target="_blank">Reference Manual: rainfall partition calculations</a> (pg. 48-51)
 
 
 
