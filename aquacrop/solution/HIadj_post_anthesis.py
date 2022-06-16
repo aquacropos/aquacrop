@@ -31,7 +31,7 @@ def HIadj_post_anthesis(
     Function to calculate adjustment to harvest index for post-anthesis water
     stress
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
 
 
     *Arguments:*

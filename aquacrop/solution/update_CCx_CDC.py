@@ -12,7 +12,7 @@ def update_CCx_CDC(cc_prev, CDC, CCx, dt):
     """
     Function to update CCx and CDC parameter valyes for rewatering in late season of an early declining canopy
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=36" target="_blank">Reference Manual: canopy_cover stress response</a> (pg. 27-33)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=36" target="_blank">Reference Manual: canopy_cover stress response</a> (pg. 27-33)
 
 
     *Arguments:*

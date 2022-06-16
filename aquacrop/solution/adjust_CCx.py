@@ -13,39 +13,46 @@ else:
    
 
 
-def adjust_CCx(cc_prev, CCo, CCx, CGC, CDC, dt, tSum, Crop_CanopyDevEnd, Crop_CCx):
+def adjust_CCx(
+    cc_prev: float,
+    CCo: float,
+    CCx: float,
+    CGC: float,
+    CDC: float,
+    dt: float,
+    tSum: float,
+    Crop_CanopyDevEnd: float,
+    Crop_CCx: float
+    ) -> float:
     """
     Function to adjust CCx value for changes in CGC due to water stress during the growing season
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=36" target="_blank">Reference Manual: canopy_cover stress response</a> (pg. 27-33)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=36" target="_blank">Reference Manual: canopy_cover stress response</a> (pg. 27-33)
 
 
-    *Arguments:*
+    Arguments:
 
+        `cc_prev (float): Canopy Cover at previous timestep.
 
-    `cc_prev`: `float` : Canopy Cover at previous timestep.
+        `CCo (float): Fractional canopy cover size at emergence
 
-    `CCo`: `float` : Fractional canopy cover size at emergence
+        `CCx (float): Maximum canopy cover (fraction of soil cover)
 
-    `CCx`: `float` : Maximum canopy cover (fraction of soil cover)
+        `CGC (float): Canopy growth coefficient (fraction per gdd)
 
-    `CGC`: `float` : Canopy growth coefficient (fraction per gdd)
+        `CDC (float): Canopy decline coefficient (fraction per gdd/calendar day)
 
-    `CDC`: `float` : Canopy decline coefficient (fraction per gdd/calendar day)
+        `dt (float): Time delta of canopy growth (1 calander day or ... gdd)
 
-    `dt`: `float` : Time delta of canopy growth (1 calander day or ... gdd)
+        `tSum (float): time since germination (CD or gdd)
 
-    `tSum`: `float` : time since germination (CD or gdd)
+        `Crop_CanopyDevEnd (float): time that Canopy developement ends
 
-    `Crop_CanopyDevEnd`: `float` : time that Canopy developement ends
+        `Crop_CCx (float): Maximum canopy cover (fraction of soil cover)
 
-    `Crop_CCx`: `float` : Maximum canopy cover (fraction of soil cover)
+    Returns:
 
-    *Returns:*
-
-    `CCxAdj`: `float` : Adjusted CCx
-
-
+        `CCxAdj (float): Adjusted CCx
 
 
 

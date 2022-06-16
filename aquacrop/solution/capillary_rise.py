@@ -7,7 +7,7 @@ def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, water_ta
     Function to calculate capillary rise from a shallow groundwater table
 
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=61" target="_blank">Reference Manual: capillary rise calculations</a> (pg. 52-61)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=61" target="_blank">Reference Manual: capillary rise calculations</a> (pg. 52-61)
 
 
     *Arguments:*

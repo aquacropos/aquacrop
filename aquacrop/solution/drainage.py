@@ -19,7 +19,7 @@ def drainage(prof, th_init, th_fc_Adj_init):
 
 
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=51" target="_blank">Reference Manual: drainage calculations</a> (pg. 42-65)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=51" target="_blank">Reference Manual: drainage calculations</a> (pg. 42-65)
 
 
     *Arguments:*

@@ -37,7 +37,7 @@ def irrigation(
 
 
 
-    <a href="../pdfs/ac_ref_man_1.pdf#page=40" target="_blank">Reference Manual: irrigation description</a> (pg. 31-32)
+    <a href="https://www.fao.org/3/BR246E/br246e.pdf#page=40" target="_blank">Reference Manual: irrigation description</a> (pg. 31-32)
 
 
     *Arguments:*

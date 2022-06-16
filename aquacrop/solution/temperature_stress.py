@@ -18,7 +18,7 @@ def temperature_stress(Crop, temp_max, temp_min):
     """
     Function to get irrigation depth for current day
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=23" target="_blank">Reference Manual: temperature stress</a> (pg. 14)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=23" target="_blank">Reference Manual: temperature stress</a> (pg. 14)
 
 
 

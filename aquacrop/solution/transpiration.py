@@ -44,7 +44,7 @@ def transpiration(
     """
     Function to calculate crop transpiration on current day
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=91" target="_blank">Reference Manual: transpiration equations</a> (pg. 82-91)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=91" target="_blank">Reference Manual: transpiration equations</a> (pg. 82-91)
 
 
 

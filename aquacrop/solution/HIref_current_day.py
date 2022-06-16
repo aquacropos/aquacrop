@@ -27,7 +27,7 @@ def HIref_current_day(
     Function to calculate reference (no adjustment for stress effects)
     harvest index on current day
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
 
 
 

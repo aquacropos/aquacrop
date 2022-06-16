@@ -13,7 +13,7 @@ def cc_required_time(cc_prev, CCo, CCx, CGC, CDC, Mode):
     """
     Function to find time required to reach canopy_cover at end of previous day, given current CGC or CDC
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=30" target="_blank">Reference Manual: canopy_cover devlopment</a> (pg. 21-24)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=30" target="_blank">Reference Manual: canopy_cover devlopment</a> (pg. 21-24)
 
 
 

@@ -23,7 +23,7 @@ def water_stress(
     """
     Function to calculate water stress coefficients
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=18" target="_blank">Reference Manual: water stress equations</a> (pg. 9-13)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=18" target="_blank">Reference Manual: water stress equations</a> (pg. 9-13)
 
 
     *Arguments:*

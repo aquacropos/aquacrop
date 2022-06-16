@@ -21,7 +21,7 @@ def evap_layer_water_content(
     """
     Function to get water contents in the evaporation layer
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=82" target="_blank">Reference Manual: evaporation equations</a> (pg. 73-81)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=82" target="_blank">Reference Manual: evaporation equations</a> (pg. 73-81)
 
 
     *Arguments:*

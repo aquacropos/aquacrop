@@ -24,7 +24,7 @@ def check_groundwater_table(
     Function to check for presence of a groundwater table, and, if present,
     to adjust compartment water contents and field capacities where necessary
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=61" target="_blank">Reference manual: water table adjustment equations</a> (pg. 52-57)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=61" target="_blank">Reference manual: water table adjustment equations</a> (pg. 52-57)
 
 
     *Arguments:*

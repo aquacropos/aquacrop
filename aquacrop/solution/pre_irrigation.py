@@ -6,7 +6,7 @@ def pre_irrigation(prof, Crop, InitCond, growing_season, IrrMngt):
     """
     Function to calculate pre-irrigation when in net irrigation mode
 
-    <a href="../pdfs/ac_ref_man_1.pdf#page=40" target="_blank">Reference Manual: Net irrigation description</a> (pg. 31)
+    <a href="https://www.fao.org/3/BR246E/br246e.pdf#page=40" target="_blank">Reference Manual: Net irrigation description</a> (pg. 31)
 
 
     *Arguments:*

@@ -1,6 +1,8 @@
 import os
 import numpy as np
 
+from aquacrop.entities.output import Output
+
 
 from ..entities.totalAvailableWater import TAW
 from ..entities.moistureDepletion import Dr
@@ -39,32 +41,45 @@ else:
     from ..solution.solution_HIref_current_day import HIref_current_day
     from ..solution.solution_biomass_accumulation import biomass_accumulation
 
+from typing import Tuple, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from numpy import ndarray
+    from aquacrop.entities.clockStruct import ClockStruct
+    from aquacrop.entities.initParamVariables import InitialCondition
+    from aquacrop.entities.paramStruct import ParamStruct
+    from aquacrop.entities.output import Output
 
 def solution_single_time_step(
-    init_cond, param_struct, clock_struct, weather_step, outputs
-):
+    init_cond: "InitialCondition",
+    param_struct: "ParamStruct",
+    clock_struct: "ClockStruct",
+    weather_step: "ndarray",
+    outputs:"Output",
+) ->  Tuple["InitialCondition", "ParamStruct","Output"]:
     """
-    Function to perform AquaCrop-OS solution for a single time step
+    Function to perform AquaCrop solution for a single time step
 
+    Arguments:
 
+        init_cond (InitialCondition):  containing current variables+counters
 
-    *Arguments:*\n
+        param_struct (ParamStruct):  contains model paramaters
 
-    `init_cond` : `InitialCondition` :  containing current model paramaters
+        clock_struct (ClockStruct):  model time paramaters
 
-    `clock_struct` : `ClockStruct` :  model time paramaters
+        weather_step (numpy.ndarray):  contains precipitation,ET,temp_max,temp_min for current day
 
-    `weather_step`: `np.array` :  containing precipitation,ET,temp_max,temp_min for current day
+        outputs (Output):  object to store outputs
 
-    `outputs` : `Output` :  object to store outputs
+    Returns:
 
-    *Returns:*
+        NewCond (InitialCondition):  containing updated simulation variables+counters
 
-    `NewCond` : `InitialCondition` :  containing updated model paramaters
+        param_struct (ParamStruct):  contains model paramaters
 
-    `outputs` : `Output` :  object to store outputs
-
-
+        outputs (Output):  object to store outputs
 
     """
 

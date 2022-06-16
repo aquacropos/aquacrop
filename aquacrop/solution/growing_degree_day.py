@@ -11,7 +11,7 @@ def growing_degree_day(GDDmethod, Tupp, Tbase, temp_max, temp_min):
     """
     Function to calculate number of growing degree days on current day
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=28" target="_blank">Reference manual: growing degree day calculations</a> (pg. 19-20)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=28" target="_blank">Reference manual: growing degree day calculations</a> (pg. 19-20)
 
 
 

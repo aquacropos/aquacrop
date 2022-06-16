@@ -37,7 +37,7 @@ def root_development(Crop,
     """
     Function to calculate root zone expansion
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=46" target="_blank">Reference Manual: root developement equations</a> (pg. 37-41)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=46" target="_blank">Reference Manual: root developement equations</a> (pg. 37-41)
 
 
     *Arguments:*

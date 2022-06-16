@@ -24,7 +24,7 @@ def root_zone_water(
     Function to calculate actual and total available water in the rootzone at current time step
 
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=14" target="_blank">Reference Manual: root-zone water calculations</a> (pg. 5-8)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=14" target="_blank">Reference Manual: root-zone water calculations</a> (pg. 5-8)
 
 
     *Arguments:*

@@ -1,11 +1,43 @@
 import pandas as pd
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from numpy import ndarray
 
 def outputs_when_model_is_finished(
-    model_is_finished, flux_output, water_output, growth_outputs, steps_are_finished
+    model_is_finished: bool,
+    flux_output: "ndarray",
+    water_output: "ndarray",
+    growth_outputs: "ndarray",
+    steps_are_finished: bool,
 ):
     """
-    Function that return the model output when model is finished.
+    Function that turns numpy array outputs into pandas dataframes
+
+    Arguments:
+
+        model_is_finished (bool):  is model finished
+
+        flux_output (numpy.array): water flux_output
+
+        water_output (numpy.array):  water storage in each compartment
+
+        growth_outputs (numpy.array):  crop growth variables
+
+        n_seasons (int):  total number of seasons being simulated
+
+        steps_are_finished (bool):  have the simulated num_steps finished
+
+    Returns:
+
+        flux_output (pandas.DataFrame): water flux_output
+
+        water_output (pandas.DataFrame):  water storage in each compartment
+
+        growth_outputs (pandas.DataFrame):  crop growth variables
+
+
     """
     if model_is_finished is True or steps_are_finished is True:
         # ClockStruct.step_start_time = ClockStruct.step_end_time

@@ -8,7 +8,7 @@ def germination(InitCond, Soil_zGerm, prof, Crop_GermThr, Crop_PlantMethod, gdd,
     Function to check if crop has germinated
 
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=32" target="_blank">Reference Manual: germination condition</a> (pg. 23)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=32" target="_blank">Reference Manual: germination condition</a> (pg. 23)
 
 
     *Arguments:*

@@ -3,28 +3,41 @@ Update time function
 """
 from .reset_initial_conditions import reset_initial_conditions
 
+from typing import Tuple, TYPE_CHECKING
 
-def update_time(clock_struct, init_cond, param_struct, weather):
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from numpy import ndarray
+    from aquacrop.entities.clockStruct import ClockStruct
+    from aquacrop.entities.initParamVariables import InitialCondition
+    from aquacrop.entities.paramStruct import ParamStruct
+
+def update_time(
+    clock_struct: "ClockStruct",
+    init_cond: "InitialCondition",
+    param_struct: "ParamStruct",
+    weather: "ndarray"
+    ) -> Tuple["ClockStruct","InitialCondition", "ParamStruct"]:
     """
     Function to update current time in model.
 
-    *Arguments:*\n
+    Arguments:
 
-    `clock_struct` : `clock_structClass` :  model time paramaters
+        clock_struct (ClockStruct):  model time paramaters
 
-    `init_cond` : `init_cond obj` :  containing current model paramaters
+        init_cond (InitialCondition):  containing sim variables+counters
 
-    `param_struct` : `init_cond obj` :  containing model paramaters
+        param_struct (ParamStruct):  containing model paramaters
 
-    `weather`: `np.array` :  weather data for simulation period
+        weather (numpy.array):  weather data for simulation period
 
-    *Returns:*
+    Returns:
 
-    `clock_struct` : `clock_structClass` :  model time paramaters
+        clock_struct (ClockStruct):  model time paramaters
 
-    `init_cond` : `init_condClass` :  containing reset model paramaters
+        init_cond (InitialCondition):  containing reset model paramaters
 
-    `param_struct` : `init_cond obj` :  containing model paramaters
+        param_struct (ParamStruct):  containing model paramaters
     """
     # Update time
     if clock_struct.model_is_finished is False:

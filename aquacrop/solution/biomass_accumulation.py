@@ -12,48 +12,48 @@ try:
 except:
     from entities.crop import CropStructNT_type_sig
 
+from typing import NamedTuple, Tuple
+
 
 @cc.export("biomass_accumulation", (CropStructNT_type_sig,i8,i8,f8,f8,f8,f8,f8,f8,f8,b1))
 def biomass_accumulation(
-                        Crop,
-                        NewCond_DAP,
-                        NewCond_DelayedCDs,
-                        NewCond_HIref,
-                        NewCond_PctLagPhase,
-                        NewCond_B,
-                        NewCond_B_NS,
-                        Tr, 
-                        TrPot, 
-                        et0, 
-                        growing_season):
+    Crop: NamedTuple,
+    NewCond_DAP: int,
+    NewCond_DelayedCDs: int,
+    NewCond_HIref: float,
+    NewCond_PctLagPhase: float,
+    NewCond_B: float,
+    NewCond_B_NS: float,
+    Tr: float,
+    TrPot: float,
+    et0: float,
+    growing_season: bool,
+    ) -> Tuple[float, float]:
     """
     Function to calculate biomass accumulation
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=107" target="_blank">Reference Manual: biomass accumulaiton</a> (pg. 98-108)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=107" target="_blank">Reference Manual: biomass accumulaiton</a> (pg. 98-108)
 
 
-    *Arguments:*
+    Arguments:
 
+        Crop (NamedTuple): Crop object
 
+        InitCond (InitialCondition): InitCond object containing model paramaters
 
-    `Crop`: `Crop` : Crop object
+        Tr (float): Daily transpiration
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+        TrPot (float): Daily potential transpiration
 
-    `Tr`: `float` : Daily transpiration
+        et0 (float): Daily reference evapotranspiration
 
-    `TrPot`: `float` : Daily potential transpiration
+        growing_season (bool): is Growing season? (True, False)
 
-    `et0`: `float` : Daily reference evapotranspiration
+    Returns:
 
-    `growing_season`:: `bool` : is Growing season? (True, False)
+        NewCond_B (float): new biomass growth
 
-    *Returns:*
-
-
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
-
-
+        NewCond_B_NS (float): new (No stress) biomass growth
 
 
     """
