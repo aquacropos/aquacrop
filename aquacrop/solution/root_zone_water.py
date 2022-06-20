@@ -193,6 +193,11 @@ def root_zone_water(
 
     return (
         WrAct,
+        WrS,
+        WrFC,
+        WrWP,
+        WrDry,
+        WrAer,
         Dr_Zt,
         Dr_Rz,
         TAW_Zt,

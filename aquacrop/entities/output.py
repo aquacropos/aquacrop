@@ -24,7 +24,7 @@ class Output:
     def __init__(self, time_span, initial_th):
 
         self.water_storage = np.zeros((len(time_span), 3 + len(initial_th)))
-        self.water_flux = np.zeros((len(time_span), 16))
+        self.water_flux = np.zeros((len(time_span), 21))
         self.crop_growth = np.zeros((len(time_span), 13))
         self.final_stats = pd.DataFrame(
             columns=[

@@ -101,7 +101,24 @@ def harvest_index(
         taw = TAW()
         water_root_depletion = Dr()
         # thRZ = RootZoneWater()
-        _, water_root_depletion.Zt, water_root_depletion.Rz, taw.Zt, taw.Rz, _,_,_,_,_,_, = root_zone_water(
+        (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            water_root_depletion.Zt,
+            water_root_depletion.Rz,
+            taw.Zt,
+            taw.Rz,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+        ) = root_zone_water(
             prof,
             float(NewCond.z_root),
             NewCond.th,

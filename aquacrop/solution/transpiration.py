@@ -246,6 +246,11 @@ def transpiration(
         thRZ = RootZoneWater()
         (
             _,
+            _,
+            _,
+            _,
+            _,
+            _,
             water_root_depletion.Zt,
             water_root_depletion.Rz,
             taw.Zt,
@@ -460,6 +465,11 @@ def transpiration(
             water_root_depletion = Dr()
             thRZ = RootZoneWater()
             (
+                _,
+                _,
+                _,
+                _,
+                _,
                 _,
                 water_root_depletion.Zt,
                 water_root_depletion.Rz,
