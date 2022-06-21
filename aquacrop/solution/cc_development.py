@@ -7,35 +7,42 @@ cc = CC("solution_cc_development")
 
 
 @cc.export("cc_development", "f8(f8,f8,f8,f8,f8,unicode_type,f8)")
-def cc_development(CCo, CCx, CGC, CDC, dt, Mode, CCx0):
+def cc_development(
+    CCo: float,
+    CCx: float,
+    CGC: float,
+    CDC: float,
+    dt: float,
+    Mode: str,
+    CCx0: float,
+    ) -> float:
+
     """
     Function to calculate canopy cover development by end of the current simulation day
 
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=30" target="_blank">Reference Manual: canopy_cover devlopment</a> (pg. 21-24)
 
 
-    *Arguments:*
+    Arguments:
 
 
+        CCo (float): Fractional canopy cover size at emergence
 
-    `CCo`: `float` : Fractional canopy cover size at emergence
+        CCx (float): Maximum canopy cover (fraction of soil cover)
 
-    `CCx`: `float` : Maximum canopy cover (fraction of soil cover)
+        CGC (float): Canopy growth coefficient (fraction per gdd)
 
-    `CGC`: `float` : Canopy growth coefficient (fraction per gdd)
+        CDC (float): Canopy decline coefficient (fraction per gdd/calendar day)
 
-    `CDC`: `float` : Canopy decline coefficient (fraction per gdd/calendar day)
+        dt (float): Time delta of canopy growth (1 calander day or ... gdd)
 
-    `dt`: `float` : Time delta of canopy growth (1 calander day or ... gdd)
+        Mode (str): stage of Canopy developement (Growth or Decline)
 
-    `Mode`: `str` : stage of Canopy developement (Growth or Decline)
+        CCx0 (float): Maximum canopy cover (fraction of soil cover)
 
-    `CCx0`: `float` : Maximum canopy cover (fraction of soil cover)
+    Returns:
 
-    *Returns:*
-
-    `canopy_cover`: `float` : Canopy Cover
-
+        canopy_cover (float): Canopy Cover
 
 
 

@@ -1,4 +1,12 @@
 import numpy as np
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from numpy import ndarray
+
+
 
 from numba import njit, f8, i8, b1
 from numba.pycc import CC
@@ -14,39 +22,37 @@ cc = CC("solution_evap_layer_water_content")
 @njit
 @cc.export("evap_layer_water_content", (f8[:],f8,SoilProfileNT_typ_sig))
 def evap_layer_water_content(
-    InitCond_th,
-    InitCond_EvapZ,
-    prof,
-):
+    InitCond_th: "ndarray",
+    InitCond_EvapZ: float,
+    prof: "SoilProfileNT",
+) -> Tuple[float, float, float, float, float]:
     """
     Function to get water contents in the evaporation layer
 
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=82" target="_blank">Reference Manual: evaporation equations</a> (pg. 73-81)
 
 
-    *Arguments:*
+    Arguments:
+
+        InitCond_th (numpy.array): Initial water content
+
+        InitCond_EvapZ (float): evaporation depth
+
+        prof (SoilProfileNT): Soil object containing soil paramaters
 
 
-
-    `InitCond_th`: `np.array` : Initial water content
-
-    `InitCond_EvapZ`: `float` : evaporation depth
-
-    `prof`: `SoilProfile` : Soil object containing soil paramaters
+    Returns:
 
 
-    *Returns:*
+        Wevap_Sat (float): Water storage in evaporation layer at saturation (mm)
 
+        Wevap_Fc (float): Water storage in evaporation layer at field capacity (mm)
 
-    `Wevap_Sat`: `float` : Water storage in evaporation layer at saturation (mm)
+        Wevap_Wp (float): Water storage in evaporation layer at permanent wilting point (mm)
 
-    `Wevap_Fc`: `float` : Water storage in evaporation layer at field capacity (mm)
+        Wevap_Dry (float): Water storage in evaporation layer at air dry (mm)
 
-    `Wevap_Wp`: `float` : Water storage in evaporation layer at permanent wilting point (mm)
-
-    `Wevap_Dry`: `float` : Water storage in evaporation layer at air dry (mm)
-
-    `Wevap_Act`: `float` : Actual water storage in evaporation layer (mm)
+        Wevap_Act (float): Actual water storage in evaporation layer (mm)
 
 
 

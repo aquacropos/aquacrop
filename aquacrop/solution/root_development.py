@@ -40,24 +40,24 @@ def root_development(Crop,
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=46" target="_blank">Reference Manual: root developement equations</a> (pg. 37-41)
 
 
-    *Arguments:*
+    Arguments:
 
-    `Crop`: `CropStruct` : jit class object containing Crop paramaters
+Crop (CropStruct): jit class object containing Crop paramaters
 
-    `prof`: `SoilProfile` : jit class object containing soil paramaters
+prof (SoilProfile): jit class object containing soil paramaters
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+InitCond (InitialCondition): InitCond object containing model paramaters
 
-    `gdd`: `float` : Growing degree days on current day
+gdd (float): Growing degree days on current day
 
-    `growing_season`: `bool` : is growing season (True or Flase)
+growing_season (bool): is growing season (True or Flase)
 
-    `water_table_presence`: `int` : water table present (True=1 or Flase=0)
+water_table_presence (int): water table present (True=1 or Flase=0)
 
 
-    *Returns:*
+    Returns:
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+NewCond (InitialCondition): InitCond object containing updated model paramaters
 
 
     """

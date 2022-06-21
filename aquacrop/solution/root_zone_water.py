@@ -27,29 +27,29 @@ def root_zone_water(
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=14" target="_blank">Reference Manual: root-zone water calculations</a> (pg. 5-8)
 
 
-    *Arguments:*
+    Arguments:
 
-    `prof`: `SoilProfile` : jit class Object containing soil paramaters
+prof (SoilProfile): jit class Object containing soil paramaters
 
-    `InitCond_Zroot`: `float` : Initial rooting depth
+InitCond_Zroot (float): Initial rooting depth
 
-    `InitCond_th`: `np.array` : Initial water content
+InitCond_th (np.array): Initial water content
 
-    `Soil_zTop`: `float` : Top soil depth
+Soil_zTop (float): Top soil depth
 
-    `Crop_Zmin`: `float` : crop minimum rooting depth
+Crop_Zmin (float): crop minimum rooting depth
 
-    `Crop_Aer`: `int` : number of aeration stress days
+Crop_Aer (int): number of aeration stress days
 
-    *Returns:*
+    Returns:
 
-     `WrAct`: `float` :  Actual rootzone water content
+ WrAct (float):  Actual rootzone water content
 
-     `Dr`: `Dr` :  depletion objection containing rootzone and topsoil depletion
+ Dr (Dr):  depletion objection containing rootzone and topsoil depletion
 
-     `taw`: `TAW` :  `TAW` containing rootzone and topsoil total avalable water
+ taw (TAW):  `TAW` containing rootzone and topsoil total avalable water
 
-     `thRZ`: `RootZoneWater` :  thRZ object conaining rootzone water content paramaters
+ thRZ (RootZoneWater):  thRZ object conaining rootzone water content paramaters
 
 
 

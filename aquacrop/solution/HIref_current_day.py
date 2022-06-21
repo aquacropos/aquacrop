@@ -31,21 +31,21 @@ def HIref_current_day(
 
 
 
-    *Arguments:*
+    Arguments:
 
 
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+InitCond (InitialCondition): InitCond object containing model paramaters
 
-    `Crop`: `Crop` : Crop object containing Crop paramaters
+Crop (Crop): Crop object containing Crop paramaters
 
-    `growing_season`: `bool` : is growing season (True or Flase)
-
-
-    *Returns:*
+growing_season (bool): is growing season (True or Flase)
 
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+    Returns:
+
+
+NewCond (InitialCondition): InitCond object containing updated model paramaters
 
 
 

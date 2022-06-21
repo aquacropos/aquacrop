@@ -40,30 +40,30 @@ def irrigation(
     <a href="https://www.fao.org/3/BR246E/br246e.pdf#page=40" target="_blank">Reference Manual: irrigation description</a> (pg. 31-32)
 
 
-    *Arguments:*
+    Arguments:
 
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+InitCond (InitialCondition): InitCond object containing model paramaters
 
-    `IrrMngt`: `IrrMngtStruct`: jit class object containing irrigation management paramaters
+IrrMngt (IrrMngtStruct`: jit class object containing irrigation management paramaters
 
-    `Crop`: `Crop` : Crop object containing Crop paramaters
+Crop (Crop): Crop object containing Crop paramaters
 
-    `Soil`: `Soil` : Soil object containing soil paramaters
+Soil (Soil): Soil object containing soil paramaters
 
-    `growing_season`: `bool` : is growing season (True or Flase)
+growing_season (bool): is growing season (True or Flase)
 
-    `Rain`: `float` : daily precipitation mm
+Rain (float): daily precipitation mm
 
-    `Runoff`: `float` : surface runoff on current day
-
-
-    *Returns:*
+Runoff (float): surface runoff on current day
 
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+    Returns:
 
-    `Irr`: `float` : Irrigaiton applied on current day mm
+
+NewCond (InitialCondition): InitCond object containing updated model paramaters
+
+Irr (float): Irrigaiton applied on current day mm
 
 """
     ## Store intial conditions for updating ##

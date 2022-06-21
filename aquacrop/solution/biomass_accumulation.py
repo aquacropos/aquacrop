@@ -39,9 +39,19 @@ def biomass_accumulation(
 
         Crop (NamedTuple): Crop object
 
-        InitCond (InitialCondition): InitCond object containing model paramaters
+        NewCond_DAP (int): days since planting
 
-        Tr (float): Daily transpiration
+        NewCond_DelayedCDs (int): Delayed calendar days
+
+        NewCond_HIref (float): reference harvest index
+
+        NewCond_PctLagPhase (float): percentage of way through early HI development stage
+
+        NewCond_B (float): Current biomass growth
+
+        NewCond_B_NS (float): current no stress biomass growth
+
+        TrPot (float): Daily crop transpiration
 
         TrPot (float): Daily potential transpiration
 

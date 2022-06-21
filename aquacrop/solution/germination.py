@@ -1,9 +1,23 @@
 import numpy as np
+from typing import TYPE_CHECKING
 
 
 
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.initParamVariables import InitialCondition
 
-def germination(InitCond, Soil_zGerm, prof, Crop_GermThr, Crop_PlantMethod, gdd, growing_season):
+
+def germination(
+    InitCond: "InitialCondition",
+    Soil_zGerm: float,
+    prof: "SoilProfileNT",
+    Crop_GermThr: float,
+    Crop_PlantMethod: bool,
+    gdd: float,
+    growing_season: bool,
+    ) -> "InitialCondition":
     """
     Function to check if crop has germinated
 
@@ -11,28 +25,28 @@ def germination(InitCond, Soil_zGerm, prof, Crop_GermThr, Crop_PlantMethod, gdd,
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=32" target="_blank">Reference Manual: germination condition</a> (pg. 23)
 
 
-    *Arguments:*
+    Arguments:
 
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+        InitCond (InitialCondition): InitCond object containing model paramaters
 
-    `Soil_zGerm`: `float` : Soil depth affecting germination
+        Soil_zGerm (float): Soil depth affecting germination
 
-    `prof`: `SoilProfile` : Soil object containing soil paramaters
+        prof (SoilProfileNT): Soil object containing soil paramaters
 
-    `Crop_GermThr`: `float` : Crop germination threshold
+        Crop_GermThr (float): Crop germination threshold
 
-    `Crop_PlantMethod`: `bool` : sown as seedling True or False
+        Crop_PlantMethod (bool): sown as seedling True or False
 
-    `gdd`: `float` : Number of Growing Degree Days on current day
+        gdd (float): Number of Growing Degree Days on current day
 
-    `growing_season`:: `bool` : is growing season (True or Flase)
-
-
-    *Returns:*
+        growing_season (bool): is growing season (True or Flase)
 
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+    Returns:
+
+
+        NewCond (InitialCondition): InitCond object containing updated model paramaters
 
 
 

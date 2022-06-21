@@ -42,28 +42,28 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, et0, temp_max, temp_min, grow
 
      <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
 
-    *Arguments:*
+    Arguments:
 
 
-    `Soil`: `Soil` : Soil object containing soil paramaters
+Soil (Soil): Soil object containing soil paramaters
 
-    `Crop`: `Crop` : Crop object containing Crop paramaters
+Crop (Crop): Crop object containing Crop paramaters
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+InitCond (InitialCondition): InitCond object containing model paramaters
 
-    `et0`: `float` : reference evapotranspiration on current day
+et0 (float): reference evapotranspiration on current day
 
-    `temp_max`: `float` : maximum tempature on current day (celcius)
+temp_max (float): maximum tempature on current day (celcius)
 
-    `temp_min`: `float` : minimum tempature on current day (celcius)
+temp_min (float): minimum tempature on current day (celcius)
 
-    `growing_season`:: `bool` : is growing season (True or Flase)
-
-
-    *Returns:*
+growing_season (bool): is growing season (True or Flase)
 
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+    Returns:
+
+
+NewCond (InitialCondition): InitCond object containing updated model paramaters
 
 
 

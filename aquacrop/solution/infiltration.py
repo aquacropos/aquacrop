@@ -36,43 +36,43 @@ def infiltration(
 
 
 
-    *Arguments:*
+    Arguments:
 
 
 
-    `prof`: `SoilProfile` : Soil object containing soil paramaters
+prof (SoilProfile): Soil object containing soil paramaters
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+InitCond (InitialCondition): InitCond object containing model paramaters
 
-    `Infl`: `float` : Infiltration so far
+Infl (float): Infiltration so far
 
-    `Irr`: `float` : Irrigation on current day
+Irr (float): Irrigation on current day
 
-    `IrrMngt_AppEff`: `float`: irrigation application efficiency
+IrrMngt_AppEff (float`: irrigation application efficiency
 
-    `FieldMngt`: `FieldMngtStruct` : field management params
+FieldMngt (FieldMngtStruct): field management params
 
-    `FluxOut`: `np.array` : flux of water out of each compartment
+FluxOut (np.array): flux of water out of each compartment
 
-    `DeepPerc0`: `float` : initial Deep Percolation
+DeepPerc0 (float): initial Deep Percolation
 
-    `Runoff0`: `float` : initial Surface Runoff
+Runoff0 (float): initial Surface Runoff
 
-    `growing_season`:: `bool` : is growing season (True or Flase)
-
-
-    *Returns:*
+growing_season (bool): is growing season (True or Flase)
 
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+    Returns:
 
-    `DeepPerc`:: `float` : Total Deep Percolation
 
-    `RunoffTot`: `float` : Total surface Runoff
+NewCond (InitialCondition): InitCond object containing updated model paramaters
 
-    `Infl`: `float` : Infiltration on current day
+DeepPerc (float): Total Deep Percolation
 
-    `FluxOut`: `np.array` : flux of water out of each compartment
+RunoffTot (float): Total surface Runoff
+
+Infl (float): Infiltration on current day
+
+FluxOut (np.array): flux of water out of each compartment
 
 
 

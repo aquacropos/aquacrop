@@ -35,33 +35,33 @@ def rainfall_partition(
 
 
 
-    *Arguments:*
+    Arguments:
 
 
-    `precipitation`: `float` : Percipitation on current day
+precipitation (float): Percipitation on current day
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+InitCond (InitialCondition): InitCond object containing model paramaters
 
-    `FieldMngt`: `FieldMngtStruct` : field management params
+FieldMngt (FieldMngtStruct): field management params
 
-    `Soil_CN`: `float` : curve number
+Soil_CN (float): curve number
 
-    `Soil_AdjCN`: `float` : adjusted curve number
+Soil_AdjCN (float): adjusted curve number
 
-    `Soil_zCN`: `float` :
+Soil_zCN (float` :
 
-    `Soil_nComp`: `float` : number of compartments
+Soil_nComp (float): number of compartments
 
-    `prof`: `SoilProfile` : Soil object
+prof (SoilProfile): Soil object
 
 
-    *Returns:*
+    Returns:
 
-    `Runoff`: `float` : Total Suface Runoff
+Runoff (float): Total Suface Runoff
 
-    `Infl`: `float` : Total Infiltration
+Infl (float): Total Infiltration
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+NewCond (InitialCondition): InitCond object containing updated model paramaters
 
 
 

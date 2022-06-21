@@ -15,23 +15,23 @@ def growing_degree_day(GDDmethod, Tupp, Tbase, temp_max, temp_min):
 
 
 
-    *Arguments:*
+    Arguments:
 
-    `GDDmethod`: `int` : gdd calculation method
+GDDmethod (int): gdd calculation method
 
-    `Tupp`: `float` : Upper temperature (degC) above which crop development no longer increases
+Tupp (float): Upper temperature (degC) above which crop development no longer increases
 
-    `Tbase`: `float` : Base temperature (degC) below which growth does not progress
+Tbase (float): Base temperature (degC) below which growth does not progress
 
-    `temp_max`: `float` : Maximum tempature on current day (celcius)
+temp_max (float): Maximum tempature on current day (celcius)
 
-    `temp_min`: `float` : Minimum tempature on current day (celcius)
-
-
-    *Returns:*
+temp_min (float): Minimum tempature on current day (celcius)
 
 
-    `gdd`: `float` : Growing degree days for current day
+    Returns:
+
+
+gdd (float): Growing degree days for current day
 
 
 

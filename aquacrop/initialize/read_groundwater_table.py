@@ -19,15 +19,15 @@ def read_groundwater_table(
 
     Arguments:
 
-        `ParamStruct` : `ParamStruct` :  Contains model paramaters
+        ParamStruct (ParamStruct): Contains model paramaters
 
-        `GwStruct` : `GroundWater` :  groundwater params
+        GwStruct (GroundWater): groundwater params
 
-        `ClockStruct` : `ClockStruct` :  time params
+        ClockStruct (ClockStruct): time params
 
     Returns:
 
-        ParamStruct` : `ParamStruct` :  updated with GW info
+        ParamStruct (ParamStruct): updated with GW info
 
     """
 

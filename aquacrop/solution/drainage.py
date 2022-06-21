@@ -2,6 +2,7 @@ import numpy as np
 
 from numba import njit, f8, i8, b1
 from numba.pycc import CC
+from typing import Tuple,TYPE_CHECKING
 
 try:
     from ..entities.soilProfile import SoilProfileNT_typ_sig
@@ -12,36 +13,42 @@ except:
 cc = CC("solution_drainage")
 
 
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from numpy import ndarray
+
+
+
 @cc.export("drainage", (SoilProfileNT_typ_sig, f8[:], f8[:]))
-def drainage(prof, th_init, th_fc_Adj_init):
+def drainage(
+    prof: "SoilProfileNT",
+    th_init: "ndarray",
+    th_fc_Adj_init: "ndarray",
+    ) -> Tuple["ndarray", float, float]:
     """
     Function to redistribute stored soil water
-
 
 
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=51" target="_blank">Reference Manual: drainage calculations</a> (pg. 42-65)
 
 
-    *Arguments:*
+    Arguments:
+
+        prof (SoilProfile): jit class object object containing soil paramaters
+
+        th_init (numpy.array): initial water content
+
+        th_fc_Adj_init (numpy.array): adjusted water content at field capacity
 
 
+    Returns:
 
-    `prof`: `SoilProfile` : jit class object object containing soil paramaters
+        thnew (numpy.array): updated water content in each compartment
 
-    `th_init`: `np.array` : initial water content
+        DeepPerc (float): Total Deep Percolation
 
-    `th_fc_Adj_init`: `np.array` : adjusted water content at field capacity
-
-
-    *Returns:*
-
-
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
-
-    `DeepPerc`:: `float` : Total Deep Percolation
-
-    `FluxOut`:: `array-like` : water of water out of each compartment
-
+        FluxOut (numpy.array): flux of water out of each compartment
 
 
 

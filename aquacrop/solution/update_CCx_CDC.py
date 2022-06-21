@@ -15,23 +15,23 @@ def update_CCx_CDC(cc_prev, CDC, CCx, dt):
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=36" target="_blank">Reference Manual: canopy_cover stress response</a> (pg. 27-33)
 
 
-    *Arguments:*
+    Arguments:
 
 
-    `cc_prev`: `float` : Canopy Cover at previous timestep.
+cc_prev (float): Canopy Cover at previous timestep.
 
-    `CDC`: `float` : Canopy decline coefficient (fraction per gdd/calendar day)
+CDC (float): Canopy decline coefficient (fraction per gdd/calendar day)
 
-    `CCx`: `float` : Maximum canopy cover (fraction of soil cover)
+CCx (float): Maximum canopy cover (fraction of soil cover)
 
-    `dt`: `float` : Time delta of canopy growth (1 calander day or ... gdd)
+dt (float): Time delta of canopy growth (1 calander day or ... gdd)
 
 
-    *Returns:*
+    Returns:
 
-    `CCxAdj`: `float` : updated CCxAdj
+CCxAdj (float): updated CCxAdj
 
-    `CDCadj`: `float` : updated CDCadj
+CDCadj (float): updated CDCadj
 
 
 

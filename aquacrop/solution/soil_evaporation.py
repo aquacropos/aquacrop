@@ -77,41 +77,41 @@ def soil_evaporation(
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=82" target="_blank">Reference Manual: evaporation equations</a> (pg. 73-81)
 
 
-    *Arguments:*
+    Arguments:
 
 
 
-    `Clock params`: `bool, int` : clock params
+Clock params (bool, int): clock params
 
-    `Soil parameters`: `float` : soil parameters
+Soil parameters (float): soil parameters
 
-    `Crop params`: `float` : Crop paramaters
+Crop params (float): Crop paramaters
 
-    `IrrMngt params`: `int, float`: irrigation management paramaters
+IrrMngt params (int, float`: irrigation management paramaters
 
-    `FieldMngt`: `FieldMngtStruct` : Field management paramaters
+FieldMngt (FieldMngtStruct): Field management paramaters
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+InitCond (InitialCondition): InitCond object containing model paramaters
 
-    `et0`: `float` : daily reference evapotranspiration
+et0 (float): daily reference evapotranspiration
 
-    `Infl`: `float` : Infiltration on current day
+Infl (float): Infiltration on current day
 
-    `Rain`: `float` : daily precipitation mm
+Rain (float): daily precipitation mm
 
-    `Irr`: `float` : Irrigation applied on current day
+Irr (float): Irrigation applied on current day
 
-    `growing_season`:: `bool` : is growing season (True or Flase)
-
-
-    *Returns:*
+growing_season (bool): is growing season (True or Flase)
 
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+    Returns:
 
-    `EsAct`: `float` : Actual surface evaporation current day
 
-    `EsPot`: `float` : Potential surface evaporation current day
+NewCond (InitialCondition): InitCond object containing updated model paramaters
+
+EsAct (float): Actual surface evaporation current day
+
+EsPot (float): Potential surface evaporation current day
 
 
 

@@ -26,25 +26,25 @@ def water_stress(
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=18" target="_blank">Reference Manual: water stress equations</a> (pg. 9-13)
 
 
-    *Arguments:*
+    Arguments:
 
 
-    `Crop`: `Crop` : Crop Object
+Crop (Crop): Crop Object
 
-    `InitCond`: `InitialCondition` : InitCond object
+InitCond (InitialCondition): InitCond object
 
-    `Dr`: `Dr` : depletion object (contains rootzone and top soil depletion totals)
+Dr (Dr): depletion object (contains rootzone and top soil depletion totals)
 
-    `taw`: `TAW` : taw object (contains rootzone and top soil total available water)
+taw (TAW): taw object (contains rootzone and top soil total available water)
 
-    `et0`: `float` : Reference Evapotranspiration
+et0 (float): Reference Evapotranspiration
 
-    `beta`: `float` : Adjust senescence threshold if early sensescence is triggered
+beta (float): Adjust senescence threshold if early sensescence is triggered
 
 
-    *Returns:*
+    Returns:
 
-    `Ksw`: `Ksw` : Ksw object containint water stress coefficients
+Ksw (Ksw): Ksw object containint water stress coefficients
 
     """
 

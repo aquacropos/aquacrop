@@ -3,28 +3,28 @@ import numpy as np
 
 
 
-def groundwater_inflow(prof, NewCond):
+def groundwater_inflow(
+    prof,
+    NewCond):
     """
     Function to calculate capillary rise in the presence of a shallow groundwater table
 
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=61" target="_blank">Reference Manual: capillary rise calculations</a> (pg. 52-61)
 
 
-    *Arguments:*
+    Arguments:
+
+        Soil (Soil): Soil object containing soil paramaters
+
+        InitCond (InitialCondition): InitCond object containing model paramaters
 
 
-
-    `Soil`: `Soil` : Soil object containing soil paramaters
-
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+    Returns:
 
 
-    *Returns:*
+        NewCond (InitialCondition): InitCond object containing updated model paramaters
 
-
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
-
-    `GwIn`: `float` : Groundwater inflow
+        GwIn (float): Groundwater inflow
 
 
     """

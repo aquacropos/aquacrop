@@ -21,19 +21,19 @@ def HIadj_pre_anthesis(
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
 
 
-    *Arguments:*
+    Arguments:
 
 
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+InitCond (InitialCondition): InitCond object containing model paramaters
 
-    `Crop`: `Crop` : Crop object containing Crop paramaters
-
-
-    *Returns:*
+Crop (Crop): Crop object containing Crop paramaters
 
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+    Returns:
+
+
+NewCond (InitialCondition): InitCond object containing updated model paramaters
 
 
     """

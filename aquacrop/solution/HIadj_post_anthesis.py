@@ -34,20 +34,20 @@ def HIadj_post_anthesis(
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
 
 
-    *Arguments:*
+    Arguments:
 
 
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+InitCond (InitialCondition): InitCond object containing model paramaters
 
-    `Crop`: `Crop` : Crop object containing Crop paramaters
+Crop (Crop): Crop object containing Crop paramaters
 
-    `Ksw`: `Ksw` : Ksw object containing water stress paramaters
+Ksw (Ksw): Ksw object containing water stress paramaters
 
-    *Returns:*
+    Returns:
 
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+NewCond (InitialCondition): InitCond object containing updated model paramaters
 
 
     """

@@ -9,25 +9,25 @@ def pre_irrigation(prof, Crop, InitCond, growing_season, IrrMngt):
     <a href="https://www.fao.org/3/BR246E/br246e.pdf#page=40" target="_blank">Reference Manual: Net irrigation description</a> (pg. 31)
 
 
-    *Arguments:*
+    Arguments:
 
-    `prof`: `SoilProfile` : Soil object containing soil paramaters
+prof (SoilProfile): Soil object containing soil paramaters
 
-    `Crop`: `CropStruct` : Crop object containing Crop paramaters
+Crop (CropStruct): Crop object containing Crop paramaters
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+InitCond (InitialCondition): InitCond object containing model paramaters
 
-    `growing_season`: `bool` : is growing season (True or Flase)
+growing_season (bool): is growing season (True or Flase)
 
-    `IrrMngt`: ``IrrMngtStruct`  object containing irrigation management paramaters
+IrrMngt (`IrrMngtStruct`  object containing irrigation management paramaters
 
 
 
-    *Returns:*
+    Returns:
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+NewCond (InitialCondition): InitCond object containing updated model paramaters
 
-    `PreIrr`: `float` : Pre-Irrigaiton applied on current day mm
+PreIrr (float): Pre-Irrigaiton applied on current day mm
 
 
 

@@ -48,37 +48,37 @@ def transpiration(
 
 
 
-    *Arguments:*
+    Arguments:
 
 
-    `Soil`: `Soil` : Soil object
+Soil (Soil): Soil object
 
-    `Crop`: `Crop` : Crop object
+Crop (Crop): Crop object
 
-    `IrrMngt`: `IrrMngt`: object containing irrigation management params
+IrrMngt (IrrMngt`: object containing irrigation management params
 
-    `InitCond`: `InitialCondition` : InitCond object
+InitCond (InitialCondition): InitCond object
 
-    `et0`: `float` : reference evapotranspiration
+et0 (float): reference evapotranspiration
 
-    `CO2`: `CO2` : CO2
+CO2 (CO2): CO2
 
-    `gdd`: `float` : Growing Degree Days
+gdd (float): Growing Degree Days
 
-    `growing_season`:: `bool` : is it currently within the growing season (True, Flase)
+growing_season (bool): is it currently within the growing season (True, Flase)
 
-    *Returns:*
+    Returns:
 
 
-    `TrAct`: `float` : Actual Transpiration on current day
+TrAct (float): Actual Transpiration on current day
 
-    `TrPot_NS`: `float` : Potential Transpiration on current day with no water stress
+TrPot_NS (float): Potential Transpiration on current day with no water stress
 
-    `TrPot0`: `float` : Potential Transpiration on current day
+TrPot0 (float): Potential Transpiration on current day
 
-    `NewCond`: `InitialCondition` : updated InitCond object
+NewCond (InitialCondition): updated InitCond object
 
-    `IrrNet`: `float` : Net Irrigation (if required)
+IrrNet (float): Net Irrigation (if required)
 
 
 

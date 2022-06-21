@@ -22,21 +22,21 @@ def temperature_stress(Crop, temp_max, temp_min):
 
 
 
-    *Arguments:*
+    Arguments:
 
 
 
-    `Crop`: `Crop` : Crop object containing Crop paramaters
+Crop (Crop): Crop object containing Crop paramaters
 
-    `temp_max`: `float` : max tempatature on current day (celcius)
+temp_max (float): max tempatature on current day (celcius)
 
-    `temp_min`: `float` : min tempature on current day (celcius)
-
-
-    *Returns:*
+temp_min (float): min tempature on current day (celcius)
 
 
-    `Kst`: `Kst` : Kst object containing tempature stress paramators
+    Returns:
+
+
+Kst (Kst): Kst object containing tempature stress paramators
 
 
 
