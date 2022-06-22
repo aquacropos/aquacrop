@@ -11,18 +11,24 @@ except:
 # temporary name for compiled module
 cc = CC("solution_HIref_current_day")
 
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.crop import CropStructNT
 
 
 @cc.export("HIref_current_day", (f8,i8,i8,b1,f8,f8,CropStructNT_type_sig,b1))
 def HIref_current_day(
-    NewCond_HIref,
-    NewCond_DAP,
-    NewCond_DelayedCDs,
-    NewCond_YieldForm,
-    NewCond_PctLagPhase,
-    NewCond_CCprev,
-    Crop,
-    growing_season):
+    NewCond_HIref: float,
+    NewCond_DAP: int,
+    NewCond_DelayedCDs: int,
+    NewCond_YieldForm: bool,
+    NewCond_PctLagPhase: float,
+    NewCond_CCprev: float,
+    Crop: "CropStructNT",
+    growing_season: bool,
+    ) -> Tuple[float, bool, float]:
     """
     Function to calculate reference (no adjustment for stress effects)
     harvest index on current day
@@ -34,20 +40,31 @@ def HIref_current_day(
     Arguments:
 
 
+        NewCond_HIref (float): reference harvest index
 
-InitCond (InitialCondition): InitCond object containing model paramaters
+        NewCond_DAP (int): days after planting
 
-Crop (Crop): Crop object containing Crop paramaters
+        NewCond_DelayedCDs (int): delayed calendar days
 
-growing_season (bool): is growing season (True or Flase)
+        NewCond_YieldForm (bool): yield formation stage
+
+        NewCond_PctLagPhase (float): percent through eraly development phase
+
+        NewCond_CCprev (float): canopy cover previous day
+
+        Crop (CropStructNT): Crop paramaters
+
+        growing_season (bool): is growing season (True or Flase)
 
 
     Returns:
 
 
-NewCond (InitialCondition): InitCond object containing updated model paramaters
+        NewCond (NewCond_HIref): reference harvest index
 
+        NewCond (NewCond_YieldForm): yield formation stage
 
+        NewCond (NewCond_PctLagPhase): percent through eraly development phase
 
 
     """

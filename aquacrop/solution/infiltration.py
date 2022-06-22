@@ -12,23 +12,29 @@ except:
 # temporary name for compiled module
 cc = CC("solution_infiltration")
 
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from numpy import ndarray
 
 @cc.export("infiltration", (SoilProfileNT_typ_sig,f8,f8[:],f8[:],f8,f8,f8,b1,f8,f8[:],f8,f8,b1))
 def infiltration(
-     prof,
-     NewCond_SurfaceStorage, 
-     NewCond_th_fc_Adj, 
-     NewCond_th, 
-     Infl, 
-     Irr, 
-     IrrMngt_AppEff, 
-     FieldMngt_Bunds,
-     FieldMngt_zBund,
-     FluxOut, 
-     DeepPerc0, 
-     Runoff0, 
-     growing_season
-):
+     prof: "SoilProfileNT",
+     NewCond_SurfaceStorage: float, 
+     NewCond_th_fc_Adj: "ndarray", 
+     NewCond_th: "ndarray", 
+     Infl: float, 
+     Irr: float, 
+     IrrMngt_AppEff: float, 
+     FieldMngt_Bunds: bool,
+     FieldMngt_zBund: float,
+     FluxOut: "ndarray", 
+     DeepPerc0: float, 
+     Runoff0: float, 
+     growing_season: bool,
+) -> Tuple["ndarray", float, float, float, float, "ndarray"]:
     """
     Function to infiltrate incoming water (rainfall and irrigation)
 
@@ -40,39 +46,44 @@ def infiltration(
 
 
 
-prof (SoilProfile): Soil object containing soil paramaters
+        prof (SoilProfile): Soil object containing soil paramaters
 
-InitCond (InitialCondition): InitCond object containing model paramaters
+        NewCond_SurfaceStorage (float): surface storage
 
-Infl (float): Infiltration so far
+        NewCond_th_fc_Adj (ndarray): water content at field capacity
 
-Irr (float): Irrigation on current day
+        NewCond_th (ndarray): soil water content
 
-IrrMngt_AppEff (float`: irrigation application efficiency
+        Infl (float): Infiltration so far
 
-FieldMngt (FieldMngtStruct): field management params
+        Irr (float): Irrigation on current day
 
-FluxOut (np.array): flux of water out of each compartment
+        IrrMngt_AppEff (float`: irrigation application efficiency
 
-DeepPerc0 (float): initial Deep Percolation
+        FieldMngt (FieldMngtStruct): field management params
 
-Runoff0 (float): initial Surface Runoff
+        FluxOut (np.array): flux of water out of each compartment
 
-growing_season (bool): is growing season (True or Flase)
+        DeepPerc0 (float): initial Deep Percolation
+
+        Runoff0 (float): initial Surface Runoff
+
+        growing_season (bool): is growing season (True or Flase)
 
 
     Returns:
 
+        NewCond_th (nunpy.darray): updated soil water content
 
-NewCond (InitialCondition): InitCond object containing updated model paramaters
+        NewCond_SurfaceStorage (float): updated surface storage
 
-DeepPerc (float): Total Deep Percolation
+        DeepPerc (float): Total Deep Percolation
 
-RunoffTot (float): Total surface Runoff
+        RunoffTot (float): Total surface Runoff
 
-Infl (float): Infiltration on current day
+        Infl (float): Infiltration on current day
 
-FluxOut (np.array): flux of water out of each compartment
+        FluxOut (numpy.array): flux of water out of each compartment
 
 
 

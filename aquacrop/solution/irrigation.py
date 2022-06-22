@@ -11,30 +11,42 @@ else:
    
 
 
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.crop import CropStructNT
+    from entities.soilProfile import SoilProfileNT
+    from numpy import ndarray
 
 # @cc.export("_irrigation", (i8,f8[:],f8,f8,i8,f8[:],f8,f8,f8,f8,f8,f8[:],i8,i8,CropStructNT_type_sig,SoilProfileNT_typ_sig,f8,b1,f8,f8))
 # @njit
 def irrigation(
-    IrrMngt_IrrMethod,
-    IrrMngt_SMT,
-    IrrMngt_AppEff,
-    IrrMngt_MaxIrr,
-    IrrMngt_IrrInterval,
-    IrrMngt_Schedule,
-    IrrMngt_depth,
-    IrrMngt_MaxIrrSeason,
-    NewCond_GrowthStage,
-    NewCond_IrrCum,
-    NewCond_Epot,
-    NewCond_Tpot,
-    NewCond_Zroot,
-    NewCond_th,
-    NewCond_DAP,
-    NewCond_TimeStepCounter,
-    Crop, prof, Soil_zTop, growing_season, Rain, Runoff):
+    IrrMngt_IrrMethod: int,
+    IrrMngt_SMT: float,
+    IrrMngt_AppEff: float,
+    IrrMngt_MaxIrr: float,
+    IrrMngt_IrrInterval: int,
+    IrrMngt_Schedule: "ndarray",
+    IrrMngt_depth: float,
+    IrrMngt_MaxIrrSeason: float,
+    NewCond_GrowthStage: float,
+    NewCond_IrrCum: float,
+    NewCond_Epot: float,
+    NewCond_Tpot: float,
+    NewCond_Zroot: float,
+    NewCond_th: "ndarray",
+    NewCond_DAP: int,
+    NewCond_TimeStepCounter: int,
+    Crop: "CropStructNT",
+    prof: "SoilProfileNT",
+    Soil_zTop: float,
+    growing_season: bool,
+    Rain: float,
+    Runoff: float,
+    ) -> Tuple[float,float,float, float]:
     """
     Function to get irrigation depth for current day
-
 
 
     <a href="https://www.fao.org/3/BR246E/br246e.pdf#page=40" target="_blank">Reference Manual: irrigation description</a> (pg. 31-32)
@@ -43,27 +55,59 @@ def irrigation(
     Arguments:
 
 
-InitCond (InitialCondition): InitCond object containing model paramaters
+        IrrMngt_IrrMethod (int): irrigation method
 
-IrrMngt (IrrMngtStruct`: jit class object containing irrigation management paramaters
+        IrrMngt_SMT (numpy.array): soil-moisture thresholds
 
-Crop (Crop): Crop object containing Crop paramaters
+        IrrMngt_AppEff (float): application efficiency
 
-Soil (Soil): Soil object containing soil paramaters
+        IrrMngt_MaxIrr (float): max irrigation depth per event
 
-growing_season (bool): is growing season (True or Flase)
+        IrrMngt_IrrInterval (int): irrigation event interval (days)
+        
+        IrrMngt_Schedule (numpy.array): irrigation depth schedule
 
-Rain (float): daily precipitation mm
+        IrrMngt_depth (float): depth to apply next day
 
-Runoff (float): surface runoff on current day
+        IrrMngt_MaxIrrSeason (float): max irrigation for the season
+
+        NewCond_GrowthStage (float): crop growth stage
+
+        NewCond_IrrCum (float): irrigation applied so far this season
+
+        NewCond_Epot (float): potential evaporation
+
+        NewCond_Tpot (float): potential transpiration
+
+        NewCond_Zroot (float): rooting depth
+
+        NewCond_th (numpy.array): soil water content
+
+        NewCond_DAP (int): days after planting
+
+        NewCond_TimeStepCounter (int): current simulation timestep
+
+        Crop (CropStructNT): Crop paramaters
+
+        Soil (SoilProfileNT): Soil object containing soil paramaters
+
+        growing_season (bool): is growing season (True or Flase)
+
+        Rain (float): daily precipitation mm
+
+        Runoff (float): surface runoff on current day
 
 
     Returns:
 
+        NewCond_Depletion (float): soil water depletion
 
-NewCond (InitialCondition): InitCond object containing updated model paramaters
+        NewCond_TAW (float): total available water
 
-Irr (float): Irrigaiton applied on current day mm
+        NewCond_IrrCum (float): total irrigation aplpied so far
+
+        Irr (float): Irrigaiton applied on current day mm
+
 
 """
     ## Store intial conditions for updating ##

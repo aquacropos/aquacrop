@@ -30,11 +30,27 @@ else:
     from .HIadj_post_anthesis import HIadj_post_anthesis
     from .HIadj_pollination import HIadj_pollination
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.crop import CropStructNT
+    from aquacrop.entities.initParamVariables import InitialCondition
+    from aquacrop.entities.soilProfile import SoilProfileNT
 
 
 
 
-def harvest_index(prof, Soil_zTop, Crop, InitCond, et0, temp_max, temp_min, growing_season):
+def harvest_index(
+    prof: "SoilProfileNT",
+    Soil_zTop: float,
+    Crop: "CropStructNT",
+    InitCond: "InitialCondition",
+    et0: float,
+    temp_max: float,
+    temp_min: float,
+    growing_season: bool,
+    ) -> "InitialCondition":
 
     """
     Function to simulate build up of harvest index
@@ -45,25 +61,27 @@ def harvest_index(prof, Soil_zTop, Crop, InitCond, et0, temp_max, temp_min, grow
     Arguments:
 
 
-Soil (Soil): Soil object containing soil paramaters
+        prof (SoilProfileNT): Soil profile paramaters
 
-Crop (Crop): Crop object containing Crop paramaters
+        Soil_zTop (float): topsoil depth
 
-InitCond (InitialCondition): InitCond object containing model paramaters
+        Crop (CropStructNT): Crop paramaters
 
-et0 (float): reference evapotranspiration on current day
+        InitCond (InitialCondition): InitCond object containing model paramaters
 
-temp_max (float): maximum tempature on current day (celcius)
+        et0 (float): reference evapotranspiration on current day
 
-temp_min (float): minimum tempature on current day (celcius)
+        temp_max (float): maximum tempature on current day (celcius)
 
-growing_season (bool): is growing season (True or Flase)
+        temp_min (float): minimum tempature on current day (celcius)
+
+        growing_season (bool): is growing season (True or Flase)
 
 
     Returns:
 
 
-NewCond (InitialCondition): InitCond object containing updated model paramaters
+        NewCond (InitialCondition): InitCond object containing updated model paramaters
 
 
 

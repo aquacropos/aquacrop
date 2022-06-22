@@ -1,7 +1,16 @@
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.crop import Crop
+    from aquacrop.entities.initParamVariables import InitialCondition
 
 
-
-def growth_stage(Crop, InitCond, growing_season):
+def growth_stage(
+    Crop: "Crop",
+    InitCond: "InitialCondition",
+    growing_season: bool,
+    ) -> "InitialCondition":
     """
     Function to determine current growth stage of crop
 
@@ -9,21 +18,16 @@ def growth_stage(Crop, InitCond, growing_season):
 
     Arguments:
 
+        Crop (Crop): Crop object containing Crop paramaters
 
+        InitCond (InitialCondition): InitCond object containing model paramaters
 
-Crop (Crop): Crop object containing Crop paramaters
-
-InitCond (InitialCondition): InitCond object containing model paramaters
-
-growing_season (bool): is growing season (True or Flase)
+        growing_season (bool): is growing season (True or Flase)
 
 
     Returns:
 
-
-NewCond (InitialCondition): InitCond object containing updated model paramaters
-
-
+        NewCond (InitialCondition): InitCond object containing updated model paramaters
 
 
 

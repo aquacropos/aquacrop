@@ -7,31 +7,35 @@ cc = CC("solution_growing_degree_day")
 
 
 @cc.export("growing_degree_day", "f8(i4,f8,f8,f8,f8)")
-def growing_degree_day(GDDmethod, Tupp, Tbase, temp_max, temp_min):
+def growing_degree_day(
+    GDDmethod: int,
+    Tupp: float,
+    Tbase: float,
+    temp_max: float,
+    temp_min: float,
+    ):
     """
     Function to calculate number of growing degree days on current day
 
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=28" target="_blank">Reference manual: growing degree day calculations</a> (pg. 19-20)
 
 
-
     Arguments:
 
-GDDmethod (int): gdd calculation method
+        GDDmethod (int): gdd calculation method
 
-Tupp (float): Upper temperature (degC) above which crop development no longer increases
+        Tupp (float): Upper temperature (degC) above which crop development no longer increases
 
-Tbase (float): Base temperature (degC) below which growth does not progress
+        Tbase (float): Base temperature (degC) below which growth does not progress
 
-temp_max (float): Maximum tempature on current day (celcius)
+        temp_max (float): Maximum tempature on current day (celcius)
 
-temp_min (float): Minimum tempature on current day (celcius)
+        temp_min (float): Minimum tempature on current day (celcius)
 
 
     Returns:
 
-
-gdd (float): Growing degree days for current day
+        gdd (float): Growing degree days for current day
 
 
 
