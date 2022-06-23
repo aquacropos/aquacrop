@@ -12,21 +12,29 @@ except:
 cc = CC("solution_rainfall_partition")
 
 
-@cc.export("rainfall_partition", (f8,f8[:],i8,f8,f8,f8,f8,f8,f8,f8,f8,SoilProfileNT_typ_sig))
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from numpy import ndarray
+
+
+@cc.export("rainfall_partition", (f8,f8[:],i8,f8,b1,f8,f8,f8,f8,f8,f8,SoilProfileNT_typ_sig))
 def rainfall_partition(
-    precipitation,
-    InitCond_th,
-    NewCond_DaySubmerged,
-    FieldMngt_SRinhb,
-    FieldMngt_Bunds,
-    FieldMngt_zBund,
-    FieldMngt_CNadjPct,
-    Soil_CN,
-    Soil_AdjCN,
-    Soil_zCN,
-    Soil_nComp,
-    prof,
-):
+    precipitation: float,
+    InitCond_th: "ndarray",
+    NewCond_DaySubmerged: int,
+    FieldMngt_SRinhb: float,
+    FieldMngt_Bunds: bool,
+    FieldMngt_zBund: float,
+    FieldMngt_CNadjPct: float,
+    Soil_CN: float,
+    Soil_AdjCN: float,
+    Soil_zCN: float,
+    Soil_nComp: int,
+    prof: "SoilProfileNT",
+) -> Tuple[float, float, float]:
     """
     Function to partition rainfall into surface runoff and infiltration using the curve number approach
 
@@ -34,38 +42,39 @@ def rainfall_partition(
     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=57" target="_blank">Reference Manual: rainfall partition calculations</a> (pg. 48-51)
 
 
-
     Arguments:
 
+        precipitation (float): Percipitation on current day
 
-precipitation (float): Percipitation on current day
+        InitCond_th (numpy.array): InitCond object containing model paramaters
 
-InitCond (InitialCondition): InitCond object containing model paramaters
+        NewCond_DaySubmerged (int): number of days submerged
 
-FieldMngt (FieldMngtStruct): field management params
+        FieldMngt_SRinhb (float): field management params
 
-Soil_CN (float): curve number
+        FieldMngt_Bunds (bool): field management params
 
-Soil_AdjCN (float): adjusted curve number
+        FieldMngt_zBund (float): bund height
 
-Soil_zCN (float` :
+        FieldMngt_CNadjPct (float): curve number adjustment percent
 
-Soil_nComp (float): number of compartments
+        Soil_CN (float): curve number
 
-prof (SoilProfile): Soil object
+        Soil_AdjCN (float): adjusted curve number
 
+        Soil_zCN (float` :
+
+        Soil_nComp (float): number of compartments
+
+        prof (SoilProfile): Soil object
 
     Returns:
 
-Runoff (float): Total Suface Runoff
+        Runoff (float): Total Suface Runoff
 
-Infl (float): Total Infiltration
+        Infl (float): Total Infiltration
 
-NewCond (InitialCondition): InitCond object containing updated model paramaters
-
-
-
-
+        NewCond_DaySubmerged (float): number of days submerged
 
 
     """
