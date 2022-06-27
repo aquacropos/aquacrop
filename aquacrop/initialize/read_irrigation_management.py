@@ -42,11 +42,27 @@ def read_irrigation_management(
         # change the index to the date
         df.index = pd.DatetimeIndex(df.Date)
 
-        # create a dateframe containing the daily irrigation to
-        # be applied for every day in the simulation
-        df = df.reindex(ClockStruct.time_span, fill_value=0).drop("Date", axis=1)
+        try:
+            # create a dateframe containing the daily irrigation to
+            # be applied for every day in the simulation
+            df = df.reindex(ClockStruct.time_span, fill_value=0).drop("Date", axis=1)
 
-        IrrMngt.Schedule = np.array(df.values, dtype=float).flatten()
+            IrrMngt.Schedule = np.array(df.values, dtype=float).flatten()
+            
+        except TypeError:
+            # older version of pandas with not reindex
+
+            # create new dataframe for whole simulation
+            # populate new dataframe with old values
+            new_df = pd.DataFrame(data=np.zeros(len(ClockStruct.time_span)),
+                index=pd.to_datetime(ClockStruct.time_span),
+                columns=['Depth']
+                )
+                
+            # fill in the new dataframe with irrigation schedule
+            new_df.loc[df.index]=df.Depth.values
+
+            IrrMngt.Schedule = np.array(new_df.values, dtype=float).flatten()
 
     else:
 
