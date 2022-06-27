@@ -24,22 +24,31 @@ else:
     from .aeration_stress import aeration_stress
      
 
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.crop import CropStructNT
+    from aquacrop.entities.initParamVariables import InitialCondition
+    from aquacrop.entities.co2 import CO2
+
 
 
 
 def transpiration(
-    Soil_Profile,
-    Soil_nComp,
-    Soil_zTop,
-    Crop,
-    IrrMngt_IrrMethod,
-    IrrMngt_NetIrrSMT,
-    InitCond,
-    et0,
-    CO2,
-    growing_season,
-    gdd,
-):
+    Soil_Profile: "SoilProfileNT",
+    Soil_nComp: int,
+    Soil_zTop: float,
+    Crop: "CropStructNT",
+    IrrMngt_IrrMethod: int,
+    IrrMngt_NetIrrSMT: float,
+    InitCond: "InitialCondition",
+    et0: float,
+    CO2: "CO2",
+    growing_season: bool,
+    gdd: float,
+) -> Tuple[float,float,float,"InitialCondition",float]:
 
     """
     Function to calculate crop transpiration on current day
@@ -51,34 +60,40 @@ def transpiration(
     Arguments:
 
 
-Soil (Soil): Soil object
+        Soil_Profile (SoilProfileNT): Soil profile params
 
-Crop (Crop): Crop object
+        Soil_nComp (int): number of soil components
 
-IrrMngt (IrrMngt`: object containing irrigation management params
+        Soil_zTop (float): depth of topsoil
 
-InitCond (InitialCondition): InitCond object
+        Crop (Crop): Crop params
 
-et0 (float): reference evapotranspiration
+        IrrMngt_IrrMethod (int): irrigation method 
 
-CO2 (CO2): CO2
+        IrrMngt_NetIrrSMT (float): net irrigation soil-moisture target
 
-gdd (float): Growing Degree Days
+        InitCond (InitialCondition): InitCond object
 
-growing_season (bool): is it currently within the growing season (True, Flase)
+        et0 (float): reference evapotranspiration
+
+        CO2 (CO2): CO2
+
+        gdd (float): Growing Degree Days
+
+        growing_season (bool): is it currently within the growing season (True, Flase)
 
     Returns:
 
 
-TrAct (float): Actual Transpiration on current day
+        TrAct (float): Actual Transpiration on current day
 
-TrPot_NS (float): Potential Transpiration on current day with no water stress
+        TrPot_NS (float): Potential Transpiration on current day with no water stress
 
-TrPot0 (float): Potential Transpiration on current day
+        TrPot0 (float): Potential Transpiration on current day
 
-NewCond (InitialCondition): updated InitCond object
+        NewCond (InitialCondition): updated InitCond object
 
-IrrNet (float): Net Irrigation (if required)
+        IrrNet (float): Net Irrigation (if required)
 
 
 

@@ -3,23 +3,31 @@ import numpy as np
 from numba import njit, f8, i8, b1
 from numba.pycc import CC
 
+
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from numpy import ndarray
+
+
 # temporary name for compiled module
 cc = CC("solution_water_stress")
 
 @njit
 @cc.export("water_stress", "(f8[:],f8[:],f8,f8,f8[:],f8,f8,f8,f8,f8)")
 def water_stress(
-    Crop_p_up,
-    Crop_p_lo,
-    Crop_ETadj,
-    Crop_beta,
-    Crop_fshape_w,
-    InitCond_tEarlySen,
-    Dr,
-    taw,
-    et0,
-    beta,
-):
+    Crop_p_up: "ndarray",
+    Crop_p_lo: "ndarray",
+    Crop_ETadj: float,
+    Crop_beta: float,
+    Crop_fshape_w: "ndarray",
+    InitCond_tEarlySen: float,
+    Dr: float,
+    taw: float,
+    et0: float,
+    beta: float,
+) -> Tuple[float, float, float, float, float]:
     """
     Function to calculate water stress coefficients
 
@@ -29,22 +37,31 @@ def water_stress(
     Arguments:
 
 
-Crop (Crop): Crop Object
+        Crop_p_up (ndarray): water stress thresholds for start of water stress
 
-InitCond (InitialCondition): InitCond object
+        Crop_p_lo (ndarray): water stress thresholds for maximum water stress
 
-Dr (Dr): depletion object (contains rootzone and top soil depletion totals)
+        Crop_ETadj (float): 
 
-taw (TAW): taw object (contains rootzone and top soil total available water)
+        Crop_beta (float): 
 
-et0 (float): Reference Evapotranspiration
+        Crop_fshape_w (ndarray): shape factors for water stress
 
-beta (float): Adjust senescence threshold if early sensescence is triggered
+        InitCond_tEarlySen (float): days in early senesence
+
+        Dr (Dr): rootzone depletion
+
+        taw (TAW): root zone total available water
+
+        et0 (float): Reference Evapotranspiration
+
+        beta (float): Adjust senescence threshold if early sensescence is triggered
 
 
     Returns:
 
-Ksw (Ksw): Ksw object containint water stress coefficients
+        Ksw (Ksw): Ksw object containint water stress coefficients
+
 
     """
 

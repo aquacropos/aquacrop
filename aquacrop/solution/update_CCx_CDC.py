@@ -6,9 +6,16 @@ from numba.pycc import CC
 # temporary name for compiled module
 cc = CC("solution_update_CCx_CDC")
 
+from typing import Tuple
+
 
 @cc.export("update_CCx_CDC", "(f8,f8,f8,f8)")
-def update_CCx_CDC(cc_prev, CDC, CCx, dt):
+def update_CCx_CDC(
+    cc_prev: float,
+    CDC: float,
+    CCx: float,
+    dt: float,
+    ) -> Tuple[float,float]:
     """
     Function to update CCx and CDC parameter valyes for rewatering in late season of an early declining canopy
 
@@ -18,20 +25,20 @@ def update_CCx_CDC(cc_prev, CDC, CCx, dt):
     Arguments:
 
 
-cc_prev (float): Canopy Cover at previous timestep.
+        cc_prev (float): Canopy Cover at previous timestep.
 
-CDC (float): Canopy decline coefficient (fraction per gdd/calendar day)
+        CDC (float): Canopy decline coefficient (fraction per gdd/calendar day)
 
-CCx (float): Maximum canopy cover (fraction of soil cover)
+        CCx (float): Maximum canopy cover (fraction of soil cover)
 
-dt (float): Time delta of canopy growth (1 calander day or ... gdd)
+        dt (float): Time delta of canopy growth (1 calander day or ... gdd)
 
 
     Returns:
 
-CCxAdj (float): updated CCxAdj
+        CCxAdj (float): updated CCxAdj
 
-CDCadj (float): updated CDCadj
+        CDCadj (float): updated CDCadj
 
 
 

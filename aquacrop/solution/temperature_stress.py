@@ -11,9 +11,20 @@ except:
 # temporary name for compiled module
 cc = CC("solution_temperature_stress")
 
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.crop import CropStructNT
+
+
 
 @cc.export("temperature_stress", (CropStructNT_type_sig,f8,f8))
-def temperature_stress(Crop, temp_max, temp_min):
+def temperature_stress(
+    Crop: "CropStructNT",
+    temp_max: float,
+    temp_min: float,
+    ) -> Tuple[float,float]:
     # Function to calculate temperature stress coefficients
     """
     Function to get irrigation depth for current day
@@ -24,19 +35,18 @@ def temperature_stress(Crop, temp_max, temp_min):
 
     Arguments:
 
+        Crop (Crop): Crop object containing Crop paramaters
 
+        temp_max (float): max tempatature on current day (celcius)
 
-Crop (Crop): Crop object containing Crop paramaters
-
-temp_max (float): max tempatature on current day (celcius)
-
-temp_min (float): min tempature on current day (celcius)
+        temp_min (float): min tempature on current day (celcius)
 
 
     Returns:
 
+        Kst_PolH (float): heat stress coefficient for current day
 
-Kst (Kst): Kst object containing tempature stress paramators
+        Kst_PolC (float): cold stress coefficient for current day
 
 
 
