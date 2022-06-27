@@ -1,25 +1,36 @@
 import numpy as np
+from typing import Tuple
 
 
 def calculate_HI_linear(
-    crop_YldFormCD,
-    crop_HIini,
-    crop_HI0,
-    crop_HIGC,
-):
-
+    crop_YldFormCD: int,
+    crop_HIini: float,
+    crop_HI0: float,
+    crop_HIGC: float,
+) -> Tuple[float, float]:
     """
     Function to calculate time to switch to linear harvest index build-up,
     and associated linear rate of build-up. Only for fruit/grain crops.
 
-    *Arguments:*\n
-
-    `crop` : `Crop` :  Crop object containing crop paramaters
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=121" target="_blank">Reference Manual</a> (pg. 112)
 
 
-    *Returns:*
+    Arguments:
 
-    `crop` : `Crop` : updated Crop object
+        crop_YldFormCD (int):  length of yield formaiton period (calendar days)
+
+        crop_HIini (float):  initial harvest index
+
+        crop_HI0 (float):  reference harvest index
+
+        crop_HIGC (float):  harvest index growth coefficent
+
+
+    Returns:
+
+        crop_tLinSwitch (float): time to switch to linear harvest index build-up
+
+        crop_dHILinear (float): linear rate of HI build-up
 
 
     """

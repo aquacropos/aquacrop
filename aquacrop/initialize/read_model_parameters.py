@@ -2,31 +2,42 @@ import numpy as np
 import pandas as pd
 from ..entities.paramStruct import ParamStruct
 from .compute_crop_calendar import compute_crop_calendar
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from pandas import DataFrame
+    from aquacrop.entities.clockStruct import ClockStruct
+    from aquacrop.entities.crop import Crop
+    from aquacrop.entities.inititalWaterContent import InitialWaterContent
+    from aquacrop.entities.soil import Soil
 
-def read_model_parameters(clock_struct, soil, crop, weather_df):
+def read_model_parameters(
+    clock_struct: "ClockStruct",
+    soil: "Soil",
+    crop: "Crop",
+    weather_df: "DataFrame"):
+
     """
     Finalise soil and crop paramaters including planting and harvest dates
     save to new object param_struct
 
 
-    *Arguments:*\n
+    Arguments:
 
-    `clock_struct` : `ClockStruct`:  time params
+        clock_struct (ClockStruct):  time params
 
-    `soil` : `Soil` :  soil object
+        soil (Soil):  soil object
 
-    `crop` : `Crop` :  crop object
+        crop (Crop):  crop object
 
-    `planting_dates` : `list` :  list of datetimes
+        weather_df (DataFrame): list of datetimes
 
-    `harvest_dates` : `list` : list of datetimes
+    Returns:
 
-    *Returns:*
+        clock_struct (ClockStruct): updated time paramaters
 
-    `clock_struct` : `ClockStruct` : updated time paramaters
-
-    `param_struct` : `ParamStruct` :  Contains model crop and soil paramaters
+        param_struct (ParamStruct):  Contains model crop and soil paramaters
 
     """
     # create param_struct object

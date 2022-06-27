@@ -1,30 +1,40 @@
 import numpy as np
 
+from typing import Tuple,TYPE_CHECKING
 
 
 
-def groundwater_inflow(prof, NewCond):
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.initParamVariables import InitialCondition
+
+
+
+
+def groundwater_inflow(
+    prof: "SoilProfileNT",
+    NewCond: "InitialCondition"
+    ) -> Tuple["InitialCondition",float]:
     """
     Function to calculate capillary rise in the presence of a shallow groundwater table
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=61" target="_blank">Reference Manual: capillary rise calculations</a> (pg. 52-61)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=61" target="_blank">Reference Manual: capillary rise calculations</a> (pg. 52-61)
 
 
-    *Arguments:*
+    Arguments:
+
+        prof (SoilProfileNT): Soil profile paramaters
+
+        NewCond (InitialCondition): model paramaters
 
 
-
-    `Soil`: `Soil` : Soil object containing soil paramaters
-
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+    Returns:
 
 
-    *Returns:*
+        NewCond (InitialCondition): InitCond object containing updated model paramaters
 
-
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
-
-    `GwIn`: `float` : Groundwater inflow
+        GwIn (float): Groundwater inflow
 
 
     """

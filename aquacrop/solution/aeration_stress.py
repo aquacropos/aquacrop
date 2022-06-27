@@ -7,35 +7,41 @@ try:
 except:
     from entities.rootZoneWaterContent import thRZNT_type_sig
 
+from typing import NamedTuple, Tuple
+
+
 # temporary name for compiled module
 cc = CC("solution_aeration_stress")
 cc.verbose = False
 
 
+
 @cc.export("aeration_stress", (f8,f8,thRZNT_type_sig))
-def aeration_stress(NewCond_AerDays, Crop_LagAer, thRZ):
+def aeration_stress(
+    NewCond_AerDays: float,
+    Crop_LagAer: float,
+    thRZ: NamedTuple,
+    ) -> Tuple[float, float]:
     """
     Function to calculate aeration stress coefficient
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=90" target="_blank">Reference Manual: aeration stress</a> (pg. 89-90)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=90" target="_blank">Reference Manual: aeration stress</a> (pg. 89-90)
 
 
-    *Arguments:*
+    Arguments:
+
+        NewCond_AerDays (int): number aeration stress days
+
+        Crop_LagAer (int): lag days before aeration stress
+
+        thRZ (NamedTuple): object that contains information on the total water in the root zone
 
 
-    `NewCond_AerDays`: `int` : number aeration stress days
+    Returns:
 
-    `Crop_LagAer`: `int` : lag days before aeration stress
+        Ksa_Aer (float): aeration stress coefficient
 
-    `thRZ`: `RootZoneWater` : object that contains information on the total water in the root zone
-
-
-
-    *Returns:*
-
-    `Ksa_Aer`: `float` : aeration stress coefficient
-
-    `NewCond_AerDays`: `float` : updated aer days
+        NewCond_AerDays (float): updated aer days
 
 
 

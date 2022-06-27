@@ -1,23 +1,27 @@
 """
 Initialize weather data
 """
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from ..entities.clockStruct import ClockStruct
+    from pandas import DataFrame
 
-def read_weather_inputs(clock_sctruct, weather_df):
+def read_weather_inputs(
+    clock_sctruct: "ClockStruct",
+    weather_df: "DataFrame") -> "DataFrame":
     """
     Clip weather to start and end simulation dates
 
     Arguments:
 
-    clock_sctruct : ClockStruct object
+        clock_sctruct (ClockStruct): ClockStruct object
 
-    weather_df : pd.DataFrame
-        weather dataframe
+        weather_df (DataFrame): weather dataframe
 
     Returns:
 
-        weather_df : pd.DataFrame
-            clipped weather data
+        weather_df (DataFrame): clipped weather dataframe
 
     """
 

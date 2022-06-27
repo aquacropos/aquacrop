@@ -13,46 +13,60 @@ except:
     from entities.temperatureStressCoefficients import KstNT_type_sig
 
     
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.waterStressCoefficients import KswNT
+    from aquacrop.entities.temperatureStressCoefficients import KstNT
+
+
+
 # temporary name for compiled module
 cc = CC("solution_HIadj_pollination")
 
 @cc.export("HIadj_pollination", (f8,f8,f8,f8,f8,KswNT_type_sig,KstNT_type_sig,f8))
 def HIadj_pollination(
-    NewCond_CC,
-    NewCond_Fpol,
-    Crop_FloweringCD, 
-    Crop_CCmin, 
-    Crop_exc, 
-    Ksw, 
-    Kst, 
-    HIt
-):
+    NewCond_CC: float,
+    NewCond_Fpol: float,
+    Crop_FloweringCD: float, 
+    Crop_CCmin: float, 
+    Crop_exc: float, 
+    Ksw: "KswNT", 
+    Kst: "KstNT", 
+    HIt: float,
+) -> float:
     """
     Function to calculate adjustment to harvest index for failure of
     pollination due to water or temperature stress
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
 
 
-    *Arguments:*
+    Arguments:
 
 
+        NewCond_CC (float): InitCond object containing model paramaters
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+        NewCond_Fpol (float): InitCond object containing model paramaters
 
-    `Crop`: `Crop` : Crop object containing Crop paramaters
+        Crop_FloweringCD (float): Length of flowering stage
 
-    `Ksw`: `Ksw` : Ksw object containing water stress paramaters
+        Crop_CCmin (float): minimum canopy cover
 
-    `Kst`: `Kst` : Kst object containing tempature stress paramaters
+        Crop_exc (float): 
 
-    `HIt`: `float` : time for harvest index build-up (calander days)
+        Ksw (KswNT): Ksw object containing water stress paramaters
+
+        Kst (KstNT): Kst object containing tempature stress paramaters
+
+        HIt (float): time for harvest index build-up (calander days)
 
 
-    *Returns:*
+    Returns:
 
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+        NewCond (InitialCondition): InitCond object containing updated model paramaters
 
 
 

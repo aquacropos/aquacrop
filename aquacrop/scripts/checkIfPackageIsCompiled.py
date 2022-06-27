@@ -2,6 +2,10 @@ from subprocess import call
 
 
 def compile_all_AOT_files():
+    """
+    Numba AOT compile functions to improve speed
+    
+    """
     try:
         from ..solution.solution_aeration_stress import aeration_stress
         from ..solution.solution_water_stress import water_stress

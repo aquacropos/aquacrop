@@ -10,6 +10,12 @@ except:
     from entities.crop import CropStructNT_type_sig
     from entities.waterStressCoefficients import KswNT_type_sig
 
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.crop import CropStructNT
+    from entities.waterStressCoefficients import KswNT
 
 # temporary name for compiled module
 cc = CC("solution_HIadj_post_anthesis")
@@ -17,37 +23,51 @@ cc = CC("solution_HIadj_post_anthesis")
 
 @cc.export("HIadj_post_anthesis", (i8,f8,f8,i8,f8,f8,f8,f8,CropStructNT_type_sig,KswNT_type_sig,))
 def HIadj_post_anthesis(
-                    NewCond_DelayedCDs,
-                    NewCond_sCor1,
-                    NewCond_sCor2,
-                    NewCond_DAP,
-                    NewCond_Fpre,
-                    NewCond_CC,
-                    NewCond_fpost_upp,
-                    NewCond_fpost_dwn,
-                    Crop, 
-                    Ksw):
+    NewCond_DelayedCDs: int,
+    NewCond_sCor1: float,
+    NewCond_sCor2: float,
+    NewCond_DAP: int,
+    NewCond_Fpre: float,
+    NewCond_CC: float,
+    NewCond_fpost_upp: float,
+    NewCond_fpost_dwn: float,
+    Crop: "CropStructNT", 
+    Ksw: "KswNT",
+    ) -> Tuple[float, float, float, float, float]:
     """
     Function to calculate adjustment to harvest index for post-anthesis water
     stress
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
 
 
-    *Arguments:*
+    Arguments:
 
 
+        NewCond_DelayedCDs (int): delayed calendar days
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+        NewCond_sCor1 (float): canopy exapnsion
 
-    `Crop`: `Crop` : Crop object containing Crop paramaters
+        NewCond_sCor2 (float): stomatal closure
 
-    `Ksw`: `Ksw` : Ksw object containing water stress paramaters
+        NewCond_DAP (int): days since planting
 
-    *Returns:*
+        NewCond_Fpre (float): delayed calendar days
+
+        NewCond_CC (float): current canopy cover
+
+        NewCond_fpost_upp (float): delayed calendar days
+
+        NewCond_fpost_dwn (float): delayed calendar days
+
+        Crop (CropStructNT): Crop paramaters
+
+        Ksw (KswNT): water stress paramaters
+
+    Returns:
 
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+        NewCond (InitialCondition): InitCond object containing updated model paramaters
 
 
     """

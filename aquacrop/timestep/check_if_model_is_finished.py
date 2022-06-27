@@ -1,24 +1,32 @@
 def check_model_is_finished(
-    step_end_time,
-    simulation_end_date,
-    model_is_finished,
-    season_counter,
-    n_seasons,
-    harvest_flag,
-):
+    step_end_time: str,
+    simulation_end_date: str,
+    model_is_finished: bool,
+    season_counter: int,
+    n_seasons: int,
+    harvest_flag: bool,
+) -> bool:
     """
     Function to check and declare model termination
 
 
-    *Arguments:*\n
+    Arguments:
 
-    `ClockStruct` : `ClockStruct` :  model time paramaters
+        step_end_time (str):  date of next step
 
-    `InitCond` : `InitialCondition` :  containing current model paramaters
+        simulation_end_date (str):  date of end of simulation
 
-    *Returns:*
+        model_is_finished (bool):  is model finished
 
-    `ClockStruct` : `ClockStruct` : updated clock paramaters
+        season_counter (int):  tracking the number of seasons simulated
+
+        n_seasons (int):  total number of seasons being simulated
+
+        harvest_flag (bool):  Has crop been harvested
+
+    Returns:
+
+        model_is_finished (bool): is simulation finished
 
 
     """

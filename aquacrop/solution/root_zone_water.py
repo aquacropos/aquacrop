@@ -8,49 +8,73 @@ try:
 except:
     from entities.soilProfile import SoilProfileNT_typ_sig
     
+
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from numpy import ndarray
+
+
+
+
 # temporary name for compiled module
 cc = CC("solution_root_zone_water")
 @njit
 @cc.export("root_zone_water", (SoilProfileNT_typ_sig,f8,f8[:],f8,f8,f8))
 def root_zone_water(
-    prof,
-    InitCond_Zroot,
-    InitCond_th,
-    Soil_zTop,
-    Crop_Zmin,
-    Crop_Aer,
-):
+    prof: "SoilProfileNT",
+    InitCond_Zroot: float,
+    InitCond_th: "ndarray",
+    Soil_zTop: float,
+    Crop_Zmin: float,
+    Crop_Aer: float,
+) -> Tuple[float, float, float, float, float, float, float, float, float, float, float]:
     """
     Function to calculate actual and total available water in the rootzone at current time step
 
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=14" target="_blank">Reference Manual: root-zone water calculations</a> (pg. 5-8)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=14" target="_blank">Reference Manual: root-zone water calculations</a> (pg. 5-8)
 
 
-    *Arguments:*
+    Arguments:
 
-    `prof`: `SoilProfile` : jit class Object containing soil paramaters
+        prof (SoilProfile): jit class Object containing soil paramaters
 
-    `InitCond_Zroot`: `float` : Initial rooting depth
+        InitCond_Zroot (float): Initial rooting depth
 
-    `InitCond_th`: `np.array` : Initial water content
+        InitCond_th (np.array): Initial water content
 
-    `Soil_zTop`: `float` : Top soil depth
+        Soil_zTop (float): Top soil depth
 
-    `Crop_Zmin`: `float` : crop minimum rooting depth
+        Crop_Zmin (float): crop minimum rooting depth
 
-    `Crop_Aer`: `int` : number of aeration stress days
+        Crop_Aer (int): number of aeration stress days
 
-    *Returns:*
+    Returns:
 
-     `WrAct`: `float` :  Actual rootzone water content
+        WrAct (float):  Actual rootzone water content
 
-     `Dr`: `Dr` :  depletion objection containing rootzone and topsoil depletion
+        Dr_Zt (float):  topsoil depletion
 
-     `taw`: `TAW` :  `TAW` containing rootzone and topsoil total avalable water
+        Dr_Rz (float):  rootzone depletion
 
-     `thRZ`: `RootZoneWater` :  thRZ object conaining rootzone water content paramaters
+        TAW_Zt (float):  topsoil total available water
 
+        TAW_Rz (float):  rootzone total available water
+
+        thRZ_Act (float):  Actual rootzone water content
+
+        thRZ_S (float):  rootzone water content at saturation
+
+        thRZ_FC (float):  rootzone water content at field capacity
+
+        thRZ_WP (float):  rootzone water content at wilting point
+
+        thRZ_Dry (float):  rootzone water content at air dry
+
+        thRZ_Aer (float):  rootzone water content at aeration stress threshold 
 
 
     """

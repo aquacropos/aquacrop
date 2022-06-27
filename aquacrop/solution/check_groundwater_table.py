@@ -11,37 +11,53 @@ except:
 # temporary name for compiled module
 cc = CC("solution_check_groundwater_table")
 
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.initParamVariables import InitialCondition
+    from numpy import ndarray
+
+
+
+
+
 @cc.export("check_groundwater_table", (SoilProfileNT_typ_sig,f8,f8[:],f8[:],i8,f8))
 def check_groundwater_table(
-    prof,
-    NewCond_zGW,
-    NewCond_th,
-    NewCond_th_fc_Adj,
-    water_table_presence,
-    z_gw,
-):
+    prof: "SoilProfileNT",
+    NewCond_zGW: float,
+    NewCond_th: "ndarray",
+    NewCond_th_fc_Adj: "ndarray",
+    water_table_presence: int,
+    z_gw: float,
+) -> "ndarray":
     """
     Function to check for presence of a groundwater table, and, if present,
     to adjust compartment water contents and field capacities where necessary
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=61" target="_blank">Reference manual: water table adjustment equations</a> (pg. 52-57)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=61" target="_blank">Reference manual: water table adjustment equations</a> (pg. 52-57)
 
 
-    *Arguments:*
+    Arguments:
 
-    `Soil`: `Soil` : Soil object containing soil paramaters
+        prof (SoilProfileNT): soil profile paramaters
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+        NewCond_zGW (float): groundwater depth
 
-    `water_table_presence`: int :  indicates if water table is present or not
+        NewCond_th (ndarray): water content in each soil commpartment
 
+        NewCond_th_fc_Adj (ndarray): adjusted water content at field capacity
 
-    *Returns:*
+        water_table_presence (int): indicates if water table is present or not
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+        z_gw (float): groundwater depth
 
-    `Soil`: `Soil` : Soil object containing updated soil paramaters
+    Returns:
 
+        NewCond_th_fc_Adj (ndarray): adjusted water content at field capacity
+
+        thfcAdj (ndarray): adjusted water content at field capacity
 
 
 

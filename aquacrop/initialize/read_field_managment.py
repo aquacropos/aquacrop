@@ -1,21 +1,30 @@
 from ..entities.fieldManagement import FieldMngtStruct
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.fieldManagement import FieldMngt, FieldMngtStruct
+    from aquacrop.entities.paramStruct import ParamStruct
 
-def read_field_management(ParamStruct, FieldMngt, FallowFieldMngt):
+def read_field_management(
+    ParamStruct: "ParamStruct",
+    FieldMngt: "FieldMngt",
+    FallowFieldMngt: "FieldMngt") -> "ParamStruct":
+
     """
-    turn field management classes into jit classes
+    store field management variables as FieldMngtStruct object
 
-    *Arguments:*\n
+    Arguments:
 
-    `ParamStruct` : `ParamStruct` :  Contains model crop and soil paramaters
+        ParamStruct (ParamStruct):  Contains model crop and soil paramaters
 
-    `FieldMngt` : `FieldMngt` :  irr mngt params object
+        FieldMngt (FieldMngt):  field mngt params
 
-    `FallowFieldMngt` : `FieldMngt` :  irr mngt params object
+        FallowFieldMngt (FieldMngt): fallow field mngt params
 
-    *Returns:*
+    Returns:
 
-    `ParamStruct` : `ParamStruct` :  updated with field management info
+        ParamStruct (ParamStruct):  updated ParamStruct with field management info
 
 
     """

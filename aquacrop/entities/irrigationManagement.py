@@ -6,31 +6,29 @@ from numba import float64, int64, boolean, types
 class IrrigationManagement:
 
     """
-    Farmer Class defines irrigation strategy
+    IrrigationManagement Class defines irrigation strategy
 
-    **Attributes:**\n
+    Attributes:
 
 
-    `Name` : `str` :  name
+        irrigation_method (int):  Irrigation method {0: rainfed, 1: soil moisture targets, 2: set time interval,
+                                                3: predifined schedule, 4: net irrigation, 5: constant depth }
 
-    `irrigation_method` : `int` :  Irrigation method {0: rainfed, 1: soil moisture targets, 2: set time interval,
-                                              3: predifined schedule, 4: net irrigation, 5: constant depth }
+        WetSurf (int): Soil surface wetted by irrigation (%)
 
-    `WetSurf` : `int` : Soil surface wetted by irrigation (%)
+        AppEff (int): Irrigation application efficiency (%)
 
-    `AppEff` : `int` : Irrigation application efficiency (%)
+        MaxIrr (float): Maximum depth (mm) that can be applied each day
 
-    `MaxIrr` : `float` : Maximum depth (mm) that can be applied each day
+        SMT (list):  Soil moisture targets (%taw) to maintain in each growth stage (only used if irrigation method is equal to 1)
 
-    `SMT` : `list` :  Soil moisture targets (%taw) to maintain in each growth stage (only used if irrigation method is equal to 1)
+        IrrInterval (int): Irrigation interval in days (only used if irrigation method is equal to 2)
 
-    `IrrInterval` : `int` : Irrigation interval in days (only used if irrigation method is equal to 2)
+        Schedule (pandas.DataFrame): DataFrame containing dates and depths
 
-    `Schedule` : `pandas.DataFrame` : DataFrame containing dates and depths
+        NetIrrSMT (float): Net irrigation threshold moisture level (% of taw that will be maintained, for irrigation_method=4)
 
-    `NetIrrSMT` : `float` : Net irrigation threshold moisture level (% of taw that will be maintained, for irrigation_method=4)
-
-    `Depth` : `float` : constant depth to apply on each day
+        Depth (float): constant depth to apply on each day
 
     """
 

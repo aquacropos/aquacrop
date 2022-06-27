@@ -19,6 +19,14 @@ if __name__ != "__main__":
 else:
     from .evap_layer_water_content import evap_layer_water_content
 
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from numpy import ndarray
+
+
 
 # temporary name for compiled module
 cc = CC("solution_soil_evaporation")
@@ -30,92 +38,153 @@ cc = CC("solution_soil_evaporation")
         f8,b1,f8,f8,f8,f8,f8,f8,f8,b1),
 )
 def soil_evaporation(
-    ClockStruct_EvapTimeSteps,
-    ClockStruct_SimOffSeason,
-    ClockStruct_TimeStepCounter,
-    prof,
-    Soil_EvapZmin,
-    Soil_EvapZmax,
-    Soil_REW,
-    Soil_Kex,
-    Soil_fwcc,
-    Soil_fWrelExp,
-    Soil_fevap,
-    Crop_CalendarType,
-    Crop_Senescence,
-    IrrMngt_IrrMethod,
-    IrrMngt_WetSurf,
-    FieldMngt_Mulches,
-    FieldMngt_fMulch,
-    FieldMngt_MulchPct,
-    NewCond_DAP,
-    NewCond_Wsurf,
-    NewCond_EvapZ,
-    NewCond_Stage2,
-    NewCond_th,
-    NewCond_DelayedCDs,
-    NewCond_GDDcum,
-    NewCond_DelayedGDDs,
-    NewCond_CCxW,
-    NewCond_CCadj,
-    NewCond_CCxAct,
-    NewCond_CC,
-    NewCond_PrematSenes,
-    NewCond_SurfaceStorage,
-    NewCond_Wstage2,
-    NewCond_Epot,
-    et0,
-    Infl,
-    Rain,
-    Irr,
-    growing_season,
-):
+    ClockStruct_EvapTimeSteps: int,
+    ClockStruct_SimOffSeason: int,
+    ClockStruct_TimeStepCounter: int,
+    prof: "SoilProfileNT",
+    Soil_EvapZmin: float,
+    Soil_EvapZmax: float,
+    Soil_REW: float,
+    Soil_Kex: float,
+    Soil_fwcc: float,
+    Soil_fWrelExp: float,
+    Soil_fevap: float,
+    Crop_CalendarType: int,
+    Crop_Senescence: float,
+    IrrMngt_IrrMethod: int,
+    IrrMngt_WetSurf: float,
+    FieldMngt_Mulches: bool,
+    FieldMngt_fMulch: float,
+    FieldMngt_MulchPct: float,
+    NewCond_DAP: int,
+    NewCond_Wsurf: float,
+    NewCond_EvapZ: float,
+    NewCond_Stage2: float,
+    NewCond_th: "ndarray",
+    NewCond_DelayedCDs: float,
+    NewCond_GDDcum: float,
+    NewCond_DelayedGDDs: float,
+    NewCond_CCxW: float,
+    NewCond_CCadj: float,
+    NewCond_CCxAct: float,
+    NewCond_CC: float,
+    NewCond_PrematSenes: bool,
+    NewCond_SurfaceStorage: float,
+    NewCond_Wstage2: float,
+    NewCond_Epot: float,
+    et0: float,
+    Infl: float,
+    Rain: float,
+    Irr: float,
+    growing_season: bool,
+) -> Tuple[float, "ndarray", bool, float, float, float, float, float, float]:
 
     """
     Function to calculate daily soil evaporation
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=82" target="_blank">Reference Manual: evaporation equations</a> (pg. 73-81)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=82" target="_blank">Reference Manual: evaporation equations</a> (pg. 73-81)
 
 
-    *Arguments:*
+    Arguments:
+
+        ClockStruct_EvapTimeSteps (int): number of evaportation time steps
+
+        ClockStruct_SimOffSeason (int): simulate off season? (0=no, 1=yes)
+        
+        ClockStruct_TimeStepCounter (int): time step counter
+
+        prof (SoilProfileNT): soil profile object
+
+        Soil_EvapZmin (float): minimum evaporation depth (m)
+
+        Soil_EvapZmax (float): maximum evaporation depth (m)
+
+        Soil_REW (float): Readily Evaporable Water 
+
+        Soil_Kex (float): Soil evaporation coefficient
+
+        Soil_fwcc (float): 
+
+        Soil_fWrelExp (float): 
+
+        Soil_fevap (float): 
+
+        Crop_CalendarType (int): calendar type 
+
+        Crop_Senescence (float):
+
+        IrrMngt_IrrMethod (int): irrigation method
+
+        IrrMngt_WetSurf (float): wet surface area
+
+        FieldMngt_Mulches (bool): mulch present? (0=no, 1=yes)
+
+        FieldMngt_fMulch (float): mulch factor
+
+        FieldMngt_MulchPct (float): mulch percentage
+
+        NewCond_DAP (int): days after planting
+
+        NewCond_Wsurf (float): wet surface area
+
+        NewCond_EvapZ (float): evaporation depth (m)
+
+        NewCond_Stage2 (float): stage 2 evaporation
+
+        NewCond_th (ndarray): soil water content
+
+        NewCond_DelayedCDs: delayed calendar days
+
+        NewCond_GDDcum (float): cumulative growing degree days
+
+        NewCond_DelayedGDDs (float): delayed growing degree days
+
+        NewCond_CCxW (float): 
+
+        NewCond_CCadj (float): canopy cover adjusted
+
+        NewCond_CCxAct: max canopy cover actual
+
+        NewCond_CC (float): canopy cover
+
+        NewCond_PrematSenes (bool): prematurity senescence? (0=no, 1=yes)
+
+        NewCond_SurfaceStorage (float): surface storage
+
+        NewCond_Wstage2 (float): stage 2 water content
+
+        NewCond_Epot (float): potential evaporation
+
+        et0 (float): daily reference evapotranspiration
+
+        Infl (float): Infiltration on current day
+
+        Rain (float): daily precipitation mm
+
+        Irr (float): Irrigation applied on current day
+
+        growing_season (bool): is growing season (True or Flase)
 
 
+    Returns:
 
-    `Clock params`: `bool, int` : clock params
+        NewCond_Epot (float): Potential surface evaporation current day
 
-    `Soil parameters`: `float` : soil parameters
+        NewCond_th (ndarray): updated soil water content
 
-    `Crop params`: `float` : Crop paramaters
+        NewCond_Stage2 (bool): stage 2 soil evaporation
 
-    `IrrMngt params`: `int, float`: irrigation management paramaters
+        NewCond_Wstage2 (float): stage 2 soil evaporation 
 
-    `FieldMngt`: `FieldMngtStruct` : Field management paramaters
+        NewCond_Wsurf (float): updated surface water content
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+        NewCond_SurfaceStorage (float): updated surface storage
 
-    `et0`: `float` : daily reference evapotranspiration
+        NewCond_EvapZ (float): updated evaporation layer depth
 
-    `Infl`: `float` : Infiltration on current day
+        EsAct (float): Actual surface evaporation current day
 
-    `Rain`: `float` : daily precipitation mm
-
-    `Irr`: `float` : Irrigation applied on current day
-
-    `growing_season`:: `bool` : is growing season (True or Flase)
-
-
-    *Returns:*
-
-
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
-
-    `EsAct`: `float` : Actual surface evaporation current day
-
-    `EsPot`: `float` : Potential surface evaporation current day
-
-
-
-
+        EsPot (float): Potential surface evaporation current day
 
     """
 

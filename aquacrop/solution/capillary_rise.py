@@ -1,34 +1,51 @@
 import numpy as np
+from typing import TYPE_CHECKING, Tuple
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.initParamVariables import InitialCondition
+    from numpy import ndarray
 
 
 
-def capillary_rise(prof, Soil_nLayer, Soil_fshape_cr, NewCond, FluxOut, water_table_presence):
+
+def capillary_rise(
+    prof: "SoilProfileNT",
+    Soil_nLayer: int,
+    Soil_fshape_cr: float,
+    NewCond: "InitialCondition",
+    FluxOut: "ndarray",
+    water_table_presence: int,
+    ) -> Tuple["InitialCondition", float]:
     """
     Function to calculate capillary rise from a shallow groundwater table
 
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=61" target="_blank">Reference Manual: capillary rise calculations</a> (pg. 52-61)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=61" target="_blank">Reference Manual: capillary rise calculations</a> (pg. 52-61)
 
 
-    *Arguments:*
+    Arguments:
 
 
+        prof (SoilProfileNT): Soil profile named tuple
 
-    `Soil`: `Soil` : Soil object
+        Soil_nLayer (int): number of soil layers
 
-    `NewCond`: `InitialCondition` : InitCond object containing model paramaters
+        Soil_fshape_cr (float): Capillary rise shape factor
 
-    `FluxOut`: `np.array` : FLux of water out of each soil compartment
+        NewCond (InitialCondition): InitialCondition object containing model paramaters
 
-    `water_table_presence`: `int` : water_table present (1:yes, 0:no)
+        FluxOut (numpy.array): Flux of water out of each soil compartment
+
+        water_table_presence (int): water_table present (1:yes, 0:no)
 
 
-    *Returns:*
+    Returns:
 
+        NewCond (InitialCondition): InitCond object containing updated model paramaters
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
-
-    `CrTot`: `float` : Total Capillary rise
+        CrTot (float): Total Capillary rise
 
 
 

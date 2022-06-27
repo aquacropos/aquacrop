@@ -1,22 +1,30 @@
 import numpy as np
 
 
+
 def calculate_HIGC(
-    crop_YldFormCD,
-    crop_HI0,
-    crop_HIini,
-):
+    crop_YldFormCD: int,
+    crop_HI0: float,
+    crop_HIini: float,
+) -> float:
     """
     Function to calculate harvest index growth coefficient
 
-    *Arguments:*\n
-
-    `crop` : `Crop` :  Crop object containing crop paramaters
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=119" target="_blank">Reference Manual</a> (pg. 110)
 
 
-    *Returns:*
+    Arguments:
 
-    `crop` : `Crop` : updated Crop object
+        crop_YldFormCD (int):  length of yield formation period (calendar days)
+
+        crop_HI0 (float):  reference harvest index
+
+        crop_HIini (float):  initial harvest index
+
+
+    Returns:
+
+        crop_HIGC (float): harvest index growth coefficient
 
 
     """

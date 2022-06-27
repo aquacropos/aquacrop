@@ -55,7 +55,7 @@ class AquaCropModel:
     This is the main class of the AquaCrop-OSPy model.
     It is in charge of executing all the operations.
 
-    Arguments:
+    Parameters:
 
         sim_start_time (str): YYYY/MM/DD, Simulation start date
 

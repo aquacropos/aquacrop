@@ -9,33 +9,38 @@ cc = CC("solution_cc_required_time")
 
 
 @cc.export("cc_required_time", "f8(f8,f8,f8,f8,f8,unicode_type)")
-def cc_required_time(cc_prev, CCo, CCx, CGC, CDC, Mode):
+def cc_required_time(
+    cc_prev: float,
+    CCo: float,
+    CCx: float,
+    CGC: float,
+    CDC: float,
+    Mode: str,
+    ) -> float:
     """
     Function to find time required to reach canopy_cover at end of previous day, given current CGC or CDC
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=30" target="_blank">Reference Manual: canopy_cover devlopment</a> (pg. 21-24)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=30" target="_blank">Reference Manual: canopy_cover devlopment</a> (pg. 21-24)
 
 
+    Arguments:
 
-    *Arguments:*
+        cc_prev (float): Canopy Cover at previous timestep.
 
+        CCo (float): Fractional canopy cover size at emergence
 
-    `cc_prev`: `float` : Canopy Cover at previous timestep.
+        CCx (float): Maximum canopy cover (fraction of soil cover)
 
-    `CCo`: `float` : Fractional canopy cover size at emergence
+        CGC (float): Canopy growth coefficient (fraction per gdd)
 
-    `CCx`: `float` : Maximum canopy cover (fraction of soil cover)
+        CDC (float): Canopy decline coefficient (fraction per gdd/calendar day)
 
-    `CGC`: `float` : Canopy growth coefficient (fraction per gdd)
-
-    `CDC`: `float` : Canopy decline coefficient (fraction per gdd/calendar day)
-
-    `Mode`: `str` : Canopy growth/decline coefficient (fraction per gdd/calendar day)
+        Mode (str): Canopy growth/decline coefficient (fraction per gdd/calendar day)
 
 
-    *Returns:*
+    Returns:
 
-    `tReq`: `float` : time required to reach canopy_cover at end of previous day
+        tReq (float): time required to reach canopy_cover at end of previous day
 
 
 

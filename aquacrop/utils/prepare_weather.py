@@ -6,17 +6,17 @@ def prepare_weather(weather_file_path):
     function to read in weather data and return a dataframe containing
     the weather data
 
-    *Arguments:*\n
+    Arguments:\n
 
-    `FileLocations` : `FileLocationsClass`:  input File Locations
+FileLocations): `FileLocationsClass`:  input File Locations
 
-    `weather_file_path` : `str` :  file location of weather data
+weather_file_path): `str):  file location of weather data
 
 
 
-    *Returns:*
+    Returns:
 
-    `weather_df`: `pandas.DataFrame` :  weather data for simulation period
+weather_df (pandas.DataFrame):  weather data for simulation period
 
     """
 

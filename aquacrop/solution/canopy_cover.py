@@ -28,39 +28,50 @@ else:
     from .update_CCx_CDC import update_CCx_CDC
     from .cc_required_time import cc_required_time
 
+from typing import NamedTuple, Tuple, TYPE_CHECKING
 
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.initParamVariables import InitialCondition
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.crop import CropStructNT
 
-
-def canopy_cover(Crop, prof, Soil_zTop, InitCond, gdd, et0, growing_season):
+def canopy_cover(
+    Crop: "CropStructNT",
+    prof: "SoilProfileNT",
+    Soil_zTop: float,
+    InitCond: "InitialCondition",
+    gdd: float,
+    et0: float,
+    growing_season: bool,
+    ):
     # def CCCrop,Soil_Profile,Soil_zTop,InitCond,gdd,et0,growing_season):
 
     """
     Function to simulate canopy growth/decline
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=30" target="_blank">Reference Manual: canopy_cover equations</a> (pg. 21-33)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=30" target="_blank">Reference Manual: canopy_cover equations</a> (pg. 21-33)
 
 
-    *Arguments:*
+    Arguments:
 
+        Crop (CropStructNT): NamedTuple of Crop object
 
-    `Crop`: `Crop` : Crop object
+        prof (SoilProfileNT): NamedTuple of SoilProfile object
 
-    `prof`: `SoilProfile` : Soil object
+        Soil_zTop (float): top soil depth
 
-    `Soil_zTop`: `float` : top soil depth
+        InitCond (InitialCondition): InitCond object
 
-    `InitCond`: `InitialCondition` : InitCond object
+        gdd (float): Growing Degree Days
 
-    `gdd`: `float` : Growing Degree Days
+        et0 (float): reference evapotranspiration
 
-    `et0`: `float` : reference evapotranspiration
+        growing_season (bool): is it currently within the growing season (True, Flase)
 
-    `growing_season`:: `bool` : is it currently within the growing season (True, Flase)
+    Returns:
 
-    *Returns:*
-
-
-    `NewCond`: `InitialCondition` : updated InitCond object
+        NewCond (InitialCondition): updated InitCond object
 
 
     """

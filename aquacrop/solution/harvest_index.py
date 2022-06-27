@@ -30,40 +30,58 @@ else:
     from .HIadj_post_anthesis import HIadj_post_anthesis
     from .HIadj_pollination import HIadj_pollination
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.crop import CropStructNT
+    from aquacrop.entities.initParamVariables import InitialCondition
+    from aquacrop.entities.soilProfile import SoilProfileNT
 
 
 
 
-def harvest_index(prof, Soil_zTop, Crop, InitCond, et0, temp_max, temp_min, growing_season):
+def harvest_index(
+    prof: "SoilProfileNT",
+    Soil_zTop: float,
+    Crop: "CropStructNT",
+    InitCond: "InitialCondition",
+    et0: float,
+    temp_max: float,
+    temp_min: float,
+    growing_season: bool,
+    ) -> "InitialCondition":
 
     """
     Function to simulate build up of harvest index
 
 
-     <a href="../pdfs/ac_ref_man_3.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
+     <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
 
-    *Arguments:*
-
-
-    `Soil`: `Soil` : Soil object containing soil paramaters
-
-    `Crop`: `Crop` : Crop object containing Crop paramaters
-
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
-
-    `et0`: `float` : reference evapotranspiration on current day
-
-    `temp_max`: `float` : maximum tempature on current day (celcius)
-
-    `temp_min`: `float` : minimum tempature on current day (celcius)
-
-    `growing_season`:: `bool` : is growing season (True or Flase)
+    Arguments:
 
 
-    *Returns:*
+        prof (SoilProfileNT): Soil profile paramaters
+
+        Soil_zTop (float): topsoil depth
+
+        Crop (CropStructNT): Crop paramaters
+
+        InitCond (InitialCondition): InitCond object containing model paramaters
+
+        et0 (float): reference evapotranspiration on current day
+
+        temp_max (float): maximum tempature on current day (celcius)
+
+        temp_min (float): minimum tempature on current day (celcius)
+
+        growing_season (bool): is growing season (True or Flase)
 
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+    Returns:
+
+
+        NewCond (InitialCondition): InitCond object containing updated model paramaters
 
 
 

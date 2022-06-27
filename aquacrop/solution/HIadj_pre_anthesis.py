@@ -10,30 +10,33 @@ cc = CC("solution_HIadj_pre_anthesis")
 
 @cc.export("HIadj_pre_anthesis", (f8,f8,f8,f8))
 def HIadj_pre_anthesis(
-    NewCond_B,
-    NewCond_B_NS,
-    NewCond_CC,
-    Crop_dHI_pre):
+    NewCond_B: float,
+    NewCond_B_NS: float,
+    NewCond_CC: float,
+    Crop_dHI_pre: float
+    ) -> float:
     """
     Function to calculate adjustment to harvest index for pre-anthesis water
     stress
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=119" target="_blank">Reference Manual: harvest index calculations</a> (pg. 110-126)
 
 
-    *Arguments:*
+    Arguments:
+
+        NewCond_B (float): biomass growth
+
+        NewCond_B_NS (float): biomass growth (no stress)
+
+        NewCond_CC (float): canopy cover
+
+        Crop_dHI_pre (float): Crop_dHI_pre
 
 
-
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
-
-    `Crop`: `Crop` : Crop object containing Crop paramaters
+    Returns:
 
 
-    *Returns:*
-
-
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+        NewCond_Fpre (float): adjustment to harvest index for pre-anthesis water stress
 
 
     """

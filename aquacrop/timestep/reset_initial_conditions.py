@@ -5,25 +5,41 @@ from ..entities.modelConstants import ModelConstants
 from ..initialize.calculate_HI_linear import calculate_HI_linear
 from ..initialize.calculate_HIGC import calculate_HIGC
 
+from typing import Tuple, TYPE_CHECKING
 
-def reset_initial_conditions(ClockStruct, InitCond, ParamStruct, weather):
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from numpy import ndarray
+    from aquacrop.entities.clockStruct import ClockStruct
+    from aquacrop.entities.initParamVariables import InitialCondition
+    from aquacrop.entities.paramStruct import ParamStruct
+
+def reset_initial_conditions(
+    ClockStruct: "ClockStruct",
+    InitCond: "InitialCondition",
+    ParamStruct: "ParamStruct",
+    weather: "ndarray") -> Tuple["InitialCondition", "ParamStruct"]:
 
     """
     Function to reset initial model conditions for start of growing
     season (when running model over multiple seasons)
 
-    *Arguments:*\n
+    Arguments:
 
-    `ClockStruct` : `ClockStruct` :  model time paramaters
+        ClockStruct (ClockStruct):  model time paramaters
 
-    `InitCond` : `InitialCondition` :  containing current model paramaters
+        InitCond (InitialCondition):  containing current model paramaters
 
-    `weather`: `np.array` :  weather data for simulation period
+        ParamStruct (ParamStruct):  containing current model paramaters
+
+        weather (numpy.ndarray):  weather data for simulation period
 
 
-    *Returns:*
+    Returns:
 
-    `InitCond` : `InitialCondition` :  containing reset model paramaters
+        InitCond (InitialCondition):  containing reset simulation variables and counters
+
+        ParamStruct (ParamStruct):  contains all model params
 
 
 

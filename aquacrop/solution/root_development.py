@@ -14,50 +14,82 @@ except:
 # temporary name for compiled module
 cc = CC("solution_root_development")
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.crop import CropStructNT
+    from numpy import ndarray
+
 
 @cc.export("root_development", (CropStructNT_type_sig,SoilProfileNT_typ_sig,f8,f8,f8,f8,f8,f8,f8[:],f8,f8,b1,f8,f8,f8,f8,b1,i8))
-def root_development(Crop,
-                    prof,
-                    NewCond_DAP,
-                    NewCond_Zroot,
-                    NewCond_DelayedCDs,
-                    NewCond_GDDcum,
-                    NewCond_DelayedGDDs,
-                    NewCond_TrRatio,
-                    NewCond_th,
-                    NewCond_CC,
-                    NewCond_CC_NS,
-                    NewCond_Germination,
-                    NewCond_rCor,
-                    NewCond_Tpot,
-                    NewCond_zGW,
-                    gdd,
-                    growing_season,
-                    water_table_presence):
+def root_development(
+    Crop: "CropStructNT",
+    prof: "SoilProfileNT",
+    NewCond_DAP: float,
+    NewCond_Zroot: float,
+    NewCond_DelayedCDs: float,
+    NewCond_GDDcum: float,
+    NewCond_DelayedGDDs: float,
+    NewCond_TrRatio: float,
+    NewCond_th: "ndarray",
+    NewCond_CC: float,
+    NewCond_CC_NS: float,
+    NewCond_Germination: bool,
+    NewCond_rCor: float,
+    NewCond_Tpot: float,
+    NewCond_zGW: float,
+    gdd: float,
+    growing_season: bool,
+    water_table_presence: int,
+    ) -> float:
     """
     Function to calculate root zone expansion
 
-    <a href="../pdfs/ac_ref_man_3.pdf#page=46" target="_blank">Reference Manual: root developement equations</a> (pg. 37-41)
+    <a href="https://www.fao.org/3/BR248E/br248e.pdf#page=46" target="_blank">Reference Manual: root developement equations</a> (pg. 37-41)
 
 
-    *Arguments:*
+    Arguments:
 
-    `Crop`: `CropStruct` : jit class object containing Crop paramaters
+        Crop (CropStructNT): crop params
 
-    `prof`: `SoilProfile` : jit class object containing soil paramaters
+        prof (SoilProfileNT): soilv profile paramaters
 
-    `InitCond`: `InitialCondition` : InitCond object containing model paramaters
+        NewCond_DAP (float): days after planting
 
-    `gdd`: `float` : Growing degree days on current day
+        NewCond_Zroot (float): root depth
 
-    `growing_season`: `bool` : is growing season (True or Flase)
+        NewCond_DelayedCDs (float): delayed calendar days
 
-    `water_table_presence`: `int` : water table present (True=1 or Flase=0)
+        NewCond_GDDcum (float): cumulative growing degree days
+
+        NewCond_TrRatio (float): transpiration ratio
+
+        NewCond_CC (float): canopy cover
+
+        NewCond_CC_NS (float): canopy cover no-stress
+
+        NewCond_Germination (float): germination flag
+
+        NewCond_rCor (float): 
+
+        NewCond_DAP (float): days after planting
+
+        NewCond_Tpot (float): potential transpiration
+
+        NewCond_zGW (float): groundwater depth
+
+        gdd (float): Growing degree days on current day
+
+        growing_season (bool): is growing season (True or Flase)
+
+        water_table_presence (int): water table present (True=1 or Flase=0)
 
 
-    *Returns:*
+    Returns:
 
-    `NewCond`: `InitialCondition` : InitCond object containing updated model paramaters
+        NewCond_Zroot (float): updated rooting depth
 
 
     """
