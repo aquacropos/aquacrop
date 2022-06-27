@@ -51,12 +51,14 @@ def read_groundwater_table(
         df.Date = pd.DatetimeIndex(df.Date)
 
         if len(df) == 1:
-
+            
             # if only 1 watertable depth then set that value to be constant
-            # accross whole simulation
-            z_gw = df.reindex(ClockStruct.time_span, fill_value=df["Depth(mm)"].iloc[0],).drop(
-                "Date", axis=1
-            )["Depth(mm)"]
+            # accross whole simulation            
+            z_gw = pd.DataFrame(
+                data=df["Depth(mm)"].iloc[0]*np.ones(len(ClockStruct.time_span)),
+                index=pd.to_datetime(ClockStruct.time_span),
+                columns=['Depth(mm)']
+            )['Depth(mm)']
 
         elif len(df) > 1:
             # check water table method
