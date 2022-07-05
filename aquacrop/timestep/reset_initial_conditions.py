@@ -53,8 +53,6 @@ def reset_initial_conditions(
     Soil = ParamStruct.Soil
     crop = ParamStruct.Seasonal_Crop_List[ClockStruct.season_counter]
     FieldMngt = ParamStruct.FieldMngt
-    CO2 = ParamStruct.CO2
-    CO2_data = ParamStruct.CO2data
 
     # Reset counters
     InitCond.age_days = 0
@@ -123,14 +121,22 @@ def reset_initial_conditions(
     # Update CO2 concentration ##
     # Get CO2 concentration
 
-    if ParamStruct.co2_concentration_adj is not None:
-        CO2.current_concentration = ParamStruct.co2_concentration_adj
+    # if user specified constant concentration
+    if  ParamStruct.CO2.constant_conc is True:
+        if ParamStruct.CO2.current_concentration > 0.:
+            CO2conc = ParamStruct.CO2.current_concentration
+        else:
+            CO2conc = ParamStruct.CO2.co2_data_processed.iloc[0]
     else:
         Yri = pd.DatetimeIndex([ClockStruct.step_start_time]).year[0]
-        CO2.current_concentration = CO2_data.loc[Yri]
+        CO2conc = ParamStruct.CO2.co2_data_processed.loc[Yri]
+
+    ParamStruct.CO2.current_concentration = CO2conc
+
     # Get CO2 weighting factor for first year
-    CO2conc = CO2.current_concentration
-    CO2ref = CO2.ref_concentration
+    CO2conc = ParamStruct.CO2.current_concentration
+    CO2ref = ParamStruct.CO2.ref_concentration
+    
     if CO2conc <= CO2ref:
         fw = 0
     else:
@@ -254,6 +260,5 @@ def reset_initial_conditions(
 
     # Update global variables
     ParamStruct.Seasonal_Crop_List[ClockStruct.season_counter] = crop
-    ParamStruct.CO2 = CO2
 
     return InitCond, ParamStruct
