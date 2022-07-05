@@ -7,3 +7,4 @@ if not '-m' in sys.argv:
     from .entities.irrigationManagement import IrrigationManagement
     from .entities.fieldManagement import FieldMngt
     from .entities.groundWater import  GroundWater
+    from .entities.co2 import  CO2
