@@ -18,13 +18,23 @@ class CO2(object):
 
         ref_concentration (float): reference CO2 concentration
 
-        current_concentration (float): current CO2 concentration
+        current_concentration (float): current CO2 concentration (initialize if constant_conc=True)
+
+        constant_conc (bool): use constant conc every season
+
+        co2_data (DataFrame): CO2 timeseries (2 columns: 'year' and 'ppm')
 
     """
 
-    def __init__(self, co2_data=None, constant_conc=False):
-        self.ref_concentration = 369.41
-        self.current_concentration = 0.0
+    def __init__(
+        self,
+        ref_concentration=369.41,
+        current_concentration=0.,
+        constant_conc=False,
+        co2_data=None,
+    ):
+        self.ref_concentration = ref_concentration
+        self.current_concentration = current_concentration
         self.constant_conc = constant_conc
         if co2_data is not None:
             self.co2_data = co2_data
