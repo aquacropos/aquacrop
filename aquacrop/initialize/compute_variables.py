@@ -8,7 +8,6 @@ from ..entities.crop import CropStruct
 from copy import deepcopy
 from os.path import dirname, abspath
 
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -115,12 +114,7 @@ def compute_variables(
 
     # Calculate WP adjustment factor for elevation in CO2 concentration
     # Load CO2 data
-    co2Data = pd.read_csv(
-        f"{acfp}/data/MaunaLoaCO2.txt",
-        header=1,
-        delim_whitespace=True,
-        names=["year", "ppm"],
-    )
+    co2Data = param_struct.CO2.co2_data
 
     # Years
     start_year, end_year = pd.DatetimeIndex(
@@ -129,18 +123,22 @@ def compute_variables(
     sim_years = np.arange(start_year, end_year + 1)
 
     # Interpolate data
-    CO2conc = np.interp(sim_years, co2Data.year, co2Data.ppm)
+    CO2conc_interp = np.interp(sim_years, co2Data.year, co2Data.ppm)
 
     # Store data
-    param_struct.CO2data = pd.Series(CO2conc, index=sim_years)  # maybe get rid of this
+    param_struct.CO2.co2_data_processed = pd.Series(CO2conc_interp, index=sim_years)  # maybe get rid of this
 
     # Get CO2 concentration for first year
-    CO2conc = param_struct.CO2data.iloc[0]
+    CO2conc = param_struct.CO2.co2_data_processed.iloc[0]
 
-    param_struct.CO2 = CO2()
+    # param_struct.CO2 = param_struct.co2_concentration_adj
 
-    if param_struct.co2_concentration_adj != None:
-        CO2conc = param_struct.co2_concentration_adj
+    # if user specified constant concentration
+    if  param_struct.CO2.constant_conc is True:
+        if param_struct.CO2.current_concentration > 0.:
+            CO2conc = param_struct.CO2.current_concentration
+        else:
+            CO2conc = param_struct.CO2.co2_data_processed.iloc[0]
 
     param_struct.CO2.current_concentration = CO2conc
 

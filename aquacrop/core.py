@@ -30,7 +30,7 @@ else:
 
 
 # pylint: disable=wrong-import-position
-
+from .entities.co2 import CO2
 from .entities.fieldManagement import FieldMngt
 from .entities.groundWater import GroundWater
 from .entities.irrigationManagement import IrrigationManagement
@@ -133,6 +133,8 @@ class AquaCropModel:
             self.fallow_field_management = FieldMngt()
         if groundwater is None:
             self.groundwater = GroundWater()
+        if co2_concentration is None:
+            self.co2_concentration = CO2()
 
     @property
     def sim_start_time(self) -> str:
@@ -224,7 +226,7 @@ class AquaCropModel:
         )
 
         # Compute additional variables
-        self._param_struct.co2_concentration_adj = self.co2_concentration
+        self._param_struct.CO2 = self.co2_concentration
         self._param_struct = compute_variables(
             self._param_struct, self.weather_df, self._clock_struct
         )
