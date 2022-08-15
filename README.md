@@ -1,6 +1,6 @@
 # AquaCrop-OSPy
 
-Soil-Crop-Water model based on AquaCrop-OS.
+Soil-Crop-Water model based on AquaCrop-OS. 
 
 ![checks](https://badgen.net/github/checks/aquacropos/aquacrop)
 ![release](https://badgen.net/github/release/aquacropos/aquacrop)
