@@ -12,11 +12,10 @@ if TYPE_CHECKING:
     from aquacrop.entities.inititalWaterContent import InitialWaterContent
     from aquacrop.entities.soil import Soil
 
+
 def read_model_parameters(
-    clock_struct: "ClockStruct",
-    soil: "Soil",
-    crop: "Crop",
-    weather_df: "DataFrame"):
+    clock_struct: "ClockStruct", soil: "Soil", crop: "Crop", weather_df: "DataFrame"
+):
 
     """
     Finalise soil and crop paramaters including planting and harvest dates
@@ -140,18 +139,9 @@ def read_model_parameters(
         # if it takes over a year then the plant year finishes 1 year before end of sim
         # and harvest year starts 1 year after sim start
 
-        if (
-            pd.to_datetime(str(start_end_years[1] + 2) + "/" + crop.harvest_date)
-            < sim_end_date
-        ):
-
-            # specify shifted planting and harvest years
-            plant_years = list(range(start_end_years[0], start_end_years[1] + 1))
-            harvest_years = list(range(start_end_years[0] + 1, start_end_years[1] + 2))
-        else:
-
-            plant_years = list(range(start_end_years[0], start_end_years[1]))
-            harvest_years = list(range(start_end_years[0] + 1, start_end_years[1] + 1))
+        # specify shifted planting and harvest years
+        plant_years = list(range(start_end_years[0], start_end_years[1]))
+        harvest_years = list(range(start_end_years[0] + 1, start_end_years[1] + 1))
 
     # Correct for partial first growing season (may occur when simulating
     # off-season soil water balance)
