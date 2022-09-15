@@ -187,7 +187,12 @@ def read_model_parameters(
     # save clock paramaters
     clock_struct.planting_dates = pd.to_datetime(planting_dates)
     clock_struct.harvest_dates = pd.to_datetime(harvest_dates)
-    clock_struct.n_seasons = len(planting_dates)
+    # calculate difference in days between simulation start and end days
+    diff_between_dates = (sim_end_date - sim_start_date).days
+    # calculate number of full years from this dates
+    total_number_of_years = diff_between_dates // 365
+    # get the number of seasons from number of full years
+    clock_struct.n_seasons = total_number_of_years + 1
 
     # Initialise growing season counter
     if pd.to_datetime(clock_struct.step_start_time) == clock_struct.planting_dates[0]:
