@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from dateutil.relativedelta import relativedelta
 from ..entities.paramStruct import ParamStruct
 from .compute_crop_calendar import compute_crop_calendar
 from typing import TYPE_CHECKING
