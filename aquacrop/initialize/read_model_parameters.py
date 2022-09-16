@@ -130,6 +130,16 @@ def read_model_parameters(
     single_year = pd.to_datetime("1990/" + crop.planting_date) < pd.to_datetime(
         "1990/" + crop.harvest_date
     )
+
+    # Check if the simulation in the following year does not reach the planting date.
+    mock_simulation_end_date = pd.to_datetime("1990/" + f'{sim_end_date.month}' + "/" + f'{sim_end_date.day}')
+    mock_simulation_start_date = pd.to_datetime("1990/" + crop.planting_date)
+    last_simulation_year_does_not_start = mock_simulation_end_date < mock_simulation_start_date
+    if single_year and last_simulation_year_does_not_start:
+        start_end_years = pd.DatetimeIndex([sim_start_date, sim_end_date - relativedelta(years=1)]).year
+    else:
+        start_end_years = pd.DatetimeIndex([sim_start_date, sim_end_date]).year
+
     if single_year:
         # if normal year
 
@@ -187,12 +197,7 @@ def read_model_parameters(
     # save clock paramaters
     clock_struct.planting_dates = pd.to_datetime(planting_dates)
     clock_struct.harvest_dates = pd.to_datetime(harvest_dates)
-    # calculate difference in days between simulation start and end days
-    diff_between_dates = (sim_end_date - sim_start_date).days
-    # calculate number of full years from this dates
-    total_number_of_years = diff_between_dates // 365
-    # get the number of seasons from number of full years
-    clock_struct.n_seasons = total_number_of_years + 1
+    clock_struct.n_seasons = len(planting_dates)
 
     # Initialise growing season counter
     if pd.to_datetime(clock_struct.step_start_time) == clock_struct.planting_dates[0]:
