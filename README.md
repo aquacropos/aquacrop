@@ -41,7 +41,7 @@ Open access journal article <a href=https://doi.org/10.1016/j.agwat.2021.106976>
 
 It is built upon the AquaCropOS crop-growth model written in Matlab (<a href=https://doi.org/10.1016/j.agwat.2016.11.015> paper </a>, <a href=https://www.aquacropos.com/> webpage </a>) which itself itself is based on the FAO AquaCrop model <a href=http://www.fao.org/aquacrop/en/>Webpage </a>. Comparisons to both base models are shown <a href=https://aquacropos.github.io/aquacrop/comparison.html> here. </a>
 
-A <a href=https://forum.aquacroposforum.com/>forum </a> has also been created so that users of AquaCrop-OSPy and AquaCrop-OS can discuss research, bugs and future development.
+A <a href=https://github.com/aquacropos/aquacrop/discussions>forum </a> has also been created so that users of AquaCrop-OSPy and AquaCrop-OS can discuss research, bugs and future development.
 
 There is also an extensive <a href=https://aquacropos.github.io/aquacrop/>documentation </a> for the model
 
@@ -59,3 +59,14 @@ A number of tutorials has been created (more to be added in future) to help user
 2.  <a href=https://colab.research.google.com/github/aquacropos/aquacrop/blob/master/docs/notebooks/AquaCrop_OSPy_Notebook_2.ipynb>Estimation of irrigation water demands</a>
 3.  <a href=https://colab.research.google.com/github/aquacropos/aquacrop/blob/master/docs/notebooks/AquaCrop_OSPy_Notebook_3.ipynb>Optimisation of irrigation management strategies</a>
 4.  <a href=https://colab.research.google.com/github/aquacropos/aquacrop/blob/master/docs/notebooks/AquaCrop_OSPy_Notebook_4.ipynb>Projection of climate change impacts</a>
+
+## AquaPlan
+
+The latest development is a streamlit-based web application AquaPlan, a powerful crop management tool that enables farmers, businesses, and governments to make more informed decisions about water management, irrigation investments, and climate risks. 
+
+You can access AquaPlan using the following link: https://tinyurl.com/aquaplan.
+
+More information, including screenshots and gifs, can be found at The University of Manchester's [article](https://www.manchester.ac.uk/discover/news/manchester-scientists-launch-new-interactive-tool-for-agricultural-water-management-and-climate-risk-assessment/), Tim Foster's medium [post](https://medium.com/@agwater/aquaplan-a-new-interactive-tool-for-agricultural-water-management-and-climate-risk-assessment-82c50cb10144), or twitter [thread](https://twitter.com/tim_foster_88/status/1557728807758737408).
+
+A seperate [category](https://github.com/aquacropos/aquacrop/discussions/categories/aquaplan) inside the AquaCrop-OSPy forum has been created to discuss
+AquaPlan, including any issues, questions, or suggestions.
