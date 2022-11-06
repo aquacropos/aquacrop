@@ -105,12 +105,6 @@ def read_model_parameters(
     sim_start_date = clock_struct.simulation_start_date
     sim_end_date = clock_struct.simulation_end_date
 
-    # extract the years and months of these dates
-    # pylint: disable=no-member
-    start_end_years = pd.DatetimeIndex([sim_start_date, sim_end_date]).year
-    # TODO: start_end_months is necessary?
-    # start_end_months = pd.DatetimeIndex([sim_start_date, sim_end_date]).month
-
     if crop.harvest_date is None:
         crop = compute_crop_calendar(
             crop,
@@ -125,13 +119,25 @@ def read_model_parameters(
         new_harvest_date = str(harv.month) + "/" + str(harv.day)
         crop.harvest_date = new_harvest_date
 
+    # extract years from simulation start and end date
+    start_end_years = [sim_start_date.year, sim_end_date.year]
+
     # check if crop growing season runs over calander year
     # Planting and harvest dates are in days/months format so just add arbitrary year
     single_year = pd.to_datetime("1990/" + crop.planting_date) < pd.to_datetime(
         "1990/" + crop.harvest_date
     )
+
     if single_year:
         # if normal year
+
+        # Check if the simulation in the following year does not reach the planting date.
+        mock_simulation_end_date = pd.to_datetime("1990/" + f'{sim_end_date.month}' + "/" + f'{sim_end_date.day}')
+        mock_simulation_start_date = pd.to_datetime("1990/" + crop.planting_date)
+        last_simulation_year_does_not_start = mock_simulation_end_date < mock_simulation_start_date
+
+        if last_simulation_year_does_not_start: 
+            start_end_years[1] = start_end_years[1] - 1
 
         # specify the planting and harvest years as normal
         plant_years = list(range(start_end_years[0], start_end_years[1] + 1))
