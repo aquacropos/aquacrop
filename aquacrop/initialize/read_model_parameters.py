@@ -131,12 +131,12 @@ def read_model_parameters(
     if single_year:
         # if normal year
 
-        # Check if the simulation in the following year does not reach the planting date.
+        # Check if the simulation in the following year does not exceed planting date.
         mock_simulation_end_date = pd.to_datetime("1990/" + f'{sim_end_date.month}' + "/" + f'{sim_end_date.day}')
         mock_simulation_start_date = pd.to_datetime("1990/" + crop.planting_date)
-        last_simulation_year_does_not_start = mock_simulation_end_date < mock_simulation_start_date
+        last_simulation_year_does_not_start = mock_simulation_end_date <= mock_simulation_start_date
 
-        if last_simulation_year_does_not_start: 
+        if last_simulation_year_does_not_start:
             start_end_years[1] = start_end_years[1] - 1
 
         # specify the planting and harvest years as normal
