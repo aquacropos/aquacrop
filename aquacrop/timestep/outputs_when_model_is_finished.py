@@ -86,6 +86,11 @@ def outputs_when_model_is_finished(
                 "harvest_index",
                 "harvest_index_adj",
                 "yield_",
+                'Tr',
+                'TrPot_NS',
+                'TrPot',
+                'Tr/Et0',
+                'NewCond.WPadj',
             ],
         )
 

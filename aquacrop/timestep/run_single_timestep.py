@@ -401,7 +401,7 @@ def solution_single_time_step(
     )
 
     # 16. Biomass accumulation
-    (NewCond.biomass, NewCond.biomass_ns) = biomass_accumulation(
+    (NewCond.biomass, NewCond.biomass_ns,NewCond.StressSFadjNEW,NewCond.StressSFadjpre,NewCond.Tr_ET0_accum,NewCond.WPadj,) = biomass_accumulation(
         Crop,
         NewCond.dap,
         NewCond.delayed_cds,
@@ -413,6 +413,10 @@ def solution_single_time_step(
         TrPot_NS,
         et0,
         growing_season,
+        NewCond.StressSFadjNEW,
+        NewCond.StressSFadjpre,
+        NewCond.Tr_ET0_accum,
+        NewCond.WPadj,
     )
 
     # 17. Harvest index
@@ -517,6 +521,11 @@ def solution_single_time_step(
         NewCond.harvest_index,
         NewCond.harvest_index_adj,
         NewCond.yield_,
+        Tr,
+        TrPot_NS,
+        TrPot,
+        Tr/et0,
+        NewCond.WPadj
     ]
 
     # Final output (if at end of growing season)

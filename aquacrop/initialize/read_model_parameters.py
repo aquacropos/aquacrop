@@ -110,6 +110,22 @@ def read_model_parameters(
     start_end_years = pd.DatetimeIndex([sim_start_date, sim_end_date]).year
     # TODO: start_end_months is necessary?
     # start_end_months = pd.DatetimeIndex([sim_start_date, sim_end_date]).month
+    
+    #need co2 data for soil fertility stress initialization
+    co2Data = param_struct.CO2.co2_data
+
+    # Years
+    start_year, end_year = pd.DatetimeIndex(
+        [clock_struct.simulation_start_date, clock_struct.simulation_end_date]
+    ).year
+    sim_years = np.arange(start_year, end_year + 1)
+
+    # Interpolate data
+    CO2conc_interp = np.interp(sim_years, co2Data.year, co2Data.ppm)
+
+    # Store data
+    param_struct.CO2.co2_data_processed = pd.Series(CO2conc_interp, index=sim_years)  # maybe get rid of this
+    
 
     if crop.harvest_date is None:
         crop = compute_crop_calendar(
@@ -118,6 +134,7 @@ def read_model_parameters(
             clock_struct.simulation_start_date,
             clock_struct.time_span,
             weather_df,
+            param_struct,#for soil fertility stress
         )
         mature = int(crop.MaturityCD + 30)
         plant = pd.to_datetime("1990/" + crop.planting_date)

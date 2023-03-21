@@ -1,6 +1,8 @@
 ACEA/
 AquaCropV61Nr02052018/
 NoteHan.txt
+figs/
+*.csv
 .gitignore
 # Byte-compiled / optimized / DLL files
 __pycache__/
