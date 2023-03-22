@@ -378,7 +378,7 @@ def canopy_cover(
                 # Crop has died
                 NewCond.canopy_cover = 0
                 NewCond.crop_dead = True
-
+        #The remaining bugs seems relate to the early senescence, how it interact with soil fertility module
         ## Canopy senescence due to water stress (actual) ##
         if tCCadj >= Crop.Emergence:
             if (tCCadj < Crop.Senescence) or (InitCond_tEarlySen > 0):
