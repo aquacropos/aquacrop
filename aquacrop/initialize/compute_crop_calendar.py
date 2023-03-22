@@ -329,7 +329,7 @@ def compute_crop_calendar(
         
         #soil fertility stress initialization and calibration, basically calculate the whole crop growth under ideal conditions (no water stress)  
 
-        #This part can be optimized(shorten) later
+        #This part can be optimized(shorten) later for the final version
         
         #print(crop.EmergenceCD)
         #print(crop.MaxCanopy)
