@@ -1,0 +1,10 @@
+paddy field (heavy clay)
+        6.0                 : AquaCrop Version (March 2017)
+       77                   : CN (Curve Number)
+       10                   : Readily evaporable water from top layer (mm)
+        2                   : number of soil horizons
+       -9                   : variable no longer applicable
+  Thickness  Sat   FC    WP     Ksat   Penetrability  Gravel  CRa       CRb           description
+  ---(m)-   ----(vol %)-----  (mm/day)      (%)        (%)    -----------------------------------------
+    0.50    54.0  50.0  32.0    15.0        100         0     -0.624600 -0.003804        silty clay
+    1.50    55.0  54.0  39.0     2.0        100         0     -0.635000 -1.426930           clay   

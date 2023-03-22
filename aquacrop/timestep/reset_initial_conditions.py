@@ -47,11 +47,11 @@ def reset_initial_conditions(
 
     # Extract crop type
     # TODO: This is necessary?
-    cropType = ParamStruct.cropChoices[ClockStruct.season_counter]
+    CropType = ParamStruct.CropChoices[ClockStruct.season_counter]
 
     # Extract structures for updating
     Soil = ParamStruct.Soil
-    crop = ParamStruct.Seasonal_crop_List[ClockStruct.season_counter]
+    crop = ParamStruct.Seasonal_Crop_List[ClockStruct.season_counter]
     FieldMngt = ParamStruct.FieldMngt
 
     # Reset counters
@@ -265,7 +265,7 @@ def reset_initial_conditions(
                                                                     /(crop.CCx*crop.Ksccx-(0.98*crop.CCx*crop.Ksccx)))/crop.CGC_CD/crop.Ksexpf))
             crop.MaxCanopy=gdd_cum[crop.MaxCanopyCD-1]
 
-        if crop.cropType == 3:
+        if crop.CropType == 3:
             # 1. Calendar days from sowing to end of flowering
             FloweringEnd = (gdd_cum > crop.FloweringEnd).argmax() + 1
             # 2. Duration of flowering in calendar days
@@ -398,7 +398,7 @@ def reset_initial_conditions(
         )
 
         # Update day to switch to linear harvest_index build-up
-        if crop.cropType == 3:
+        if crop.CropType == 3:
             # Determine linear switch point and HIGC rate for fruit/grain crops
             crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
                 crop.YldFormCD, crop.HIini, crop.HI0, crop.HIGC
@@ -416,9 +416,9 @@ def reset_initial_conditions(
             crop.Bio_top[i_]=Bio_top
             if i_>=crop.HIstartCD:
 
-                if ((crop.cropType == 2) or (crop.cropType == 3)):
+                if ((crop.CropType == 2) or (crop.CropType == 3)):
                 
-                    if crop.cropType == 2:
+                    if crop.CropType == 2:
                         PctLagPhase_=100
                     else:
                         if (i_-crop.HIstartCD) < crop.tLinSwitch:
@@ -446,6 +446,6 @@ def reset_initial_conditions(
         crop.Bio_top[len(Ksc_Total):len(Ksc_Total)+100]=Bio_top
 
     # Update global variables
-    ParamStruct.Seasonal_crop_List[ClockStruct.season_counter] = crop
+    ParamStruct.Seasonal_Crop_List[ClockStruct.season_counter] = crop
 
     return InitCond, ParamStruct

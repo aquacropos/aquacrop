@@ -1,0 +1,17 @@
+a particular schedule
+   3.2   : AquaCrop Version (January 2011)
+   4     : Surface irrigation: Furrow
+  90     : Percentage of soil surface wetted by irrigation
+   1     : Irrigation schedule
+
+   Day    Depth (mm)   ECw (dS/m)
+====================================
+     1        20          0.0
+     5        20          0.0
+    10        50          0.0
+    20        50          0.0
+    30        50          0.0
+    40        50          0.0
+    50        50          0.0
+    60        50          0.0
+    70        50          0.0

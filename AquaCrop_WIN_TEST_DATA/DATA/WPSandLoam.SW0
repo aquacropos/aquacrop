@@ -1,0 +1,10 @@
+Sanyd loam at wilting point
+    3.2   : AquaCrop Version (January 2011)
+    0.0   : water layer (mm) stored between soil bunds (if present)
+    0.00  : electrical conductivity (dS/m) of water layer stored between soil bunds (if present)
+    0     : soil water content specified for specific layers
+    1     : number of layers considered
+
+Thickness layer (m)     Water content (vol%)     ECe(dS/m)
+==============================================================
+         4.00                10.00                  0.00

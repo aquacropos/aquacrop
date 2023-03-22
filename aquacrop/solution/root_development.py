@@ -95,7 +95,6 @@ def root_development(
     """
     # Store initial conditions for updating
     # NewCond = InitCond
-
     # save initial zroot
     Zroot_init = float(NewCond_Zroot) * 1.0
     Soil_nLayer = np.unique(prof.Layer).shape[0]

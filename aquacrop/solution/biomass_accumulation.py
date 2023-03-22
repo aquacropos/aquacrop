@@ -32,7 +32,7 @@ def biomass_accumulation(
     NewCond_StressSFadjpre: float,
     NewCond_Tr_ET0_accum: float,
     NewCond_WPadj: float,
-    ) -> Tuple[float, float, float, float, float]:
+    ) -> Tuple[float, float, float, float, float, float, NamedTuple]:
     """
     Function to calculate biomass accumulation
 
@@ -128,7 +128,6 @@ def biomass_accumulation(
         NewCond_B = NewCond_B + dB
         NewCond_B_NS = NewCond_B_NS + dB_NS
         
-        #需要把输入和输出改成允许NewCond才行
         #update NewCond_StressSFadjNEW based on B
         loc_=np.argmin(np.abs(Crop.sf_es[0:100]-Crop.sfertstress))
         FracBiomassPotSF=Crop.relbio_es[loc_]
@@ -165,23 +164,22 @@ def biomass_accumulation(
         #update parameters according to NewCond_StressSFadjNEW
         loc_=np.argmin(np.abs(Crop.sf_es[0:100]-NewCond_StressSFadjNEW))
         
-        Crop.Ksccx=Crop.Ksccx_es[loc_]
-        Crop.Ksexpf=Crop.Ksexpf_es[loc_]
-        Crop.Kswp=Crop.Kswp_es[loc_]
-        Crop.fcdecline=Crop.fcdecline_es[loc_]
+        #need tp return crop to update crop outside the function, but also need to pass the new value to NewCpnd and then read from NewCond for day+1, new for seperated version
+
+        Crop=Crop._replace(Ksccx=Crop.Ksccx_es[loc_],Ksexpf=Crop.Ksexpf_es[loc_],Kswp=Crop.Kswp_es[loc_],fcdecline=Crop.fcdecline_es[loc_])
 
         if Crop.Ksccx<1 or Crop.Ksexpf<1:
-            Crop.MaxCanopyCD = round(Crop.EmergenceCD+(np.log((0.25*Crop.CCx*Crop.Ksccx*Crop.CCx*Crop.Ksccx/Crop.CC0)
-                                                                        /(Crop.CCx*Crop.Ksccx-(0.98*Crop.CCx*Crop.Ksccx)))/Crop.CGC_CD/Crop.Ksexpf))
+            Crop=Crop._replace(MaxCanopyCD = round(Crop.EmergenceCD+(np.log((0.25*Crop.CCx*Crop.Ksccx*Crop.CCx*Crop.Ksccx/Crop.CC0)
+                                                                        /(Crop.CCx*Crop.Ksccx-(0.98*Crop.CCx*Crop.Ksccx)))/Crop.CGC_CD/Crop.Ksexpf)))
             if Crop.MaxCanopyCD>Crop.CanopyDevEndCD:
                 while Crop.MaxCanopyCD>Crop.CanopyDevEndCD and Crop.Ksexpf<1:
-                    Crop.Ksexpf=Crop.Ksexpf+0.01
-                    Crop.MaxCanopyCD = round(Crop.EmergenceCD+(np.log((0.25*Crop.CCx*Crop.Ksccx*Crop.CCx*Crop.Ksccx/Crop.CC0)
-                                                                    /(Crop.CCx*Crop.Ksccx-(0.98*Crop.CCx*Crop.Ksccx)))/Crop.CGC_CD/Crop.Ksexpf))
+                    Crop=Crop._replace(Ksexpf=Crop.Ksexpf+0.01)
+                    Crop=Crop._replace(MaxCanopyCD = round(Crop.EmergenceCD+(np.log((0.25*Crop.CCx*Crop.Ksccx*Crop.CCx*Crop.Ksccx/Crop.CC0)
+                                                                    /(Crop.CCx*Crop.Ksccx-(0.98*Crop.CCx*Crop.Ksccx)))/Crop.CGC_CD/Crop.Ksexpf)))
                 while Crop.MaxCanopyCD>Crop.CanopyDevEndCD and Crop.CCx*Crop.Ksccx>0.1 and Crop.Ksccx>0.5:
-                    Crop.Ksccx=Crop.Ksccx-0.01
-                    Crop.MaxCanopyCD = round(Crop.EmergenceCD+(np.log((0.25*Crop.CCx*Crop.Ksccx*Crop.CCx*Crop.Ksccx/Crop.CC0)
-                                                                    /(Crop.CCx*Crop.Ksccx-(0.98*Crop.CCx*Crop.Ksccx)))/Crop.CGC_CD/Crop.Ksexpf))
+                    Crop=Crop._replace(Ksccx=Crop.Ksccx-0.01)
+                    Crop=Crop._replace(MaxCanopyCD = round(Crop.EmergenceCD+(np.log((0.25*Crop.CCx*Crop.Ksccx*Crop.CCx*Crop.Ksccx/Crop.CC0)
+                                                                    /(Crop.CCx*Crop.Ksccx-(0.98*Crop.CCx*Crop.Ksccx)))/Crop.CGC_CD/Crop.Ksexpf)))
         
         
     else:
@@ -197,7 +195,8 @@ def biomass_accumulation(
             NewCond_StressSFadjNEW,
             NewCond_StressSFadjpre,
             NewCond_Tr_ET0_accum,
-            NewCond_WPadj,)
+            NewCond_WPadj,
+            Crop,)
 
 if __name__ == "__main__":
     cc.compile()

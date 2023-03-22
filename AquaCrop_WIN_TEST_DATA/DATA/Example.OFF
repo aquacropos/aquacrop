@@ -1,0 +1,13 @@
+mulches and irrigations
+     3.0       : AquaCrop Version (January 2009)
+    10         : percentage (%) of ground surface covered by mulches BEFORE growing period
+    20         : percentage (%) of ground surface covered by mulches AFTER growing period
+    30         : effect (%) of mulches on reduction of soil evaporation
+     1         : number of irrigation events BEFORE growing period
+     1         : number of irrigation events AFTER growing period
+    60         : percentage (%) of soil surface wetted by off-season irrigation
+
+   Day    Depth(mm)    When         
+   =================================
+     4        40       before season
+     5        50       after season

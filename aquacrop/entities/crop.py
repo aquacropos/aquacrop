@@ -87,7 +87,7 @@ class Crop:
         self.fcdecline_es=np.zeros(101)
         self.sf_es=np.zeros(101)
         self.relbio_es=np.zeros(101)+1
-        self.Bio_top=np.zeros(101)
+        self.Bio_top=np.zeros(1000)
 
         if c_name == "custom":
 
@@ -210,6 +210,7 @@ class Crop:
             'fcdecline_es',
             'sf_es',
             'relbio_es',
+            "MaxCanopyCD",
         }
 
         self.__dict__.update(
@@ -217,6 +218,7 @@ class Crop:
         )
 
         self.calculate_additional_params()
+
 
     def calculate_additional_params(
         self,
@@ -361,16 +363,12 @@ crop_spec = [
     ("fCO2", float64),
     ("FloweringCD", int64),
     ("FloweringEnd", float64),
-    
-    #for soil fertility stress parameters
     ('Ksccx',float64),
     ('Ksexpf',float64),
     ('Kswp',float64),
     ('fcdecline',float64),
     ('sfertstress',float64),
     ('TR_ET0_fertstress', float64),
-    ('CGC_CD', float64),
-    
     ('need_calib',float64),
     ('RelativeBio',float64),
     ('Ksccx_in',float64),
@@ -499,7 +497,7 @@ class CropStruct(object):
         self.CDC_CD = (
             0.01  # Canopy decline coefficient (fraction per gdd/calendar day)
         )
-        self.CGC_CD = 0.0125  # Canopy growth coefficient (fraction per gdd)
+        self.CGC_CD = 0.0125  # Canopy growth coefficient (fraction per gdd), note even under GDD mode, this value will also be used for soil fertility stress calculation, set as -1 if no data available under GDD mode
         self.Kcb = 1.05  # Crop coefficient when canopy growth is complete but prior to senescence
         self.fage = 0.3  #  Decline of crop coefficient due to ageing (%/day)
         self.WP = 33.7  # Water productivity normalized for ET0 and C02 (g/m2)
@@ -541,7 +539,7 @@ class CropStruct(object):
         self.Kswp=1#0-1
         self.fcdecline=0#0-0.01,per canlendar days, 0-0.01 suggested
         self.sfertstress=0#0-1, total soil fertility stress
-        self.CGC_CD=-1
+        #self.CGC_CD=-1
         
         #for soil fertility stress calibration
         self.need_calib=0 #1 yes,default 1 output; 2 all possibilities
@@ -554,10 +552,48 @@ class CropStruct(object):
         self.fcdecline_es=np.zeros(101)
         self.sf_es=np.zeros(101)
         self.relbio_es=np.zeros(101)+1
-        self.Bio_top=np.zeros(101)
+        self.Bio_top=np.zeros(10000)
         
         #normalized water will have been transpired given soil fertility stress and no water stress
         self.TR_ET0_fertstress = 0
+        
+        #enable to update some variables during simulation (after initialization)
+        @property
+        def Ksccx(self):
+            return self._Ksccx
+        @Ksccx.setter
+        def Ksccx(self,value):
+            self._Ksccx=value
+
+        @property
+        def Ksexpf(self):
+            return self._Ksexpf
+        @Ksexpf.setter
+        def Ksexpf(self,value):
+            self._Ksexpf=value
+            
+        @property
+        def Kswp(self):
+            return self._Kswp
+        @Kswp.setter
+        def Kswp(self,value):
+            self._Kswp=value
+            
+        @property
+        def fcdecline(self):
+            return self._fcdecline
+        @fcdecline.setter
+        def fcdecline(self,value):
+            self._fcdecline=value
+
+        @property
+        def MaxCanopyCD(self):
+            return self._MaxCanopyCD
+        @MaxCanopyCD.setter
+        def MaxCanopyCD(self,value):
+            self._MaxCanopyCD=value
+            
+            
 
 
 CropStructNT = typing.NamedTuple("CropStructNT", crop_spec)

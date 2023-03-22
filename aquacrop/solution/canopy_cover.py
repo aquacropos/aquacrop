@@ -317,7 +317,7 @@ def canopy_cover(
                 CC_ = cc_development(Crop.CC0,Crop.CCx*Crop.Ksccx, \
                                                        Crop.CGC*Crop.Ksexpf,Crop.CDC,tmp_tCC,'Growth',Crop.CCx*Crop.Ksccx)
                 NewCond.CCx_fertstress=CC_-Crop.fcdecline*(day_fertility-Crop.MaxCanopyCD)*(day_fertility-Crop.MaxCanopyCD)/(Crop.SenescenceCD-Crop.MaxCanopyCD)
-            if NewCond.CCx_fertstress<NewCond.canopy_cover:
+            if NewCond.CCx_fertstress<NewCond.canopy_cover and Crop.SenescenceCD>Crop.MaxCanopyCD:
                 NewCond.canopy_cover=NewCond.CCx_fertstress
             if NewCond.canopy_cover<0:
                     NewCond.canopy_cover=0
@@ -334,7 +334,7 @@ def canopy_cover(
                 if day_fertility > Crop.MaxCanopyCD and Crop.SenescenceCD>Crop.MaxCanopyCD:
                     NewCond.CCx_fertstress=Crop.CCx*Crop.Ksccx-Crop.fcdecline*(day_fertility-Crop.MaxCanopyCD)*(day_fertility-Crop.MaxCanopyCD)/(Crop.SenescenceCD-Crop.MaxCanopyCD)
                 
-                if NewCond.CCx_fertstress<NewCond.canopy_cover:
+                if NewCond.CCx_fertstress<NewCond.canopy_cover and Crop.SenescenceCD>Crop.MaxCanopyCD:
                     NewCond.canopy_cover=NewCond.CCx_fertstress
                 if NewCond.canopy_cover<0:
                     NewCond.canopy_cover=0
@@ -354,7 +354,7 @@ def canopy_cover(
                 
                 NewCond.CCx_fertstress=Crop.CCx*Crop.Ksccx-Crop.fcdecline*(Crop.SenescenceCD-Crop.MaxCanopyCD)
                 
-                if NewCond.ccx_act>NewCond.CCx_fertstress:
+                if NewCond.ccx_act>NewCond.CCx_fertstress and Crop.SenescenceCD>Crop.MaxCanopyCD:
                     NewCond.ccx_act=NewCond.CCx_fertstress
 
                 cc_=cc_development(Crop.CC0,Crop.CCx*Crop.Ksccx, \
@@ -363,12 +363,12 @@ def canopy_cover(
                 #I add additional adjustment here, double counting, but seems it helps to achieve the same results with AquaCrop-win in some cases, for other cases, nearly have no impact
                 CDCadj = Crop.CDC*((NewCond.ccx_act+2.29)/(Crop.CCx+2.29))*((cc_+2.29)/(Crop.CCx+2.29))
                 
-                NewCond.canopy_cover = cc_development(NewCond.CC0adj,NewCond.ccx_act, \
+                NewCond.canopy_cover = cc_development(NewCond.cc0_adj,NewCond.ccx_act, \
                                                        Crop.CGC,CDCadj,tmp_tCC,'Decline',NewCond.ccx_act)
                 
                 #if CC_confs<NewCond.CC:#should enable for aquacrop v7
                 #    NewCond.CC=CC_confs
-                if NewCond.canopy_cover>NewCond.CCx_fertstress:#apply for aquacrop v6
+                if NewCond.canopy_cover>NewCond.CCx_fertstress and Crop.SenescenceCD>Crop.MaxCanopyCD:#apply for aquacrop v6
                     NewCond.canopy_cover=NewCond.CCx_fertstress
                 if NewCond.canopy_cover<0:
                     NewCond.canopy_cover=0

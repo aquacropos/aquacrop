@@ -1,0 +1,7 @@
+2 meter and 2 dS/m
+     4.0   : AquaCrop Version (January 2012)
+     1     : groundwater table at fixed depth and with constant salinity
+
+   Day    Depth (m)    ECw (dS/m)
+====================================
+     1      2.00          2.0

@@ -1,0 +1,6 @@
+Example net irrigation requirement (allowable depletion 30 % RAW)
+   6.1   : AquaCrop Version (May 2018)
+   1     : Sprinkler irrigation
+ 100     : Percentage of soil surface wetted by irrigation
+   3     : Determination of Net Irrigation requirement
+  30     : Allowable depletion of RAW (%)

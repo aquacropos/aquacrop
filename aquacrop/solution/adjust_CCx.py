@@ -22,8 +22,8 @@ def adjust_CCx(
     dt: float,
     tSum: float,
     Crop_CanopyDevEnd: float,
-    Crop_CCx: float
-    Crop_Ksccx: float=1
+    Crop_CCx: float,
+    Crop_Ksccx: float=1,
     ) -> float:
     """
     Function to adjust CCx value for changes in CGC due to water stress during the growing season

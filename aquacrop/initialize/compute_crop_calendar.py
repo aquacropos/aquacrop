@@ -4,6 +4,9 @@ import pandas as pd
 from ..entities.modelConstants import ModelConstants
 from typing import TYPE_CHECKING
 
+from .calculate_HIGC import calculate_HIGC
+from .calculate_HI_linear import calculate_HI_linear
+
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
     from aquacrop.entities.crop import Crop
@@ -462,10 +465,16 @@ def compute_crop_calendar(
         #print(Ksc_Total[:])
         #print(crop.MaturityCD)
         
-        crop = calculate_HIGC(crop)
+        crop.HIGC = calculate_HIGC(
+            crop.YldFormCD,
+            crop.HI0,
+            crop.HIini,
+        )
         if crop.CropType == 3:
             # Determine linear switch point and HIGC rate for fruit/grain crops
-            crop = calculate_HI_linear(crop)
+            crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
+                crop.YldFormCD, crop.HIini, crop.HI0, crop.HIGC
+            )
         else:
             # No linear switch for leafy vegetable or root/tiber crops
             crop.tLinSwitch = 0
@@ -638,10 +647,16 @@ def compute_crop_calendar(
         
         if crop.need_calib==1:
             
-            crop = calculate_HIGC(crop)
+            crop.HIGC = calculate_HIGC(
+            crop.YldFormCD,
+            crop.HI0,
+            crop.HIini,
+        )
             if crop.CropType == 3:
                 # Determine linear switch point and HIGC rate for fruit/grain crops
-                crop = calculate_HI_linear(crop)
+                crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
+                crop.YldFormCD, crop.HIini, crop.HI0, crop.HIGC
+            )
             else:
                 # No linear switch for leafy vegetable or root/tiber crops
                 crop.tLinSwitch = 0
@@ -739,7 +754,7 @@ def compute_crop_calendar(
                     k_+=1
                     bio_cur=Biomas_ini_es(Bio_mul,TopStress,Ksccx_temp,Ksexpf_temp,fcdecline_temp,Kswp_temp)
                     #print(Kswp_temp)
-                    #print(np.round(bio_cur/Bio_top*100))
+                    #print(int(bio_cur/Bio_top*100))
                     if int(bio_cur/Bio_top*100)==int(crop.RelativeBio*100):
                         adj_flag=False
                         adj_wp=False
@@ -854,7 +869,7 @@ def compute_crop_calendar(
                 
                 #if L12>L123:
                 #    print("L12>L123")
-            
+
 
             if (int(bio_cur/Bio_top*100)==int(crop.RelativeBio*100)) or (kk_>=100 and np.abs(int(bio_cur/Bio_top*100)-int(crop.RelativeBio*100))<5):
             #accept some errors when exit because of maximum loop, in theory, the above can ensure ==
@@ -909,10 +924,16 @@ def compute_crop_calendar(
 
         if crop.need_calib==2:
             
-            crop = calculate_HIGC(crop)
+            crop.HIGC = calculate_HIGC(
+            crop.YldFormCD,
+            crop.HI0,
+            crop.HIini,
+        )
             if crop.CropType == 3:
                 # Determine linear switch point and HIGC rate for fruit/grain crops
-                crop = calculate_HI_linear(crop)
+                crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
+                crop.YldFormCD, crop.HIini, crop.HI0, crop.HIGC
+            )
             else:
                 # No linear switch for leafy vegetable or root/tiber crops
                 crop.tLinSwitch = 0
