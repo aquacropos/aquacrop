@@ -1,0 +1,5 @@
+The current soil fertility module only works for GDD mode, for calendar days, it still needs time to figure out the conversion if it needs.
+
+To run the soil fertility module, it needs to run initialization first to calibrate the data (as shown in the *.ipynb test examples). Different from AquaCrop-Win which needs one curve parameter as an input, python requires discrete data points on the curve as inputs.
+
+To compare with AquaCrop-Win, unzip AquaCropV61Nr02052018.zip, and copy the data from AquaCrop_WIN_TEST_DATA to replace the unzipped files. Each time to run the python code, before drawing any figures, need to run the AquaCrop-win with the same setting.
