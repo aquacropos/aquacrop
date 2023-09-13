@@ -10,8 +10,10 @@ filepath=get_filepath('tunis_climate.txt')
 weather_data = prepare_weather(filepath)
 weather_data
 
+tunis = Soil(soil_type='ac_TunisLocal')
 sandy_loam = Soil(soil_type='SandyLoam')
 wheat = Crop('Wheat', planting_date='10/01')
+
 InitWC = InitialWaterContent(value=['FC'])
 
 # test custom initial water content:
@@ -20,15 +22,27 @@ customWC = InitialWaterContent(wc_type = 'Pct',
                                depth_layer= [1],
                                value = [60])
 
+# default wc
+defaultWC = InitialWaterContent(wc_type = 'Prop',
+                               method = 'Layer',
+                               depth_layer= [1],
+                               value = ['FC'])
+
+# multi WC
+multiWC = InitialWaterContent(wc_type = ['Prop', 'Pct'],
+                              method = 'Layer',
+                              depth_layer= [1,2],
+                              value = ['FC', 20])
+
 # test scheduling with irri type 3
 
 # combine into aquacrop model and specify start and end simulation date
 model = AquaCropModel(sim_start_time=f'{1979}/10/01',
                       sim_end_time=f'{1985}/05/30',
                       weather_df=weather_data,
-                      soil=sandy_loam,
+                      soil=tunis,
                       crop=wheat,
-                      initial_water_content=customWC)
+                      initial_water_content=multiWC)
 
 # run model till termination
 model.run_model(till_termination=True)
@@ -44,7 +58,7 @@ model_default = AquaCropModel(sim_start_time=f'{1979}/10/01',
                       weather_df=weather_data,
                       soil=Soil('SandyLoam'),
                       crop=wheat,
-                      initial_water_content=InitWC)
+                      initial_water_content=defaultWC)
 
 model_default.run_model(till_termination=True)
 
