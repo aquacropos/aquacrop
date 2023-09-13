@@ -76,6 +76,6 @@ If you receive an error message such as "No module named aquacrop.scripts.initia
 
 1. Run "python -m aquacrop.scripts.initiate_library" in your terminal, if this generates an error such as "RuntimeError: Attempted to compile AOT function without the compiler used by numpy.distutils present. Cannot find suitable msvc.", then you need to download and install an MSVC compiler such as the one included in Visual Studio build tools (see https://www.youtube.com/watch?v=p_R3tXSq0KI).
 
-2. If Step 1 doesn't help, then you can run aquacrop in pure python (this will be slower) using: 
-```import os```
+2. If Step 1 doesn't help, then you can run aquacrop in pure python (this will be slower) using: <br>
+```import os```<br>
 ```os.environ['DEVELOPMENT'] = 'DEVELOPMENT'```
