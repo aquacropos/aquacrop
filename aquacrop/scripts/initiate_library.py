@@ -24,4 +24,4 @@ modules_to_compile = [
     "aquacrop.solution.biomass_accumulation"]
 
 for mod in tqdm(modules_to_compile):
-    call(["python", "-m", mod])
+    subprocess.run([f"{sys.executable}", "-m", mod]) # requires testing!
