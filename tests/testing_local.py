@@ -63,14 +63,14 @@ model_custom = AquaCropModel(sim_start_time=f'{1979}/10/01',
                       soil=soil_custom2,
                       crop=maize,
                       irrigation_management=irr_mngt,
-                      initial_water_content=multiWC)
+                      initial_water_content=InitialWaterContent(value=['FC']))
 
 # run model till termination
 model_custom.run_model(till_termination=True)
 
 print('Custom model:')
-print(model_custom._outputs.water_flux.tail())
-print(model_custom._outputs.water_storage.tail())
+print(model_custom._outputs.water_flux.head())
+print(model_custom._outputs.water_storage.head())
 print(model_custom._outputs.crop_growth.head())
 print(model_custom._outputs.final_stats.head())
 
@@ -86,8 +86,8 @@ model_default = AquaCropModel(sim_start_time=f'{1979}/10/01',
 model_default.run_model(till_termination=True)
 
 print('Default model:')
-print(model_default._outputs.water_flux.tail())
-print(model_default._outputs.water_storage.tail())
+print(model_default._outputs.water_flux.head())
+print(model_default._outputs.water_storage.head())
 print(model_default._outputs.crop_growth.head())
 print(model_default._outputs.final_stats.head())
 
