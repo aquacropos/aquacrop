@@ -116,7 +116,10 @@ class AquaCropModel:
         self.sim_end_time = sim_end_time
         self.weather_df = weather_df
         self.soil = soil
+        soil_layers = self.soil.nLayer
         self.crop = crop
+        init_water_layers = len(initial_water_content.value)
+        assert soil_layers == init_water_layers # test that specified soil layers match specified number of initial water content layers
         self.initial_water_content = initial_water_content
         self.co2_concentration = co2_concentration
 
