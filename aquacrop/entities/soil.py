@@ -47,7 +47,7 @@ class Soil:
     ):
 
         self.Name = soil_type
-        print('SOIL INITIALISED')
+
         self.zSoil = sum(dz)  # Total thickness of soil profile (m)
         self.nComp = len(dz)  # Total number of soil compartments
         self.nLayer = 0  # Total number of soil layers
