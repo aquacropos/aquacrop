@@ -19,6 +19,10 @@ class InitialWaterContent:
     def __init__(self, wc_type="Prop", method="Layer", depth_layer=[1], value=["FC"]):
 
         assert len(depth_layer) == len(value)
+        print(len(depth_layer))
+        print(len(value))
+
+        print('IWC initialised')
 
         self.wc_type = wc_type
         self.method = method
