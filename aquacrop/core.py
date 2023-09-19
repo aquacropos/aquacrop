@@ -120,7 +120,6 @@ class AquaCropModel:
         self.crop = crop
         init_water_layers = len(initial_water_content.value)
         print(f"soil layers = {soil_layers}, water layers = {init_water_layers}")
-        assert soil_layers == init_water_layers # test that specified soil layers match specified number of initial water content layers
         self.initial_water_content = initial_water_content
         self.co2_concentration = co2_concentration
 
