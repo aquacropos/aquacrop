@@ -126,7 +126,7 @@ class AquaCropModel:
 
         if check_iwc_soil_match(iwc_layers, soil_layers) is False:
             new_water_layers = ['FC'] * soil_layers
-            new_water_depths = range(1, soil_layers,1)
+            new_water_depths = list(range(1, soil_layers,1))
             self.initial_water_content.value=new_water_layers
             self.initial_water_content.depth_layer=new_water_depths
             print(f"Initial water content layers ({iwc_layers}) do not match number of soil layers ({soil_layers}), initial water content layers now set to: {self.initial_water_content.value}")
