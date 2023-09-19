@@ -120,7 +120,7 @@ class AquaCropModel:
         self.crop = crop
         init_water_layers = len(initial_water_content.value)
         print(f"soil layers = {soil_layers}, water layers = {init_water_layers}")
-        self.initial_water_content = initial_water_content
+        self.initial_water_content = initial_water_content(iwc_value= init_water_layers, soil_value=soil_layers)
         self.co2_concentration = co2_concentration
 
         self.irrigation_management = irrigation_management
