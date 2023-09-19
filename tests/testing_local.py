@@ -26,6 +26,19 @@ soil_custom2.add_layer( thickness=.1*6,thWP=0.24,
 soil_custom2.add_layer(thickness=.1*6,thWP=0.24,
                         thFC=0.40,thS=0.50,Ksat=155,
                         penetrability=100)
+soil_custom3 = Soil(soil_type='custom', cn=46, rew=7)
+soil_custom3.add_layer(thickness=.1*3,thWP=0.24,
+                        thFC=0.40,thS=0.50,Ksat=155,
+                        penetrability=100)
+soil_custom3.add_layer(thickness=.1*3,thWP=0.24,
+                        thFC=0.40,thS=0.50,Ksat=155,
+                        penetrability=100)
+soil_custom3.add_layer(thickness=.1*3,thWP=0.24,
+                        thFC=0.40,thS=0.50,Ksat=155,
+                        penetrability=100)
+soil_custom3.add_layer(thickness=.1*3,thWP=0.24,
+                        thFC=0.40,thS=0.50,Ksat=155,
+                        penetrability=100)
 
 # crops
 wheat = Crop('Wheat', planting_date='10/01')
@@ -51,7 +64,7 @@ maize = Crop('Maize', planting_date='05/01')
 #                               method = 'Layer',
 #                               depth_layer= [1,2],
 #                               value = ['FC', 'FC'])
-
+print(soil_custom3.nLayer)
 # create irr management
 irr_mngt = IrrigationManagement(irrigation_method=0)
 
@@ -59,7 +72,7 @@ irr_mngt = IrrigationManagement(irrigation_method=0)
 model_custom = AquaCropModel(sim_start_time=f'{1979}/10/01',
                       sim_end_time=f'{1985}/05/30',
                       weather_df=weather_data,
-                      soil=soil_custom2,
+                      soil=soil_custom3,
                       crop=maize,
                       irrigation_management=irr_mngt,
                       initial_water_content=InitialWaterContent(value=['FC']))

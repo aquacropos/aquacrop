@@ -5,6 +5,7 @@ import time
 import datetime
 import os
 import logging
+import warnings
 from typing import Dict, Union, Optional, Tuple, TYPE_CHECKING
 from .scripts.checkIfPackageIsCompiled import compile_all_AOT_files
 
@@ -122,15 +123,17 @@ class AquaCropModel:
 
         iwc_layers = len(initial_water_content.value)
         soil_layers = self.soil.nLayer
-        print(f"soil layers = {soil_layers}, water layers = {iwc_layers}")
 
         if check_iwc_soil_match(iwc_layers, soil_layers) is False:
             new_water_layers = ['FC'] * soil_layers
             new_water_depths = list(range(1, soil_layers+1,1))
             self.initial_water_content.value=new_water_layers
             self.initial_water_content.depth_layer=new_water_depths
-            print(f"Initial water content layers ({iwc_layers}) do not match number of soil layers ({soil_layers}), initial water content layers now set to: {self.initial_water_content.value}")
-
+            warnings.warn(
+                f"Warning: Initial water content layers ({iwc_layers}) do not match number of soil layers ({soil_layers}),
+                initial water content layers now set to: {self.initial_water_content.value}"
+                )
+            
         self.irrigation_management = irrigation_management
         self.field_management = field_management
         self.fallow_field_management = fallow_field_management
