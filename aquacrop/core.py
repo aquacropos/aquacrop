@@ -128,7 +128,7 @@ class AquaCropModel:
             new_water_depths = list(range(1, soil_layers+1,1))
             self.initial_water_content.value=new_water_layers
             self.initial_water_content.depth_layer=new_water_depths
-            warnings.warn("Warning: Initial water content layers ({}) do not match number of soil layers ({}), initial water content layers now set to: {}".format(iwc_layers, soil_layers,self.initial_water_content.value), stacklevel=2)
+            warnings.warn("Initial water content layers ({}) do not match number of soil layers ({}), initial water content layers now set to: {}".format(iwc_layers, soil_layers,self.initial_water_content.value), stacklevel=1)
             
         self.irrigation_management = irrigation_management
         self.field_management = field_management
