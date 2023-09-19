@@ -141,6 +141,25 @@ class AquaCropModel:
             self.co2_concentration = CO2()
 
     @property
+    def initial_water_content(self) -> str:
+        """
+        Return IWC
+        """
+        return self._initial_water_content
+
+    @initial_water_content.setter
+    def initial_water_content(self, soil_value: int, iwc_value: int) -> None:
+        """
+        Check if number of soil layers matched number of layers specified in initial water content
+        """
+
+        if _initial_water_layers_are_correct(soil_value, iwc_value) is False:
+            iwc_layers_default = ['FC']*self.soil.nLayer
+            init_wc = InitialWaterContent(value=iwc_layers_default)
+            print(f"User-specified initial water content profile has been overwritten with Field Capacity at all layers, so that the number of layers matches soil profile.")
+            self._initial_water_content = init_wc
+
+    @property
     def sim_start_time(self) -> str:
         """
         Return sim start date
@@ -444,6 +463,26 @@ class AquaCropModel:
                 "You cannot get results without running the model. "
                 + "Please execute the run_model() method."
             )
+
+
+def _initial_water_layers_are_correct(soil_layers: int, iwc_layers: int) -> bool:
+    """
+    This function checks if the number of soil layers is equivalent between the user-specified soil profile and initial water content.
+    
+    Arguments:
+        soil_layers
+        iwc_layers
+
+    Return:
+        boolean: True if number of layers match
+    
+    """
+    if(soil_layers == iwc_layers):
+        return True
+    else:
+        return False
+        
+
 
 
 def _sim_date_format_is_correct(date: str) -> bool:
