@@ -64,7 +64,7 @@ maize = Crop('Maize', planting_date='05/01')
 #                               method = 'Layer',
 #                               depth_layer= [1,2],
 #                               value = ['FC', 'FC'])
-print(soil_custom3.nLayer)
+
 # create irr management
 irr_mngt = IrrigationManagement(irrigation_method=0)
 

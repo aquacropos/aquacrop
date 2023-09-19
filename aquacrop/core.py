@@ -38,7 +38,7 @@ from .entities.irrigationManagement import IrrigationManagement
 from .entities.output import Output
 from .initialize.compute_variables import compute_variables
 from .initialize.create_soil_profile import create_soil_profile
-from .initialize.read_clocks_parameters import read_clock_paramaters
+from .initialize.read_clocks_parameters import read_clock_parameters
 from .initialize.read_field_managment import read_field_management
 from .initialize.read_groundwater_table import read_groundwater_table
 from .initialize.read_irrigation_management import read_irrigation_management
@@ -81,6 +81,9 @@ class AquaCropModel:
 
         co2_concentration: Defines CO2 concentrations
 
+        off_season: 'Y'/'N' whether to simulate off-season or skip ahead to start of 
+                    next growing season
+
 
     """
 
@@ -110,6 +113,7 @@ class AquaCropModel:
         fallow_field_management: Optional["FieldMngt"] = None,
         groundwater: Optional["GroundWater"] = None,
         co2_concentration: Optional["CO2"] = None,
+        off_season: str='N',
     ) -> None:
 
         self.sim_start_time = sim_start_time
@@ -119,10 +123,12 @@ class AquaCropModel:
         self.crop = crop
         self.initial_water_content = initial_water_content   
         self.co2_concentration = co2_concentration
+        self.off_season = off_season
 
         iwc_layers = len(initial_water_content.value)
         soil_layers = self.soil.nLayer
 
+        # If number of layers in IWC do not match number of soil layers in soil profile, change them to match and warn user of changes made
         if check_iwc_soil_match(iwc_layers, soil_layers) is False:
             new_water_layers = ['FC'] * soil_layers
             new_water_depths = list(range(1, soil_layers+1,1))
@@ -208,8 +214,8 @@ class AquaCropModel:
         """
 
         # Initialize ClockStruct object
-        self._clock_struct = read_clock_paramaters(
-            self.sim_start_time, self.sim_end_time
+        self._clock_struct = read_clock_parameters(
+            self.sim_start_time, self.sim_end_time, self.off_season
         )
 
         # get _weather data
