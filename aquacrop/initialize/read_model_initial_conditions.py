@@ -165,6 +165,7 @@ def read_model_initial_conditions(
 
     depth_layer = InitWC.depth_layer
     datapoints = InitWC.value
+    print(f"Depth layer: {depth_layer}, datapoints: {datapoints}")
 
     values = np.zeros(len(datapoints))
 
@@ -210,7 +211,7 @@ def read_model_initial_conditions(
         # Values are specified as soil hydraulic properties (SAT, FC, or WP).
         # Extract and assign value for each soil layer
         depth_layer = np.array(depth_layer, dtype=float)
-        datapoints = np.array(datapoints, dtype=float)
+        datapoints = np.array(datapoints, dtype=str)
 
         for ii in range(len(values)):
             if methodstr == "Depth":
