@@ -81,7 +81,7 @@ class AquaCropModel:
 
         co2_concentration: Defines CO2 concentrations
 
-        off_season: 'Y'/'N' whether to simulate off-season or skip ahead to start of 
+        off_season: (True) simulate off-season or (False) skip ahead to start of 
                     next growing season
 
 
@@ -113,7 +113,7 @@ class AquaCropModel:
         fallow_field_management: Optional["FieldMngt"] = None,
         groundwater: Optional["GroundWater"] = None,
         co2_concentration: Optional["CO2"] = None,
-        off_season: str='N',
+        off_season: bool=False,
     ) -> None:
 
         self.sim_start_time = sim_start_time

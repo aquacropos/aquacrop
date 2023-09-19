@@ -8,7 +8,7 @@ from ..entities.clockStruct import ClockStruct
 def read_clock_parameters(
     sim_start_time: str,
     sim_end_time: str,
-    off_season: str='N') -> ClockStruct:
+    off_season: bool=False) -> ClockStruct:
     """
     Function to read in start and end simulation time and return a ClockStruct object
 
@@ -18,7 +18,8 @@ def read_clock_parameters(
 
         sim_end_time (str): simulation start date
 
-        off_season (str): 'Y'/'N' simulate off season
+        off_season (bool): True, simulate off season
+                          False, skip ahead to next season post-harvest
 
     Returns:
 

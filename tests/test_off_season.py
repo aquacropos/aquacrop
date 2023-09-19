@@ -32,7 +32,7 @@ model = AquaCropModel(sim_start_time=f'{1979}/10/01',
                       crop=wheat,
                       irrigation_management=irr_mngt,
                       initial_water_content=InitWC,
-                      off_season='Y')
+                      off_season='N')
 
 # run model till termination
 model.run_model(till_termination=True)
