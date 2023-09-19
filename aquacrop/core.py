@@ -50,9 +50,6 @@ from .timestep.run_single_timestep import solution_single_time_step
 from .timestep.update_time import update_time
 from .timestep.outputs_when_model_is_finished import outputs_when_model_is_finished
 
-# Record all warnings
-logging.captureWarnings(True)
-
 class AquaCropModel:
     """
     This is the main class of the AquaCrop-OSPy model.
