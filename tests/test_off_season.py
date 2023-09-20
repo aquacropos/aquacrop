@@ -24,20 +24,37 @@ InitWC = InitialWaterContent(value=['FC'])
 # irr management
 irr_mngt = IrrigationManagement(irrigation_method=1)
 
+y_axis = 'biomass' # canopy_cover
+
 # combine into aquacrop model and specify start and end simulation date
-model = AquaCropModel(sim_start_time=f'{1979}/10/01',
+model1 = AquaCropModel(sim_start_time=f'{1979}/10/01',
                       sim_end_time=f'{1985}/05/30',
                       weather_df=weather_data,
                       soil=sandy_loam,
                       crop=wheat,
                       irrigation_management=irr_mngt,
                       initial_water_content=InitWC,
-                      off_season='N')
+                      off_season=False)
 
 # run model till termination
-model.run_model(till_termination=True)
+model1.run_model(till_termination=True)
 
-print(model._outputs.crop_growth)
+print(model1._outputs.crop_growth)
 
-sns.boxplot(data=pd.DataFrame(model._outputs.crop_growth),x='time_step_counter',y='canopy_cover')
+
+model2 = AquaCropModel(sim_start_time=f'{1979}/10/01',
+                      sim_end_time=f'{1985}/05/30',
+                      weather_df=weather_data,
+                      soil=sandy_loam,
+                      crop=wheat,
+                      irrigation_management=irr_mngt,
+                      initial_water_content=InitWC,
+                      off_season=True)
+
+model2.run_model(till_termination=True)
+
+fig,ax=plt.subplots(2,1,figsize=(12,14))
+
+sns.boxplot(data=pd.DataFrame(model1._outputs.crop_growth),x='time_step_counter',y=y_axis, ax=ax[0])
+sns.boxplot(data=pd.DataFrame(model2._outputs.crop_growth),x='time_step_counter',y=y_axis, ax=ax[1])
 

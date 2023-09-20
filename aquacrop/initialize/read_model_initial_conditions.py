@@ -165,7 +165,6 @@ def read_model_initial_conditions(
 
     depth_layer = InitWC.depth_layer
     datapoints = InitWC.value
-    print(f"Depth layer: {depth_layer}, datapoints: {datapoints}")
 
     values = np.zeros(len(datapoints))
 
