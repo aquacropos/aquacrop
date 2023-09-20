@@ -83,6 +83,7 @@ def check_groundwater_table(
         if NewCond_WTinSoil == True:
             idx = np.argwhere(zMid >= NewCond_zGW).flatten()[0]
             for ii in range(idx, len(prof.Comp)):
+                print(prof.th_s[ii])
                 NewCond_th[ii] = prof.th_s[ii]
 
         # Adjust compartment field capacity
