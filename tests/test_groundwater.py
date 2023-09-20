@@ -23,7 +23,7 @@ InitWC = InitialWaterContent(value=['FC'])
 # irr management
 irr_mngt = IrrigationManagement(irrigation_method=1)
 
-y_axis = 'biomass' # canopy_cover
+y_axis = 'Infl' # canopy_cover
 
 # combine into aquacrop model and specify start and end simulation date
 model1 = AquaCropModel(sim_start_time=f'{1979}/10/01',
@@ -38,6 +38,13 @@ model1 = AquaCropModel(sim_start_time=f'{1979}/10/01',
 # run model till termination
 model1.run_model(till_termination=True)
 
-print(model1._outputs.crop_growth)
+print(model1._outputs.water_storage)
 
-sns.boxplot(data=pd.DataFrame(model1._outputs.crop_growth),x='time_step_counter',y=y_axis)
+# sns.boxplot(data=pd.DataFrame(model1._outputs.water_flux),x='time_step_counter',y='Infl')
+
+fig,ax=plt.subplots(2,2,figsize=(12,14))
+
+sns.boxplot(data=pd.DataFrame(model1._outputs.water_storage),x='time_step_counter',y='th1',ax=ax[0,0])
+sns.boxplot(data=pd.DataFrame(model1._outputs.water_storage),x='time_step_counter',y='th2',ax=ax[0,1])
+sns.boxplot(data=pd.DataFrame(model1._outputs.water_storage),x='time_step_counter',y='th3',ax=ax[1,0])
+sns.boxplot(data=pd.DataFrame(model1._outputs.water_storage),x='time_step_counter',y='th4',ax=ax[1,1])
