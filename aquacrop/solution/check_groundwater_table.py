@@ -122,9 +122,9 @@ def check_groundwater_table(
         # Store adjusted field capacity values
         NewCond_th_fc_Adj = thfcAdj
         # prof.th_fc_Adj = thfcAdj
-        return (NewCond_th_fc_Adj, thfcAdj)
+        return (NewCond_th_fc_Adj, NewCond_zGW)
 
-    return (NewCond_th_fc_Adj, NewCond_zGW)
+    return (NewCond_th_fc_Adj, None)
 
 if __name__ == "__main__":
     cc.compile()
