@@ -114,7 +114,7 @@ def read_model_parameters(
             weather_df,
         )
         mature = int(crop.MaturityCD + 30)
-        plant = pd.to_datetime("1990/" + crop.planting_date)
+        plant = pd.to_datetime("1992/" + crop.planting_date)
         harv = plant + np.timedelta64(mature, "D")
         new_harvest_date = str(harv.month) + "/" + str(harv.day)
         crop.harvest_date = new_harvest_date
@@ -124,16 +124,16 @@ def read_model_parameters(
 
     # check if crop growing season runs over calander year
     # Planting and harvest dates are in days/months format so just add arbitrary year
-    single_year = pd.to_datetime("1990/" + crop.planting_date) < pd.to_datetime(
-        "1990/" + crop.harvest_date
+    single_year = pd.to_datetime("1992/" + crop.planting_date) < pd.to_datetime(
+        "1992/" + crop.harvest_date
     )
 
     if single_year:
         # if normal year
 
         # Check if the simulation in the following year does not exceed planting date.
-        mock_simulation_end_date = pd.to_datetime("1990/" + f'{sim_end_date.month}' + "/" + f'{sim_end_date.day}')
-        mock_simulation_start_date = pd.to_datetime("1990/" + crop.planting_date)
+        mock_simulation_end_date = pd.to_datetime("1992/" + f'{sim_end_date.month}' + "/" + f'{sim_end_date.day}')
+        mock_simulation_start_date = pd.to_datetime("1992/" + crop.planting_date)
         last_simulation_year_does_not_start = mock_simulation_end_date <= mock_simulation_start_date
 
         if last_simulation_year_does_not_start:
