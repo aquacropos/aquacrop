@@ -170,6 +170,7 @@ def solution_single_time_step(
     NewCond.temp_min = weather_step[0]
     NewCond.et0 = weather_step[3]
 
+
     class_args = {
         key: value
         for key, value in Crop_.__dict__.items()
@@ -180,7 +181,7 @@ def solution_single_time_step(
     # Run simulations %%
     # 1. Check for groundwater table
     print(f'NewCond.z_gw: {NewCond.z_gw}')
-    (NewCond.th_fc_Adj, _) = check_groundwater_table(
+    (NewCond.th_fc_Adj, NewCond.z_gw) = check_groundwater_table(
         Soil.Profile,
         NewCond.z_gw,
         NewCond.th,
