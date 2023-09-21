@@ -88,7 +88,6 @@ def solution_single_time_step(
     CO2 = param_struct.CO2
     if param_struct.water_table == 1:
         Groundwater = param_struct.z_gw[clock_struct.time_step_counter]
-        print(f'New z_gw is: {param_struct.z_gw[clock_struct.time_step_counter]}')
     else:
         Groundwater = 0
 
@@ -180,6 +179,7 @@ def solution_single_time_step(
 
     # Run simulations %%
     # 1. Check for groundwater table
+    print(f'NewCond.z_gw: {NewCond.z_gw}')
     (NewCond.th_fc_Adj, _) = check_groundwater_table(
         Soil.Profile,
         NewCond.z_gw,
@@ -484,6 +484,7 @@ def solution_single_time_step(
     outputs.water_storage[row_day, 3:] = NewCond.th
 
     # Water fluxes
+    print(f'Saving NewCond.z_gw to outputs: {NewCond.z_gw}')
     outputs.water_flux[row_day, :] = [
         clock_struct.time_step_counter,
         clock_struct.season_counter,
