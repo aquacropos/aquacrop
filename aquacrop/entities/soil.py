@@ -396,7 +396,7 @@ class Soil:
             bCR_sandy=-1.4936 + 0.2416*np.log(Ksat)
 
             aCR_loamy=-0.4986 + 9*Ksat/100000
-            bCR_loamy=-2.1320 + 0.4778*LN(Ksat)
+            bCR_loamy=-2.1320 + 0.4778*np.log(Ksat)
 
             aCR_sandy_clayey=-0.5677 - 4*Ksat/100000
             bCR_sandy_clayey=-3.7189 + 0.5922*np.log(Ksat)
