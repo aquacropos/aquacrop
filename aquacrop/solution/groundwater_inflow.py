@@ -53,9 +53,10 @@ def groundwater_inflow(
         zMid = prof.zMid
         print(f'zMid in groundwater_inflow.py: {zMid}')
         # For compartments below water table, set to saturation # (but what if no compartments are below water table?)
-        idx = np.argwhere(zMid >= z_gw).flatten()[0]
         print(f'argwhere 1: {np.argwhere(zMid >= z_gw)}')
         print(f'argwhere 2, flatten: {np.argwhere(zMid >= z_gw).flatten}')
+        idx = np.argwhere(zMid >= z_gw).flatten()[0]
+
         for ii in range(idx, len(prof.Comp)):
             # Get soil layer
             if NewCond.th[ii] < prof.th_s[ii]:
