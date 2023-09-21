@@ -180,7 +180,7 @@ def solution_single_time_step(
 
     # Run simulations %%
     # 1. Check for groundwater table
-    print(f'NewCond.z_gw: {NewCond.z_gw}')
+    print(f'NewCond.z_gw pre-check: {NewCond.z_gw}')
     (NewCond.th_fc_Adj, NewCond.z_gw) = check_groundwater_table(
         Soil.Profile,
         NewCond.z_gw,
@@ -189,7 +189,8 @@ def solution_single_time_step(
         param_struct.water_table,
         Groundwater,
     )
-
+    print(f'NewCond.z_gw post-check: {NewCond.z_gw}')
+    print(f'NewCond.z_gw post-check type: {type(NewCond.z_gw)}')
     # 2. Root development
     NewCond.z_root = root_development(
         Crop,
