@@ -4,18 +4,34 @@ import datetime
 
 from numpy import ndarray
 
-# TESTING FUNCTION RETURNS AND TYPES
-def test(
-        in1: float,
-        in2: str
-) -> "ndarray":
-    out1=in1+5
-    out2=in2+'_x'
-    print(f'1: {out1}, 2: {out2}')
-    return (out1,out2)
+# TESTING NP.ARGWHERE FOR GROUNDWATER INFLOW
+z_gw = 1.16
+zMid=np.array([0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95, 1.05, 1.15])
+print(np.argmax((zMid>=z_gw)))
+idx = np.argwhere(zMid >= z_gw).flatten()[0]
+print(idx)
+# for ii in range(idx, len(prof.Comp)):
+#             # Get soil layer
+#             if NewCond.th[ii] < prof.th_s[ii]:
+#                 # Update water content
+#                 dth = prof.th_s[ii] - NewCond.th[ii]
+#                 NewCond.th[ii] = prof.th_s[ii]
+#                 # Update groundwater inflow
+#                 GwIn = GwIn + (dth * 1000 * prof.dz[ii])
 
-(res1,res2) = test(1,'y')
-print(f'Res1: {res1}, Res2: {res2}')
+
+# TESTING FUNCTION RETURNS AND TYPES
+# def test(
+#         in1: float,
+#         in2: str
+# ) -> "ndarray":
+#     out1=in1+5
+#     out2=in2+'_x'
+#     print(f'1: {out1}, 2: {out2}')
+#     return (out1,out2)
+
+# (res1,res2) = test(1,'y')
+# print(f'Res1: {res1}, Res2: {res2}')
 
 
 # TESTING INTERPOLATION LOGIC FOR GROUNDWATER DEPTH

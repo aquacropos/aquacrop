@@ -46,15 +46,20 @@ def groundwater_inflow(
     if NewCond.wt_in_soil == True:
         # Water table in soil profile. Calculate horizontal inflow.
         # Get groundwater table elevation on current day
-        print(f'Setting z_gw in groundwater_inflow.py as: {NewCond.z_gw}')
+        # print(f'Setting z_gw in groundwater_inflow.py as: {NewCond.z_gw}')
         z_gw = NewCond.z_gw
 
         # Find compartment mid-points
         zMid = prof.zMid
-        print(f'zMid in groundwater_inflow.py: {zMid}')
-        # For compartments below water table, set to saturation # (but what if no compartments are below water table?)
-        print(f'argwhere 1: {np.argwhere(zMid >= z_gw)}')
-        print(f'argwhere 2, flatten: {np.argwhere(zMid >= z_gw).flatten}')
+        # print(f'zMid in groundwater_inflow.py: {zMid}')
+        # For compartments below water table, set to saturation # 
+
+        # Check whether ALL compartments are below water table, if so set all to sat, otherwise check number that are and set those to sat.
+        # if z_gw < np.min(zMid):
+        #     for i in range(len(prof.Comp)):
+
+        # print(f'argwhere 1: {np.argwhere(zMid >= z_gw)}')
+        # print(f'argwhere 2, flatten: {np.argwhere(zMid >= z_gw).flatten}')
         idx = np.argwhere(zMid >= z_gw).flatten()[0]
 
         for ii in range(idx, len(prof.Comp)):
