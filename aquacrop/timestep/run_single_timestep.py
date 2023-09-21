@@ -88,6 +88,7 @@ def solution_single_time_step(
     CO2 = param_struct.CO2
     if param_struct.water_table == 1:
         Groundwater = param_struct.z_gw[clock_struct.time_step_counter]
+        print(f'New z_gw is: {param_struct.z_gw[clock_struct.time_step_counter]}')
     else:
         Groundwater = 0
 

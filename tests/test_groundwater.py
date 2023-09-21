@@ -79,9 +79,9 @@ model2.run_model(till_termination=True)
 # sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y='z_gw',ax=ax[1])
 
 # MULTIMODEL 4 PLOT
-fig,ax=plt.subplots(2,2,figsize=(12,14))
+# fig,ax=plt.subplots(2,2,figsize=(12,14))
 
-sns.boxplot(data=pd.DataFrame(model1._outputs.water_flux),x='time_step_counter',y='z_gw',ax=ax[0,0])
-sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y='z_gw',ax=ax[1,0])
-sns.boxplot(data=pd.DataFrame(model1._outputs.water_flux),x='time_step_counter',y='GwIn',ax=ax[0,1])
-sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y='GwIn',ax=ax[1,1])
+# sns.boxplot(data=pd.DataFrame(model1._outputs.water_flux),x='time_step_counter',y='z_gw',ax=ax[0,0])
+# sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y='z_gw',ax=ax[1,0])
+# sns.boxplot(data=pd.DataFrame(model1._outputs.water_flux),x='time_step_counter',y='GwIn',ax=ax[0,1])
+# sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y='GwIn',ax=ax[1,1])

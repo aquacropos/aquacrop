@@ -35,6 +35,6 @@ if len(df) > 1:
         z_gw.loc[date] = depth
 
     # Interpolate daily groundwater depths
-    print(f"pre-interpolation Z_GW: {z_gw}")
+    print(f"pre-interpolation Z_GW: {z_gw.values}")
     z_gw = z_gw.interpolate()
-    print(f"post-interpolation Z_GW: {z_gw}")
+    print(f"post-interpolation Z_GW: {z_gw.values}")
