@@ -487,7 +487,7 @@ def solution_single_time_step(
     outputs.water_storage[row_day, 3:] = NewCond.th
 
     # Water fluxes
-    print(f'Saving NewCond.z_gw to outputs: {NewCond.z_gw}')
+    # print(f'Saving NewCond.z_gw to outputs: {NewCond.z_gw}')
     outputs.water_flux[row_day, :] = [
         clock_struct.time_step_counter,
         clock_struct.season_counter,
