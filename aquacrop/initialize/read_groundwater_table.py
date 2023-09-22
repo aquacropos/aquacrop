@@ -49,8 +49,8 @@ def read_groundwater_table(
 
         # get date in correct format
         df.Date = pd.DatetimeIndex(df.Date)
-        print(f'DF length: {len(df)}')
-        print(f'Index length: {len(df.index)}')
+        # print(f'DF length: {len(df)}')
+        # print(f'Index length: {len(df.index)}')
 
         if len(df) == 1:
             

@@ -73,11 +73,11 @@ def check_groundwater_table(
         zMid = prof.zMid
 
         # Check if water table is within modelled soil profile
-        # if NewCond_zGW >= 0:
-        #     if len(zMid[zMid >= NewCond_zGW]) == 0:
-        #         NewCond_WTinSoil = False
-        #     else:
-        #         NewCond_WTinSoil = True
+        if NewCond_zGW >= 0:
+            if len(zMid[zMid >= NewCond_zGW]) == 0:
+                NewCond.wt_in_soil = False
+            else:
+                NewCond.wt_in_soil = True
 
         # If water table is in soil profile, adjust water contents
         # if NewCond_WTinSoil == True:
