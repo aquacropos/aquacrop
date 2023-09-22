@@ -1,8 +1,6 @@
-import subprocess
 import sys
-
-# from subprocess import call
-from tqdm import tqdm
+from subprocess import call
+from tqdm.autonotebook import tqdm
 
 modules_to_compile = [
     "aquacrop.solution.water_stress",
@@ -27,4 +25,4 @@ modules_to_compile = [
     "aquacrop.solution.biomass_accumulation"]
 
 for mod in tqdm(modules_to_compile):
-    subprocess.run([f"{sys.executable}", "-m", mod]) # requires testing!
+    call([f"{sys.executable}", "-m", mod]) # requires testing!
