@@ -1,4 +1,7 @@
-from subprocess import call
+import subprocess
+import sys
+
+# from subprocess import call
 from tqdm import tqdm
 
 modules_to_compile = [
