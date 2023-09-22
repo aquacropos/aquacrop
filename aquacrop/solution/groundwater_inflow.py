@@ -24,15 +24,15 @@ def groundwater_inflow(
 
     Arguments:
 
-        prof (SoilProfileNT): Soil profile paramaters
+        prof (SoilProfileNT): Soil profile parameters
 
-        NewCond (InitialCondition): model paramaters
+        NewCond (InitialCondition): model parameters
 
 
     Returns:
 
 
-        NewCond (InitialCondition): InitCond object containing updated model paramaters
+        NewCond (InitialCondition): InitCond object containing updated model parameters
 
         GwIn (float): Groundwater inflow
 

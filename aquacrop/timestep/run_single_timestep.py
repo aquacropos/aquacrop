@@ -86,11 +86,6 @@ def solution_single_time_step(
     # Unpack structures
     Soil = param_struct.Soil
     CO2 = param_struct.CO2
-    if param_struct.water_table == 1:
-        Groundwater = param_struct.z_gw[clock_struct.time_step_counter]
-    else:
-        Groundwater = 0
-
     precipitation = weather_step[2]
     temp_max = weather_step[1]
     temp_min = weather_step[0]
@@ -98,6 +93,11 @@ def solution_single_time_step(
 
     # Store initial conditions in structure for updating %%
     NewCond = init_cond
+
+    if param_struct.water_table == 1:
+        NewCond.z_gw = param_struct.z_gw[clock_struct.time_step_counter]
+    else:
+        NewCond.z_gw = 0
 
     # Check if growing season is active on current time step %%
     if clock_struct.season_counter >= 0:
@@ -185,11 +185,12 @@ def solution_single_time_step(
     # print(f'NewCond.z_gw post-change: {NewCond.z_gw}')
     (NewCond.th_fc_Adj, _) = check_groundwater_table(
         Soil.Profile,
-        NewCond.z_gw,
-        NewCond.th,
-        NewCond.th_fc_Adj,
+        NewCond,
+        # NewCond.z_gw,
+        # NewCond.th,
+        # NewCond.th_fc_Adj,
         param_struct.water_table,
-        Groundwater,
+        # Groundwater,
     )
     # print(f'NewCond.z_gw post-check: {NewCond.z_gw}')
     # 2. Root development
