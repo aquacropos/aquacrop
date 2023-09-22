@@ -1,4 +1,3 @@
-import sys
 from subprocess import call
 from tqdm.autonotebook import tqdm
 
@@ -25,4 +24,4 @@ modules_to_compile = [
     "aquacrop.solution.biomass_accumulation"]
 
 for mod in tqdm(modules_to_compile):
-    call([f"{sys.executable}", "-m", mod]) # requires testing!
+    call(["python", "-m", mod])
