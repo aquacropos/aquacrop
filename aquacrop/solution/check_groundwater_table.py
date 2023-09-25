@@ -28,11 +28,12 @@ if TYPE_CHECKING:
 @cc.export("check_groundwater_table", (SoilProfileNT_typ_sig,InitCond_spec,i8)) # SoilProfileNT_typ_sig,f8,f8[:],f8[:],i8,f8
 def check_groundwater_table(
     prof: "SoilProfileNT",
-    NewCond_zGW: float,
-    NewCond_th: "ndarray",
-    NewCond_th_fc_Adj: "ndarray",
+    NewCond: "InitialCondition",
+    # NewCond_zGW: float,
+    # NewCond_th: "ndarray",
+    # NewCond_th_fc_Adj: "ndarray",
     water_table_presence: int,
-    z_gw: float,
+    # z_gw: float,
 ) -> "ndarray":
     """
     Function to check for presence of a groundwater table, and, if present,
@@ -44,6 +45,8 @@ def check_groundwater_table(
     Arguments:
 
         prof (SoilProfileNT): soil profile paramaters
+
+        NewCond (InitialCondition): InitCond object containing updated model parameters
 
         NewCond_zGW (float): groundwater depth
 
@@ -69,14 +72,15 @@ def check_groundwater_table(
     if water_table_presence == 1:
 
         # Update groundwater conditions for current day
-        NewCond_zGW = z_gw
+        # NewCond_zGW = z_gw
+        z_gw = NewCond.z_gw
 
         # Find compartment mid-points
         zMid = prof.zMid
 
         # Check if water table is within modelled soil profile
-        if NewCond_zGW >= 0:
-            if len(zMid[zMid >= NewCond_zGW]) == 0:
+        if z_gw >= 0:
+            if len(zMid[zMid >= z_gw]) == 0:
                 NewCond.wt_in_soil = False
             else:
                 NewCond.wt_in_soil = True
@@ -102,7 +106,7 @@ def check_groundwater_table(
                     pF = 2 + 0.3 * (prof.th_fc[compi] - 0.1) / 0.2
                     Xmax = (np.exp(pF * np.log(10))) / 100
 
-            if (NewCond_zGW < 0) or ((NewCond_zGW - zMid[compi]) >= Xmax):
+            if (z_gw < 0) or ((z_gw - zMid[compi]) >= Xmax):
                 for ii in range(compi + 1):
 
                     thfcAdj[ii] = prof.th_fc[ii]
@@ -112,11 +116,11 @@ def check_groundwater_table(
                 if prof.th_fc[compi] >= prof.th_s[compi]:
                     thfcAdj[compi] = prof.th_fc[compi]
                 else:
-                    if zMid[compi] >= NewCond_zGW:
+                    if zMid[compi] >= z_gw:
                         thfcAdj[compi] = prof.th_s[compi]
                     else:
                         dV = prof.th_s[compi] - prof.th_fc[compi]
-                        dFC = (dV / (Xmax * Xmax)) * ((zMid[compi] - (NewCond_zGW - Xmax)) ** 2)
+                        dFC = (dV / (Xmax * Xmax)) * ((zMid[compi] - (z_gw - Xmax)) ** 2)
                         thfcAdj[compi] = prof.th_fc[compi] + dFC
 
                 compi = compi - 1
