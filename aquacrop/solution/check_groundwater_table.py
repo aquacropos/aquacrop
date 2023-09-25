@@ -1,6 +1,6 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
+from numba import njit, f8, i8
 from numba.pycc import CC
 
 
@@ -25,16 +25,14 @@ if TYPE_CHECKING:
 
 
 
-@cc.export("check_groundwater_table", (SoilProfileNT_typ_sig,InitCond_spec,i8)) # SoilProfileNT_typ_sig,f8,f8[:],f8[:],i8,f8
+@cc.export("check_groundwater_table", (SoilProfileNT_typ_sig,f8,f8[:],f8[:],i8))
 def check_groundwater_table(
     prof: "SoilProfileNT",
-    NewCond: "InitialCondition",
-    # NewCond_zGW: float,
-    # NewCond_th: "ndarray",
-    # NewCond_th_fc_Adj: "ndarray",
+    NewCond_zGW: float,
+    NewCond_th: "ndarray",
+    NewCond_th_fc_Adj: "ndarray",
     water_table_presence: int,
-    # z_gw: float,
-) -> "ndarray":
+) -> Tuple["ndarray", "int"]:
     """
     Function to check for presence of a groundwater table, and, if present,
     to adjust compartment water contents and field capacities where necessary
@@ -73,8 +71,8 @@ def check_groundwater_table(
 
         # Update groundwater conditions for current day
         # NewCond_zGW = z_gw
-        z_gw = NewCond.z_gw
-        print(f'New z_gw in check...py is: {z_gw}')
+        z_gw = NewCond_zGW
+        print(f'New z_gw in check_groundwater_table.py is: {z_gw}')
 
         # Find compartment mid-points
         zMid = prof.zMid
@@ -82,9 +80,9 @@ def check_groundwater_table(
         # Check if water table is within modelled soil profile
         if z_gw >= 0:
             if len(zMid[zMid >= z_gw]) == 0:
-                NewCond.wt_in_soil = False
+                wt_in_soil = False
             else:
-                NewCond.wt_in_soil = True
+                wt_in_soil = True
 
         # If water table is in soil profile, adjust water contents
         # if NewCond_WTinSoil == True:
@@ -129,9 +127,9 @@ def check_groundwater_table(
         # Store adjusted field capacity values
         NewCond_th_fc_Adj = thfcAdj
         # prof.th_fc_Adj = thfcAdj
-        return (NewCond_th_fc_Adj, thfcAdj)
+        return NewCond_th_fc_Adj, wt_in_soil
 
-    return (NewCond_th_fc_Adj, None)
+    return NewCond_th_fc_Adj, wt_in_soil
 
 if __name__ == "__main__":
     cc.compile()
