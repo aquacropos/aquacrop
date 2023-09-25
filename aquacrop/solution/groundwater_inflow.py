@@ -57,6 +57,7 @@ def groundwater_inflow(
         # Check whether ALL compartments are below water table, if so set all to sat, otherwise check number that are and set those to sat.
         # if z_gw < np.min(zMid):
         #     for i in range(len(prof.Comp)):
+        print(f'Groundwater in triggered at z_gw: {z_gw}')
 
         # print(f'argwhere 1: {np.argwhere(zMid >= z_gw)}')
         # print(f'argwhere 2, flatten: {np.argwhere(zMid >= z_gw).flatten}')
@@ -69,6 +70,7 @@ def groundwater_inflow(
                 dth = prof.th_s[ii] - NewCond.th[ii]
                 NewCond.th[ii] = prof.th_s[ii]
                 # Update groundwater inflow
+                print(f'dth = {dth}, prof.dz[ii] = {prof.dz[ii]}')
                 GwIn = GwIn + (dth * 1000 * prof.dz[ii])
 
     return NewCond, GwIn

@@ -69,13 +69,13 @@ model2 = AquaCropModel(sim_start_time=f'{1979}/10/01',
                       irrigation_management=irr_mngt,
                       initial_water_content=InitWC,
                       groundwater=GroundWater(method="Variable", water_table='Y',
-                                              dates=[f'{1979}/10/01', f'{1985}/04/30'], values = [0.5,2]))
+                                              dates=[f'{1979}/10/01', f'{1983}/04/30'], values = [0.5,2]))
 model2.run_model(till_termination=True)
 
 # MULTIMODEL 2 PLOT
 fig,ax=plt.subplots(2,1,figsize=(12,14))
 
-sns.boxplot(data=pd.DataFrame(model1._outputs.water_flux),x='time_step_counter',y='z_gw',ax=ax[0])
+sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y='GwIn',ax=ax[0])
 sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y='z_gw',ax=ax[1])
 
 # MULTIMODEL 4 PLOT
