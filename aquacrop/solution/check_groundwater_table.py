@@ -6,8 +6,10 @@ from numba.pycc import CC
 
 try:
     from ..entities.soilProfile import SoilProfileNT_typ_sig
+    from ..entities.initParamVariables import InitCond_spec
 except:
     from entities.soilProfile import SoilProfileNT_typ_sig
+    from entities.initParamVariables import InitCond_spec
 # temporary name for compiled module
 cc = CC("solution_check_groundwater_table")
 
@@ -23,7 +25,7 @@ if TYPE_CHECKING:
 
 
 
-@cc.export("check_groundwater_table", (SoilProfileNT_typ_sig,f8,f8[:],f8[:],i8,f8))
+@cc.export("check_groundwater_table", (SoilProfileNT_typ_sig,InitCond_spec,i8)) # SoilProfileNT_typ_sig,f8,f8[:],f8[:],i8,f8
 def check_groundwater_table(
     prof: "SoilProfileNT",
     NewCond_zGW: float,
