@@ -180,9 +180,9 @@ def solution_single_time_step(
 
     # Run simulations %%
     # 1. Check for groundwater table
-    # print(f'NewCond.z_gw pre-check: {NewCond.z_gw}')
-    # NewCond.z_gw=Groundwater
-    # print(f'NewCond.z_gw post-change: {NewCond.z_gw}')
+    print(f'NewCond.z_gw pre-change: {NewCond.z_gw}')
+    NewCond.z_gw=Groundwater
+    print(f'NewCond.z_gw post-change: {NewCond.z_gw}')
     (NewCond.th_fc_Adj, _) = check_groundwater_table(
         Soil.Profile,
         NewCond,

@@ -74,6 +74,7 @@ def check_groundwater_table(
         # Update groundwater conditions for current day
         # NewCond_zGW = z_gw
         z_gw = NewCond.z_gw
+        print(f'New z_gw in check...py is: {z_gw}')
 
         # Find compartment mid-points
         zMid = prof.zMid
