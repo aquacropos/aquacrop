@@ -51,16 +51,16 @@ y_axis = 'Infl' # canopy_cover
 # sns.boxplot(data=pd.DataFrame(model1._outputs.water_storage),x='time_step_counter',y='th4',ax=ax[1,1])
 
 # MULTIMODEL TESTING
-model1 = AquaCropModel(sim_start_time=f'{1979}/10/01',
-                      sim_end_time=f'{1985}/05/30',
-                      weather_df=weather_data,
-                      soil=sandy_loam,
-                      crop=wheat,
-                      irrigation_management=irr_mngt,
-                      initial_water_content=InitWC,
-                      groundwater=GroundWater(method="Constant", water_table='Y',
-                                              dates=[f'{1979}/10/01'], values = [2]))
-model1.run_model(till_termination=True)
+# model1 = AquaCropModel(sim_start_time=f'{1979}/10/01',
+#                       sim_end_time=f'{1985}/05/30',
+#                       weather_df=weather_data,
+#                       soil=sandy_loam,
+#                       crop=wheat,
+#                       irrigation_management=irr_mngt,
+#                       initial_water_content=InitWC,
+#                       groundwater=GroundWater(method="Constant", water_table='Y',
+#                                               dates=[f'{1979}/10/01'], values = [2]))
+# model1.run_model(till_termination=True)
 model2 = AquaCropModel(sim_start_time=f'{1979}/10/01',
                       sim_end_time=f'{1985}/05/30',
                       weather_df=weather_data,

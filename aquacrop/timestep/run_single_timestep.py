@@ -93,7 +93,6 @@ def solution_single_time_step(
 
     # Store initial conditions in structure for updating %%
     NewCond = init_cond
-    print(f'NewCond.z_gw pre-change: {NewCond.z_gw}')
     if param_struct.water_table == 1:
         NewCond.z_gw = param_struct.z_gw[clock_struct.time_step_counter]
     else:
@@ -190,7 +189,7 @@ def solution_single_time_step(
     )
 
     NewCond.wt_in_soil=wt_in_soil
-    print(f'NewCond.wt_in_soil: {NewCond.wt_in_soil}')
+    print(f'NewCond.wt_in_soil in run_single_timestep: {NewCond.wt_in_soil}')
     # print(f'NewCond.z_gw post-check: {NewCond.z_gw}')
     # 2. Root development
     NewCond.z_root = root_development(
@@ -389,6 +388,7 @@ def solution_single_time_step(
         gdd,
     )
 
+    print(f'Pre-groundwater_inflow NewCond.wt_in_soil: {NewCond.wt_in_soil}')
     # 14. Groundwater inflow
     NewCond, GwIn = groundwater_inflow(Soil.Profile, NewCond)
 

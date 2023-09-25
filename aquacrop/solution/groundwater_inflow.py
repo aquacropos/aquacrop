@@ -42,6 +42,8 @@ def groundwater_inflow(
     ## Store initial conditions for updating ##
     GwIn = 0
 
+    print(f'Groundwater inflow NewCond.wt_in_soil: {NewCond.wt_in_soil}')
+
     ## Perform calculations ##
     if NewCond.wt_in_soil == True:
         # Water table in soil profile. Calculate horizontal inflow.
