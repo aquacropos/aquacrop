@@ -1,5 +1,5 @@
-# import os
-# os.environ['DEVELOPMENT'] = 'True'
+import os
+os.environ['DEVELOPMENT'] = 'True'
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -73,10 +73,10 @@ model2 = AquaCropModel(sim_start_time=f'{1979}/10/01',
 model2.run_model(till_termination=True)
 
 # MULTIMODEL 2 PLOT
-# fig,ax=plt.subplots(2,1,figsize=(12,14))
+fig,ax=plt.subplots(2,1,figsize=(12,14))
 
-# sns.boxplot(data=pd.DataFrame(model1._outputs.water_flux),x='time_step_counter',y='z_gw',ax=ax[0])
-# sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y='z_gw',ax=ax[1])
+sns.boxplot(data=pd.DataFrame(model1._outputs.water_flux),x='time_step_counter',y='z_gw',ax=ax[0])
+sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y='z_gw',ax=ax[1])
 
 # MULTIMODEL 4 PLOT
 # fig,ax=plt.subplots(2,2,figsize=(12,14))
