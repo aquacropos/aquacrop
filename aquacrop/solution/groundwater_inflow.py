@@ -42,8 +42,6 @@ def groundwater_inflow(
     ## Store initial conditions for updating ##
     GwIn = 0
 
-    print(f'Groundwater inflow NewCond.wt_in_soil: {NewCond.wt_in_soil}')
-
     ## Perform calculations ##
     if NewCond.wt_in_soil == True:
         # Water table in soil profile. Calculate horizontal inflow.
@@ -53,28 +51,16 @@ def groundwater_inflow(
 
         # Find compartment mid-points
         zMid = prof.zMid
-        # print(f'zMid in groundwater_inflow.py: {zMid}')
-        # For compartments below water table, set to saturation # 
 
-        # Check whether ALL compartments are below water table, if so set all to sat, otherwise check number that are and set those to sat.
-        # if z_gw < np.min(zMid):
-        #     for i in range(len(prof.Comp)):
-        print(f'Groundwater in triggered at z_gw: {z_gw}')
-
-        # print(f'argwhere 1: {np.argwhere(zMid >= z_gw)}')
-        # print(f'argwhere 2, flatten: {np.argwhere(zMid >= z_gw).flatten}')
         idx = np.argwhere(zMid >= z_gw).flatten()[0]
-        print(f'Groundwater idx: {idx}')
 
         for ii in range(idx, len(prof.Comp)):
-            print(f'For {ii}, is {NewCond.th[ii]} < {prof.th_s[ii]}')
             # Get soil layer
             if NewCond.th[ii] < prof.th_s[ii]:
                 # Update water content
                 dth = prof.th_s[ii] - NewCond.th[ii]
                 NewCond.th[ii] = prof.th_s[ii]
                 # Update groundwater inflow
-                print(f'dth = {dth}, prof.dz[ii] = {prof.dz[ii]}')
                 GwIn = GwIn + (dth * 1000 * prof.dz[ii])
 
     return NewCond, GwIn

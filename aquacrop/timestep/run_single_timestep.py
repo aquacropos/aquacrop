@@ -189,8 +189,7 @@ def solution_single_time_step(
     )
 
     NewCond.wt_in_soil=wt_in_soil
-    print(f'NewCond.wt_in_soil in run_single_timestep: {NewCond.wt_in_soil}')
-    # print(f'NewCond.z_gw post-check: {NewCond.z_gw}')
+
     # 2. Root development
     NewCond.z_root = root_development(
         Crop,
