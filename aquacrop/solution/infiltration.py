@@ -112,7 +112,7 @@ def infiltration(
     ## Determine surface storage (if bunds are present) ##
     if FieldMngt_Bunds:
         # bunds on field
-        if FieldMngt_zBund > 0.001:
+        if FieldMngt_zBund < 0.001:
             # Bund height too small to be considered
             InflTot = Infl + NewCond_SurfaceStorage
             if InflTot > 0:

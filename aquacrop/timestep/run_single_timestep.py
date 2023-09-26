@@ -97,7 +97,6 @@ def solution_single_time_step(
         NewCond.z_gw = param_struct.z_gw[clock_struct.time_step_counter]
     else:
         NewCond.z_gw = 0
-    print(f'NewCond.z_gw post-change: {NewCond.z_gw}')  
 
     # Check if growing season is active on current time step %%
     if clock_struct.season_counter >= 0:
@@ -387,7 +386,6 @@ def solution_single_time_step(
         gdd,
     )
 
-    print(f'Pre-groundwater_inflow NewCond.wt_in_soil: {NewCond.wt_in_soil}')
     # 14. Groundwater inflow
     NewCond, GwIn = groundwater_inflow(Soil.Profile, NewCond)
 
