@@ -65,23 +65,23 @@ def check_groundwater_table(
 
 
     """
+
+    # Update groundwater conditions for current day
+    # NewCond_zGW = z_gw
+    z_gw = NewCond_zGW
+
+    # Find compartment mid-points
+    zMid = prof.zMid
+
+    # Check if water table is within modelled soil profile
+    if z_gw >= 0:
+        if len(zMid[zMid >= z_gw]) == 0:
+            wt_in_soil = False
+        else:
+            wt_in_soil = True
     
     ## Perform calculations (if variable water table is present) ##
     if water_table_presence == 1:
-
-        # Update groundwater conditions for current day
-        # NewCond_zGW = z_gw
-        z_gw = NewCond_zGW
-
-        # Find compartment mid-points
-        zMid = prof.zMid
-
-        # Check if water table is within modelled soil profile
-        if z_gw >= 0:
-            if len(zMid[zMid >= z_gw]) == 0:
-                wt_in_soil = False
-            else:
-                wt_in_soil = True
 
         # If water table is in soil profile, adjust water contents
         # if NewCond_WTinSoil == True:

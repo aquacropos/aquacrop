@@ -12,7 +12,7 @@ filepath=get_filepath('tunis_climate.txt')
 weather_data = prepare_weather(filepath)
 
 # soil
-sandy_loam = Soil(soil_type='SandyLoam')
+sandy_loam = Soil(soil_type='SiltLoam')
 
 # crops
 wheat = Crop('Wheat', planting_date='10/01')
@@ -69,7 +69,7 @@ model2 = AquaCropModel(sim_start_time=f'{1979}/10/01',
                       irrigation_management=irr_mngt,
                       initial_water_content=InitWC,
                       groundwater=GroundWater(method="Variable", water_table='Y',
-                                              dates=[f'{1979}/10/01', f'{1983}/04/30'], values = [0.5,2]))
+                                              dates=[f'{1979}/10/01', f'{1984}/04/30'], values = [0.25,2]))
 model2.run_model(till_termination=True)
 
 # MULTIMODEL 2 PLOT
