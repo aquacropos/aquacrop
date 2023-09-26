@@ -64,8 +64,10 @@ def groundwater_inflow(
         # print(f'argwhere 1: {np.argwhere(zMid >= z_gw)}')
         # print(f'argwhere 2, flatten: {np.argwhere(zMid >= z_gw).flatten}')
         idx = np.argwhere(zMid >= z_gw).flatten()[0]
+        print(f'Groundwater idx: {idx}')
 
         for ii in range(idx, len(prof.Comp)):
+            print(f'For {ii}, is {NewCond.th[ii]} < {prof.th_s[ii]}')
             # Get soil layer
             if NewCond.th[ii] < prof.th_s[ii]:
                 # Update water content
