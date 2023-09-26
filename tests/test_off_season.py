@@ -45,7 +45,7 @@ model1 = AquaCropModel(sim_start_time=f'{1982}/10/01',
 # run model till termination
 model1.run_model(till_termination=True)
 
-print(model1._outputs.crop_growth)
+# print(model1._outputs.crop_growth)
 
 model2 = AquaCropModel(sim_start_time=f'{1982}/10/01',
                       sim_end_time=f'{2018}/05/30',
@@ -61,5 +61,5 @@ model2.run_model(till_termination=True)
 
 fig,ax=plt.subplots(2,1,figsize=(12,14))
 
-sns.boxplot(data=pd.DataFrame(model1._outputs.water_flux),x='time_step_counter',y=y_axis, ax=ax[0])
-sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y=y_axis, ax=ax[1])
+sns.boxplot(data=pd.DataFrame(model1._outputs.water_flux),x='dap',y=y_axis, ax=ax[0])
+sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='dap',y=y_axis, ax=ax[1])

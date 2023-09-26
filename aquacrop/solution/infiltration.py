@@ -109,10 +109,11 @@ def infiltration(
 
     assert Infl >= 0
 
+    print(f'Infiltration start stats: FieldMngt_Bunds = {FieldMngt_Bunds}, FieldMngt_zBund = {FieldMngt_zBund}, Infl = {Infl}, prof.Ksat = {prof.Ksat[0]}')
     ## Determine surface storage (if bunds are present) ##
     if FieldMngt_Bunds:
         # bunds on field
-        if FieldMngt_zBund < 0.001:
+        if FieldMngt_zBund > 0.001:
             # Bund height too small to be considered
             InflTot = Infl + NewCond_SurfaceStorage
             if InflTot > 0:
@@ -163,6 +164,7 @@ def infiltration(
         # days when bunds are removed to maintain water balance)
         RunoffIni = RunoffIni + InitCond_SurfaceStorage
 
+    print(f'ToStore infiltration var is: {ToStore}')
     ## Initialise counters
     ii = -1
     Runoff = 0
