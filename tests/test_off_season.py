@@ -28,13 +28,14 @@ irr_mngt = IrrigationManagement(irrigation_method=0)
 fal_fld = FieldMngt(mulches=True,
                     mulch_pct=100,
                     bunds=True,
-                    bund_water=10)
+                    bund_water=10,
+                    z_bund=1)
 
-y_axis = 'surface_storage' # canopy_cover, surface_storage, Runoff, Es
+y_axis = 'Wr' # canopy_cover, surface_storage, Runoff, Es, Infl
 
 # combine into aquacrop model and specify start and end simulation date
 model1 = AquaCropModel(sim_start_time=f'{1982}/10/01',
-                      sim_end_time=f'{2018}/05/30',
+                      sim_end_time=f'{1985}/05/30',
                       weather_df=weather_data,
                       soil=sandy_loam,
                       crop=wheat,
@@ -48,7 +49,7 @@ model1.run_model(till_termination=True)
 # print(model1._outputs.crop_growth)
 
 model2 = AquaCropModel(sim_start_time=f'{1982}/10/01',
-                      sim_end_time=f'{2018}/05/30',
+                      sim_end_time=f'{1985}/05/30',
                       weather_df=weather_data,
                       soil=sandy_loam,
                       crop=wheat,
@@ -59,7 +60,33 @@ model2 = AquaCropModel(sim_start_time=f'{1982}/10/01',
 
 model2.run_model(till_termination=True)
 
-fig,ax=plt.subplots(2,1,figsize=(12,14))
+# fig,ax=plt.subplots(2,1,figsize=(12,14))
 
-sns.boxplot(data=pd.DataFrame(model1._outputs.water_flux),x='dap',y=y_axis, ax=ax[0])
-sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='dap',y=y_axis, ax=ax[1])
+# sns.scatterplot(data=pd.DataFrame(model1._outputs.water_flux),x='time_step_counter',y=y_axis, ax=ax[0])
+# sns.scatterplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y=y_axis, ax=ax[1])
+model_out=pd.DataFrame(model2._outputs.water_flux)
+
+# Test all outputs
+all_water_flux = [
+                "Wr",
+                "z_gw",
+                "surface_storage",
+                "IrrDay",
+                "Infl",
+                "Runoff",
+                "DeepPerc",
+                "CR",
+                "GwIn",
+                "Es",
+                "EsPot",
+                "Tr",
+                "TrPot",
+            ]
+
+for y_var in all_water_flux:
+    plt.figure()
+    plot=sns.scatterplot(data=model_out,
+                        x='time_step_counter',
+                        y=y_var)
+    fig=plot.get_figure()
+    fig.savefig(f'../plots/off_season/{y_var}_2.png')

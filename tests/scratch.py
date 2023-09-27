@@ -4,12 +4,14 @@ import datetime
 
 from numpy import ndarray
 
+test1 = test2 = ''
+
 # TESTING NP.ARGWHERE FOR GROUNDWATER INFLOW
-z_gw = 1.16
-zMid=np.array([0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95, 1.05, 1.15])
-print(np.argmax((zMid>=z_gw)))
-idx = np.argwhere(zMid >= z_gw).flatten()[0]
-print(idx)
+# z_gw = 1.16
+# zMid=np.array([0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95, 1.05, 1.15])
+# print(np.argmax((zMid>=z_gw)))
+# idx = np.argwhere(zMid >= z_gw).flatten()[0]
+# print(idx)
 # for ii in range(idx, len(prof.Comp)):
 #             # Get soil layer
 #             if NewCond.th[ii] < prof.th_s[ii]:
