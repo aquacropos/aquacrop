@@ -1,0 +1,9 @@
+deep uniform 'silty clay' soil profile
+        6.0                 : AquaCrop Version (March 2017)
+       72                   : CN (Curve Number)
+       14                   : Readily evaporable water from top layer (mm)
+        1                   : number of soil horizons
+       -9                   : variable no longer applicable
+  Thickness  Sat   FC    WP     Ksat   Penetrability  Gravel  CRa       CRb           description
+  ---(m)-   ----(vol %)-----  (mm/day)      (%)        (%)    -----------------------------------------
+    4.00    54.0  50.0  32.0   100.0        100         0     -0.556600  1.336132        silty clay

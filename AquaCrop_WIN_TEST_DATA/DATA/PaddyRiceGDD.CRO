@@ -1,0 +1,77 @@
+Default Paddy Rice, GDD (LosBanos, 15Jan04)
+     6.0       : AquaCrop Version (March 2017)
+     0         : File protected
+     2         : fruit/grain producing crop
+     0         : Crop is transplanted
+     0         : Determination of crop cycle : by growing degree-days
+     1         : Soil water depletion factors (p) are adjusted by ETo
+     8.0       : Base temperature (°C) below which crop development does not progress
+    30.0       : Upper temperature (°C) above which crop development no longer increases with an increase in temperature
+  1900         : Total length of crop cycle in growing degree-days
+     0.00      : Soil water depletion factor for canopy expansion (p-exp) - Upper threshold
+     0.40      : Soil water depletion factor for canopy expansion (p-exp) - Lower threshold
+     3.0       : Shape factor for water stress coefficient for canopy expansion (0.0 = straight line)
+     0.50      : Soil water depletion fraction for stomatal control (p - sto) - Upper threshold
+     3.0       : Shape factor for water stress coefficient for stomatal control (0.0 = straight line)
+     0.55      : Soil water depletion factor for canopy senescence (p - sen) - Upper threshold
+     3.0       : Shape factor for water stress coefficient for canopy senescence (0.0 = straight line)
+     0         : Sum(ETo) during stress period to be exceeded before senescence is triggered
+     0.75      : Soil water depletion factor for pollination (p - pol) - Upper threshold
+     0         : Vol% for Anaerobiotic point (* (SAT - [vol%]) at which deficient aeration occurs *)
+    50         : Considered soil fertility stress for calibration of stress response (%)
+    25.00      : Response of canopy expansion is not considered
+    25.00      : Response of maximum canopy cover is not considered
+    25.00      : Response of crop Water Productivity is not considered
+    25.00      : Response of decline of canopy cover is not considered
+    -9         : dummy - Parameter no Longer required
+     8         : Minimum air temperature below which pollination starts to fail (cold stress) (°C)
+    35         : Maximum air temperature above which pollination starts to fail (heat stress) (°C)
+    10.0       : Minimum growing degrees required for full crop transpiration (°C - day)
+     3         : Electrical Conductivity of soil saturation extract at which crop starts to be affected by soil salinity (dS/m)
+    11         : Electrical Conductivity of soil saturation extract at which crop can no longer grow (dS/m)
+    -9         : Dummy - no longer applicable
+    25         : Calibrated distortion (%) of CC due to salinity stress (Range: 0 (none) to +100 (very strong))
+   100         : Calibrated response (%) of stomata stress to ECsw (Range: 0 (none) to +200 (extreme))
+     1.10      : Crop coefficient when canopy is complete but prior to senescence (KcTr,x)
+     0.150     : Decline of crop coefficient (%/day) as a result of ageing, nitrogen deficiency, etc.
+     0.30      : Minimum effective rooting depth (m)
+     0.50      : Maximum effective rooting depth (m)
+    25         : Shape factor describing root zone expansion
+     0.048     : Maximum root water extraction (m3water/m3soil.day) in top quarter of root zone
+     0.012     : Maximum root water extraction (m3water/m3soil.day) in bottom quarter of root zone
+    50         : Effect of canopy cover in reducing soil evaporation in late season stage
+     6.00      : Soil surface covered by an individual seedling at 90 % emergence (cm2)
+     6.00      : Canopy size of individual plant (re-growth) at 1st day (cm2)
+  1000000      : Number of plants per hectare
+     0.12257   : Canopy growth coefficient (CGC): Increase in canopy cover (fraction soil cover per day)
+    -9         : Maximum decrease of Canopy Growth Coefficient in and between seasons - Not Applicable
+    -9         : Number of seasons at which maximum decrease of Canopy Growth Coefficient is reached - Not Applicable
+    -9.0       : Shape factor for decrease Canopy Growth Coefficient - Not Applicable
+     0.95      : Maximum canopy cover (CCx) in fraction soil cover
+     0.09330   : Canopy decline coefficient (CDC): Decrease in canopy cover (in fraction per day)
+     3         : Calendar Days: from transplanting to recovered transplant
+    21         : Calendar Days: from transplanting to maximum rooting depth
+    73         : Calendar Days: from transplanting to start senescence
+   104         : Calendar Days: from transplanting to maturity
+    65         : Calendar Days: from transplanting to flowering
+    19         : Length of the flowering stage (days)
+     1         : Crop determinancy linked with flowering
+   100         : Excess of potential fruits (%)
+    36         : Building up of Harvest Index starting at flowering (days)
+    19.0       : Water Productivity normalized for ETo and CO2 (WP*) (gram/m2)
+   100         : Water Productivity normalized for ETo and CO2 during yield formation (as % WP*)
+    50         : Crop performance under elevated atmospheric CO2 concentration (%)
+    43         : Reference Harvest Index (HIo) (%)
+     0         : Possible increase (%) of HI due to water stress before flowering
+    10.0       : Coefficient describing positive impact on HI of restricted vegetative growth during yield formation
+     7.0       : Coefficient describing negative impact on HI of stomatal closure during yield formation
+    15         : Allowable maximum increase (%) of specified HI
+    50         : GDDays: from transplanting to recovered transplant
+   370         : GDDays: from transplanting to maximum rooting depth
+  1300         : GDDays: from transplanting to start senescence
+  1900         : GDDays: from transplanting to maturity
+  1150         : GDDays: from transplanting to flowering
+   350         : Length of the flowering stage (growing degree days)
+     0.007004  : CGC for GGDays: Increase in canopy cover (in fraction soil cover per growing-degree day)
+     0.005003  : CDC for GGDays: Decrease in canopy cover (in fraction per growing-degree day)
+   680         : GDDays: building-up of Harvest Index during yield formation

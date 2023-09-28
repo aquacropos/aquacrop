@@ -1,5 +1,5 @@
 from subprocess import call
-from tqdm import tqdm
+from tqdm.autonotebook import tqdm
 
 modules_to_compile = [
     "aquacrop.solution.water_stress",

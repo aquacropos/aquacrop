@@ -25,7 +25,7 @@ class Output:
 
         self.water_storage = np.zeros((len(time_span), 3 + len(initial_th)))
         self.water_flux = np.zeros((len(time_span), 16))
-        self.crop_growth = np.zeros((len(time_span), 13))
+        self.crop_growth = np.zeros((len(time_span), 18))#add output for soil fertility stress testing
         self.final_stats = pd.DataFrame(
             columns=[
                 "Season",

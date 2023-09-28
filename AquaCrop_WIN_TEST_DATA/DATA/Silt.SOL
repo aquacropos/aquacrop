@@ -1,0 +1,9 @@
+deep uniform 'silt' soil profile
+        6.0                 : AquaCrop Version (March 2017)
+       61                   : CN (Curve Number)
+       11                   : Readily evaporable water from top layer (mm)
+        1                   : number of soil horizons
+       -9                   : variable no longer applicable
+  Thickness  Sat   FC    WP     Ksat   Penetrability  Gravel  CRa       CRb           description
+  ---(m)-   ----(vol %)-----  (mm/day)      (%)        (%)    -----------------------------------------
+    4.00    43.0  33.0   9.0   500.0        100         0     -0.453600  0.837340              silt

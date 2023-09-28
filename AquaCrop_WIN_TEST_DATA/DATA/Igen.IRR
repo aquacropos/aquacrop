@@ -1,0 +1,11 @@
+Generation of irrigation schedule (sprinkler - 80% RAW depletion - back to FC)
+   4.0   : AquaCrop Version (March 2012)
+   1     : Sprinkler irrigation
+ 100     : Percentage of soil surface wetted by irrigation
+   2     : Generate irrigation schedule
+   3     : Time criterion = allowable fraction of RAW
+   1     : Depth criterion = back to FC
+
+  From day    Depleted RAW (%)   Back to FC (+/- mm)       ECw (dS/m)
+=========================================================================
+       1             80                   0                   0.0

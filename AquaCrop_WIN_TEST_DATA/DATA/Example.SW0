@@ -1,0 +1,13 @@
+example with soil water content at particulars depths
+    3.0   : AquaCrop Version (January 2009)
+    0.0   : water stored between soil bunds (if present)
+    1     : soil water content specified at particular depths
+    5     : number of soil depths considered
+
+  Soil depth (m)         Soil water content (vol%)
+==================================================
+      0.10                         23.00
+      0.29                         15.00
+      0.45                         34.00
+      0.66                         15.00
+      1.00                         10.00

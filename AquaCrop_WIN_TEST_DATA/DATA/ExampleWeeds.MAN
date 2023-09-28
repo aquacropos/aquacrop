@@ -1,0 +1,11 @@
+presence of weeds (moderate weed management - decrease of RC in season)
+     6.0       : AquaCrop Version (March 2016)
+     0         : percentage (%) of ground surface covered by mulches IN growing period
+    50         : effect (%) of mulches on reduction of soil evaporation
+     0         : Non-limiting soil fertility
+     0.00      : height (m) of soil bunds
+     0         : surface runoff NOT affected by field surface practices
+     0         : N/A (surface runoff is not affected or completely prevented)
+    25         : relative cover of weeds at canopy closure (%)
+   -36         : decrease of relative cover of weeds in mid-season (-%)
+    -0.91      : shape factor of the CC expansion function in a weed infested field

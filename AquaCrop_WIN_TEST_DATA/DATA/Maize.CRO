@@ -1,0 +1,77 @@
+Default Maize, Calendar (Davis, 1Jun96)
+     6.0       : AquaCrop Version (March 2017)
+     0         : File protected
+     2         : fruit/grain producing crop
+     1         : Crop is sown
+     1         : Determination of crop cycle : by calendar days
+     1         : Soil water depletion factors (p) are adjusted by ETo
+     8.0       : Base temperature (°C) below which crop development does not progress
+    30.0       : Upper temperature (°C) above which crop development no longer increases with an increase in temperature
+    -9         : Total length of crop cycle in growing degree-days
+     0.14      : Soil water depletion factor for canopy expansion (p-exp) - Upper threshold
+     0.72      : Soil water depletion factor for canopy expansion (p-exp) - Lower threshold
+     2.9       : Shape factor for water stress coefficient for canopy expansion (0.0 = straight line)
+     0.69      : Soil water depletion fraction for stomatal control (p - sto) - Upper threshold
+     6.0       : Shape factor for water stress coefficient for stomatal control (0.0 = straight line)
+     0.69      : Soil water depletion factor for canopy senescence (p - sen) - Upper threshold
+     2.7       : Shape factor for water stress coefficient for canopy senescence (0.0 = straight line)
+     0         : Sum(ETo) during stress period to be exceeded before senescence is triggered
+     0.80      : Soil water depletion factor for pollination (p - pol) - Upper threshold
+     5         : Vol% for Anaerobiotic point (* (SAT - [vol%]) at which deficient aeration occurs *)
+    50         : Considered soil fertility stress for calibration of stress response (%)
+    25.00      : Response of canopy expansion is not considered
+    25.00      : Response of maximum canopy cover is not considered
+    25.00      : Response of crop Water Productivity is not considered
+    25.00      : Response of decline of canopy cover is not considered
+    -9         : dummy - Parameter no Longer required
+    10         : Minimum air temperature below which pollination starts to fail (cold stress) (°C)
+    40         : Maximum air temperature above which pollination starts to fail (heat stress) (°C)
+    12.0       : Minimum growing degrees required for full crop transpiration (°C - day)
+     2         : Electrical Conductivity of soil saturation extract at which crop starts to be affected by soil salinity (dS/m)
+    10         : Electrical Conductivity of soil saturation extract at which crop can no longer grow (dS/m)
+    -9         : Dummy - no longer applicable
+    25         : Calibrated distortion (%) of CC due to salinity stress (Range: 0 (none) to +100 (very strong))
+   100         : Calibrated response (%) of stomata stress to ECsw (Range: 0 (none) to +200 (extreme))
+     1.05      : Crop coefficient when canopy is complete but prior to senescence (KcTr,x)
+     0.300     : Decline of crop coefficient (%/day) as a result of ageing, nitrogen deficiency, etc.
+     0.30      : Minimum effective rooting depth (m)
+     2.30      : Maximum effective rooting depth (m)
+    13         : Shape factor describing root zone expansion
+     0.045     : Maximum root water extraction (m3water/m3soil.day) in top quarter of root zone
+     0.011     : Maximum root water extraction (m3water/m3soil.day) in bottom quarter of root zone
+    50         : Effect of canopy cover in reducing soil evaporation in late season stage
+     6.50      : Soil surface covered by an individual seedling at 90 % emergence (cm2)
+     6.50      : Canopy size of individual plant (re-growth) at 1st day (cm2)
+    75000      : Number of plants per hectare
+     0.16312   : Canopy growth coefficient (CGC): Increase in canopy cover (fraction soil cover per day)
+    -9         : Maximum decrease of Canopy Growth Coefficient in and between seasons - Not Applicable
+    -9         : Number of seasons at which maximum decrease of Canopy Growth Coefficient is reached - Not Applicable
+    -9.0       : Shape factor for decrease Canopy Growth Coefficient - Not Applicable
+     0.96      : Maximum canopy cover (CCx) in fraction soil cover
+     0.11691   : Canopy decline coefficient (CDC): Decrease in canopy cover (in fraction per day)
+     6         : Calendar Days: from sowing to emergence
+   108         : Calendar Days: from sowing to maximum rooting depth
+   107         : Calendar Days: from sowing to start senescence
+   132         : Calendar Days: from sowing to maturity (length of crop cycle)
+    66         : Calendar Days: from sowing to flowering
+    13         : Length of the flowering stage (days)
+     1         : Crop determinancy linked with flowering
+    50         : Excess of potential fruits (%)
+    61         : Building up of Harvest Index starting at flowering (days)
+    33.7       : Water Productivity normalized for ETo and CO2 (WP*) (gram/m2)
+   100         : Water Productivity normalized for ETo and CO2 during yield formation (as % WP*)
+    50         : Crop performance under elevated atmospheric CO2 concentration (%)
+    48         : Reference Harvest Index (HIo) (%)
+     0         : Possible increase (%) of HI due to water stress before flowering
+     7.0       : Coefficient describing positive impact on HI of restricted vegetative growth during yield formation
+     3.0       : Coefficient describing negative impact on HI of stomatal closure during yield formation
+    15         : Allowable maximum increase (%) of specified HI
+    -9         : GDDays: from sowing to emergence
+    -9         : GDDays: from sowing to maximum rooting depth
+    -9         : GDDays: from sowing to start senescence
+    -9         : GDDays: from sowing to maturity (length of crop cycle)
+    -9         : GDDays: from sowing to flowering
+    -9         : Length of the flowering stage (growing degree days)
+    -9.000000  : CGC for GGDays: Increase in canopy cover (in fraction soil cover per growing-degree day)
+    -9.000000  : CDC for GGDays: Decrease in canopy cover (in fraction per growing-degree day)
+    -9         : GDDays: building-up of Harvest Index during yield formation

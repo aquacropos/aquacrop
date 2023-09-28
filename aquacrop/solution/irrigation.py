@@ -4,7 +4,7 @@ if __name__ != "__main__":
     if os.getenv("DEVELOPMENT"):
         from .root_zone_water import root_zone_water
     else:
-        from .solution_root_zone_water import root_zone_water
+        from .root_zone_water import root_zone_water
 
 else:
    from .root_zone_water import root_zone_water

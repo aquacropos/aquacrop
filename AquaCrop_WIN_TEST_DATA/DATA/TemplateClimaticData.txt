@@ -1,0 +1,59 @@
+Distinction is made between 3 types of climate files
+- files containing temperate data (extension  TMP)
+- files containing ETo data (extension ETo)
+- files containing rainfall data (extension PLU)
+
+The structure of all files is identical and consists of:
+- 5 lines containing information required by the program
+- an empty line to separate the information from the records
+- 2 lines for the title of the records
+- list of records (1 line for each daily, 10-daily or monthly record)
+Records are temperature, ETo or rainfall data (only 1 digit allowed)
+
+
+
+
+1. EXAMPLE TEMPERATURE FILE (files with extension TMP)
+First line is a description which is displayed when selecting the file
+     1  : Daily records (1=daily, 2=10-daily and 3=monthly data)       
+     1  : First day of record (1, 11 or 21 for 10-day or 1 for months)
+     1  : First month of record
+  1999  : First year of record (1901 if not linked to a specific year)
+
+  Tmin (°C)   TMax (°C)      
+========================
+    7.0      15.0   
+    8.0      16.0   
+    9.0      18.0  
+
+
+
+
+2. EXAMPLE ETo file (files with extension ETo)
+First line is a description which is displayed when selecting the file
+     1  : Daily records (1=daily, 2=10-daily and 3=monthly data)       
+     1  : First day of record (1, 11 or 21 for 10-day or 1 for months)
+     1  : First month of record
+  1999  : First year of record (1901 if not linked to a specific year)
+
+  Average ETo (mm/day)
+=======================
+    1.0
+    1.1
+    1.2
+
+
+
+
+3. EXAMPLE RAIN file (files with extension PLU)
+First line is a description which is displayed when selecting the file
+     1  : Daily records (1=daily, 2=10-daily and 3=monthly data)
+     1  : First day of record (1, 11 or 21 for 10-day or 1 for months)
+     1  : First month of record
+  1999  : First year of record (1901 if not linked to a specific year)
+
+  Total Rain (mm)
+=======================
+    0.0
+    0.0
+   16.6
