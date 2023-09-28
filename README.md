@@ -60,13 +60,12 @@ A number of tutorials has been created (more to be added in future) to help user
 3.  <a href=https://colab.research.google.com/github/aquacropos/aquacrop/blob/master/docs/notebooks/AquaCrop_OSPy_Notebook_3.ipynb>Optimisation of irrigation management strategies</a>
 4.  <a href=https://colab.research.google.com/github/aquacropos/aquacrop/blob/master/docs/notebooks/AquaCrop_OSPy_Notebook_4.ipynb>Projection of climate change impacts</a>
 
-## AquaPlan
 
-The latest development is a streamlit-based web application AquaPlan, a powerful crop management tool that enables farmers, businesses, and governments to make more informed decisions about water management, irrigation investments, and climate risks. 
+## Installation troubleshooting
+If you receive an error message such as "No module named aquacrop.scripts.initiate_library" or "ModuleNotFoundError: No module named 'aquacrop.solution.solution_root_zone_water'", please try the following troubleshooting steps:
 
-You can access AquaPlan using the following link: https://tinyurl.com/aquaplan.
+1. Run "python -m aquacrop.scripts.initiate_library" in your terminal, if this generates an error such as "RuntimeError: Attempted to compile AOT function without the compiler used by numpy.distutils present. Cannot find suitable msvc.", then you need to download and install an MSVC compiler such as the one included in Visual Studio build tools (see https://www.youtube.com/watch?v=p_R3tXSq0KI).
 
-More information, including screenshots and gifs, can be found at The University of Manchester's [article](https://www.manchester.ac.uk/discover/news/manchester-scientists-launch-new-interactive-tool-for-agricultural-water-management-and-climate-risk-assessment/), Tim Foster's medium [post](https://medium.com/@agwater/aquaplan-a-new-interactive-tool-for-agricultural-water-management-and-climate-risk-assessment-82c50cb10144), or twitter [thread](https://twitter.com/tim_foster_88/status/1557728807758737408).
-
-A seperate [category](https://github.com/aquacropos/aquacrop/discussions/categories/aquaplan) inside the AquaCrop-OSPy forum has been created to discuss
-AquaPlan, including any issues, questions, or suggestions.
+2. If Step 1 doesn't help, then you can run aquacrop in pure python (this will be slower) using: <br>
+```import os```<br>
+```os.environ['DEVELOPMENT'] = 'DEVELOPMENT'```

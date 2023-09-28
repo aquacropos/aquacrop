@@ -391,53 +391,46 @@ class Soil:
             aCR = 0
             bCR = 0
 
-            #change it according to Aquacrop code to avoid classification error in few grid cells
-            soilclass=0
-            
-            if ths<=0.55:
-                if thwp>=0.2:
-                    if ths>=0.49 and thfc>=0.4:
-                        soilclass=4
+            # Define aCR and bCR calculations for each Soil Class 
+            aCR_sandy=-0.3112 - Ksat/100000
+            bCR_sandy=-1.4936 + 0.2416*np.log(Ksat)
+
+            aCR_loamy=-0.4986 + 9*Ksat/100000
+            bCR_loamy=-2.1320 + 0.4778*np.log(Ksat)
+
+            aCR_sandy_clayey=-0.5677 - 4*Ksat/100000
+            bCR_sandy_clayey=-3.7189 + 0.5922*np.log(Ksat)
+
+            aCR_silty_clayey=-0.6366 + 8*Ksat/10000
+            bCR_silty_clayey=-1.9165 + 0.7063*np.log(Ksat)
+
+            # Assign aCR/bCR based on soil class definition from FAO
+            if ths <= 0.55:
+                if thwp >= 0.20:
+                    if (ths >= 0.49) and (thfc >= 0.40):
+                        aCR=aCR_silty_clayey
+                        bCR=bCR_silty_clayey
                     else:
-                        soilclass=3
+                        aCR=aCR_sandy_clayey
+                        bCR=bCR_sandy_clayey
                 else:
-                    if thfc<0.23:
-                        soilclass=1
+                    if thfc < 0.23:
+                        aCR=aCR_sandy
+                        bCR=bCR_sandy
                     else:
-                        if thwp>0.16 and Ksat<100:
-                            soilclass=3
+                        if (thwp > 0.16) and (Ksat < 100):
+                            aCR=aCR_sandy_clayey
+                            bCR=bCR_sandy_clayey
                         else:
-                            if thwp<0.06 and thfc<0.28 and Ksat>750:
-                                soilclass=1
+                            if (thwp < 0.06) and (thfc < 0.28) and (Ksat > 750):
+                                aCR=aCR_sandy
+                                bCR=bCR_sandy
                             else:
-                                soilclass=2
+                                aCR=aCR_loamy
+                                bCR=bCR_loamy
             else:
-                soilclass=4
-
-            if soilclass==1:
-
-                # Sandy soil class
-                aCR = -0.3112-(Ksat*(1e-5))
-                bCR = -1.4936+(0.2416*np.log(Ksat))
-
-            elif soilclass==2:
-
-                # Loamy soil class
-                aCR = -0.4986+(9*(1e-5)*Ksat)
-                bCR = -2.132+(0.4778*np.log(Ksat))
-
-            elif soilclass==3:
-
-                # Sandy clayey soil class
-                aCR = -0.5677-(4*(1e-5)*Ksat)
-                bCR = -3.7189+(0.5922*np.log(Ksat))
-
-            # elif (thwp >= 0.20) and (thwp <= 0.42) and (thfc >= 0.40) and \
-            elif soilclass==4:
-
-                # Silty clayey soil class
-                aCR = -0.6366+(8*(1e-4)*Ksat)
-                bCR = -1.9165+(0.7063*np.log(Ksat))
+                aCR=aCR_silty_clayey
+                bCR=bCR_silty_clayey
 
             assert aCR != 0
             assert bCR != 0

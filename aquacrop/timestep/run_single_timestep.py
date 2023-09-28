@@ -86,11 +86,6 @@ def solution_single_time_step(
     # Unpack structures
     Soil = param_struct.Soil
     CO2 = param_struct.CO2
-    if param_struct.water_table == 1:
-        Groundwater = param_struct.z_gw[clock_struct.time_step_counter]
-    else:
-        Groundwater = 0
-
     precipitation = weather_step[2]
     temp_max = weather_step[1]
     temp_min = weather_step[0]
@@ -98,6 +93,10 @@ def solution_single_time_step(
 
     # Store initial conditions in structure for updating %%
     NewCond = init_cond
+    if param_struct.water_table == 1:
+        NewCond.z_gw = param_struct.z_gw[clock_struct.time_step_counter]
+    else:
+        NewCond.z_gw = 0
 
     # Check if growing season is active on current time step %%
     if clock_struct.season_counter >= 0:
@@ -170,6 +169,7 @@ def solution_single_time_step(
     NewCond.temp_min = weather_step[0]
     NewCond.et0 = weather_step[3]
 
+
     class_args = {
         key: value
         for key, value in Crop_.__dict__.items()
@@ -179,15 +179,16 @@ def solution_single_time_step(
     
     # Run simulations %%
     # 1. Check for groundwater table
-    (NewCond.th_fc_Adj, _) = check_groundwater_table(
+    NewCond.th_fc_Adj, wt_in_soil = check_groundwater_table(
         Soil.Profile,
         NewCond.z_gw,
         NewCond.th,
         NewCond.th_fc_Adj,
         param_struct.water_table,
-        Groundwater,
     )
-    #print(Crop)
+
+    NewCond.wt_in_soil=wt_in_soil
+
     # 2. Root development
     NewCond.z_root = root_development(
         Crop,
@@ -494,6 +495,7 @@ def solution_single_time_step(
     outputs.water_storage[row_day, 3:] = NewCond.th
 
     # Water fluxes
+    # print(f'Saving NewCond.z_gw to outputs: {NewCond.z_gw}')
     outputs.water_flux[row_day, :] = [
         clock_struct.time_step_counter,
         clock_struct.season_counter,
