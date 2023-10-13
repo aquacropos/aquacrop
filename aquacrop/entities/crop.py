@@ -117,6 +117,7 @@ class Crop:
             "HIstart",
             "Flowering",
             "YldForm",
+            "YldWC",
             "GDDmethod",
             "Tbase",
             "Tupp",
@@ -274,6 +275,7 @@ crop_spec = [
     ("HIend", float64),
     ("CanopyDevEnd", float64),
     ("MaxCanopy", float64),
+    ("YldWC", float64),
     ("GDDmethod", int64),
     ("Tbase", float64),
     ("Tupp", float64),
@@ -402,7 +404,7 @@ class CropStruct(object):
         self.MaxCanopy = 0
         self.CanopyDevEnd = 0
         self.Canopy10Pct = 0
-
+        self.YldWC = 0
         self.GDDmethod = 2  # Growing degree day calculation method
         self.Tbase = (
             8  # Base temperature (degC) below which growth does not progress
