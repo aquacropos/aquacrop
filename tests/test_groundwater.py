@@ -78,6 +78,7 @@ fig,ax=plt.subplots(2,1,figsize=(12,14))
 sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y='GwIn',ax=ax[0])
 sns.boxplot(data=pd.DataFrame(model2._outputs.water_flux),x='time_step_counter',y='z_gw',ax=ax[1])
 
+plt.show()
 # MULTIMODEL 4 PLOT
 # fig,ax=plt.subplots(2,2,figsize=(12,14))
 
