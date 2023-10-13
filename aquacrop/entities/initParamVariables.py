@@ -58,7 +58,8 @@ InitCond_spec = [
     ("ccx_early_sen", float64),
     ("cc_prev", float64),
     ("protected_seed", int64),
-    ("yield_", float64),
+    ("DryYield", float64),
+    ("FreshYield", float64),
     ("z_root", float64),
     ("cc0_adj", float64),
     ("surface_storage", float64),
@@ -158,7 +159,8 @@ class InitialCondition:
         self.ccx_early_sen = 0
         self.cc_prev = 0
         self.protected_seed = 0
-        self.yield_ = 0
+        self.DryYield = 0
+        self.FreshYield = 0
 
         self.z_root = 0.0
         self.cc0_adj = 0

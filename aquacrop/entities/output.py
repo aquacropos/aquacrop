@@ -32,7 +32,8 @@ class Output:
                 "crop Type",
                 "Harvest Date (YYYY/MM/DD)",
                 "Harvest Date (Step)",
-                "Yield (tonne/ha)",
+                "Dry yield (tonne/ha)",
+                "Fresh yield (tonne/ha)",
                 "Seasonal irrigation (mm)",
             ]
         )

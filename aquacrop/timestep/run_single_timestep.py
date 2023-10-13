@@ -421,10 +421,11 @@ def solution_single_time_step(
         Soil.Profile, Soil.z_top, Crop, NewCond, et0, temp_max, temp_min, growing_season
     )
 
-    # 18. Crop yield_
+    # 18. Crop yield_ (dry and fresh)
     if growing_season is True:
         # Calculate crop yield_ (tonne/ha)
-        NewCond.yield_ = (NewCond.biomass / 100) * NewCond.harvest_index_adj
+        NewCond.DryYield = (NewCond.biomass / 100) * NewCond.harvest_index_adj
+        NewCond.FreshYield = NewCond.DryYield / (1 - (Crop.YldWC / 100))
         # print( clock_struct.time_step_counter,(NewCond.biomass/100),NewCond.harvest_index_adj)
         # Check if crop has reached maturity
         if ((Crop.CalendarType == 1) and (NewCond.dap >= Crop.Maturity)) or (
@@ -435,7 +436,8 @@ def solution_single_time_step(
 
     elif growing_season is False:
         # Crop yield_ is zero outside of growing season
-        NewCond.yield_ = 0
+        NewCond.DryYield = 0
+        NewCond.FreshYield = 0
 
     # 19. Root zone water
     _TAW = TAW()
@@ -518,7 +520,8 @@ def solution_single_time_step(
         NewCond.biomass_ns,
         NewCond.harvest_index,
         NewCond.harvest_index_adj,
-        NewCond.yield_,
+        NewCond.DryYield,
+        NewCond.FreshYield,
     ]
 
     # Final output (if at end of growing season)
@@ -538,7 +541,8 @@ def solution_single_time_step(
                 Crop_Name,
                 clock_struct.step_end_time,
                 clock_struct.time_step_counter,
-                NewCond.yield_,
+                NewCond.DryYield,
+                NewCond.FreshYield,
                 IrrTot,
             ]
 
