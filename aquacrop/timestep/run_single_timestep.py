@@ -422,7 +422,7 @@ def solution_single_time_step(
     )
 
     # 18. Yield potential
-    NewCond.YieldPot = NewCond.biomass_ns * NewCond.harvest_index
+    NewCond.YieldPot = (NewCond.biomass_ns / 100) * NewCond.harvest_index
 
     # 19. Crop yield_ (dry and fresh)
     if growing_season is True:
