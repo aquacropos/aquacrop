@@ -87,6 +87,7 @@ def outputs_when_model_is_finished(
                 "harvest_index_adj",
                 "DryYield",
                 "FreshYield",
+                "YieldPot",
             ],
         )
 
