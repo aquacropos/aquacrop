@@ -421,7 +421,10 @@ def solution_single_time_step(
         Soil.Profile, Soil.z_top, Crop, NewCond, et0, temp_max, temp_min, growing_season
     )
 
-    # 18. Crop yield_ (dry and fresh)
+    # 18. Yield potential
+    NewCond.YieldPot = NewCond.biomass_ns * NewCond.harvest_index
+
+    # 19. Crop yield_ (dry and fresh)
     if growing_season is True:
         # Calculate crop yield_ (tonne/ha)
         NewCond.DryYield = (NewCond.biomass / 100) * NewCond.harvest_index_adj
@@ -439,7 +442,7 @@ def solution_single_time_step(
         NewCond.DryYield = 0
         NewCond.FreshYield = 0
 
-    # 19. Root zone water
+    # 20. Root zone water
     _TAW = TAW()
     _water_root_depletion = Dr()
     # thRZ = RootZoneWater()
@@ -453,7 +456,7 @@ def solution_single_time_step(
         Crop.Aer,
     )
 
-    # 20. Update net irrigation to add any pre irrigation
+    # 21. Update net irrigation to add any pre irrigation
     IrrNet = IrrNet + PreIrr
     NewCond.irr_net_cum = NewCond.irr_net_cum + PreIrr
 
@@ -522,6 +525,7 @@ def solution_single_time_step(
         NewCond.harvest_index_adj,
         NewCond.DryYield,
         NewCond.FreshYield,
+        NewCond.YieldPot,
     ]
 
     # Final output (if at end of growing season)
@@ -543,6 +547,7 @@ def solution_single_time_step(
                 clock_struct.time_step_counter,
                 NewCond.DryYield,
                 NewCond.FreshYield,
+                NewCond.YieldPot,
                 IrrTot,
             ]
 

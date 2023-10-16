@@ -49,6 +49,7 @@ InitCond_spec = [
     ("canopy_cover_adj_ns", float64),
     ("biomass", float64),
     ("biomass_ns", float64),
+    ("YieldPot", float64),
     ("harvest_index", float64),
     ("harvest_index_adj", float64),
     ("ccx_act", float64),
@@ -150,6 +151,7 @@ class InitialCondition:
         self.canopy_cover_adj_ns = 0
         self.biomass = 0
         self.biomass_ns = 0
+        self.YieldPot = 0
         self.harvest_index = 0
         self.harvest_index_adj = 0
         self.ccx_act = 0

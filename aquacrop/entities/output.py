@@ -25,7 +25,7 @@ class Output:
 
         self.water_storage = np.zeros((len(time_span), 3 + len(initial_th)))
         self.water_flux = np.zeros((len(time_span), 16))
-        self.crop_growth = np.zeros((len(time_span), 14))
+        self.crop_growth = np.zeros((len(time_span), 15))
         self.final_stats = pd.DataFrame(
             columns=[
                 "Season",
@@ -34,6 +34,7 @@ class Output:
                 "Harvest Date (Step)",
                 "Dry yield (tonne/ha)",
                 "Fresh yield (tonne/ha)",
+                "Yield potential (tonne/ha)",
                 "Seasonal irrigation (mm)",
             ]
         )
