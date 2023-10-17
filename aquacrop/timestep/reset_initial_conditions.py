@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import math
 
 from ..entities.modelConstants import ModelConstants
 from ..initialize.calculate_HI_linear import calculate_HI_linear
@@ -146,7 +147,7 @@ def reset_initial_conditions(
             fw = 1 - ((550 - CO2conc) / (550 - CO2ref))
 
     # Determine initial adjustment
-    fCO2 = (CO2conc / CO2ref) / (
+    fCO2old = (CO2conc / CO2ref) / (
         1
         + (CO2conc - CO2ref)
         * (
@@ -154,6 +155,25 @@ def reset_initial_conditions(
             + fw * ((crop.bsted * crop.fsink) + (crop.bface * (1 - crop.fsink)))
         )
     )
+    # New adjusted correction coefficient for CO2 (version 7 of AquaCrop)
+    if (CO2conc > CO2ref):
+        # Calculate shape factor
+        fshape = -4.61824 - 3.43831*crop.fsink - 5.32587*crop.fsink*crop.fsink
+        # Determine adjustment for CO2
+        if (CO2conc >= 2000):
+            fCO2new = 1.58  # Maximum CO2 adjustment 
+        else:
+            CO2rel = (CO2conc-CO2ref)/(2000-CO2ref)
+            fCO2new = 1 + 0.58 * ((math.exp(CO2rel*fshape) - 1)/(math.exp(fshape) - 1))
+
+
+    # Select adjusted coefficient for CO2
+        if (CO2conc <= CO2ref):
+            fCO2 = fCO2old
+        elif ((CO2conc <= 550) and (fCO2old < fCO2new)):
+            fCO2 = fCO2old
+        else:
+            fCO2 = fCO2new
 
     # Consider crop type
     if crop.WP >= 40:
