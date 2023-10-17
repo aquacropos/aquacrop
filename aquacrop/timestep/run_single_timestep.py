@@ -390,7 +390,7 @@ def solution_single_time_step(
     NewCond, GwIn = groundwater_inflow(Soil.Profile, NewCond)
 
     # 15. Reference harvest index
-    (NewCond.hi_ref, NewCond.yield_form, NewCond.pct_lag_phase,) = HIref_current_day(
+    (NewCond.hi_ref, NewCond.yield_form, NewCond.pct_lag_phase,NewCond.HIfinal) = HIref_current_day(
         NewCond.hi_ref,
         NewCond.HIfinal,
         NewCond.dap,
