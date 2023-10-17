@@ -85,11 +85,11 @@ def canopy_cover(
     InitCond_CropDead = InitCond.crop_dead
     InitCond_tEarlySen = InitCond.t_early_sen
     InitCond_CCxW = InitCond.ccx_w
-
+    InitCond_sumET0EarlySen = InitCond.sumET0EarlySen
     ## Store initial conditions in a new structure for updating ##
     NewCond = InitCond
     NewCond.cc_prev = InitCond.canopy_cover
-
+    CCdorm=0.05
     ## Calculate canopy development (if in growing season) ##
     if growing_season == True:
         # Calculate root zone water content
@@ -341,6 +341,8 @@ def canopy_cover(
 
                     # Increment early senescence gdd counter
                     NewCond.t_early_sen = InitCond_tEarlySen + dtCC
+                    # Increment ET0 early senescence counter
+                    NewCond.sumET0EarlySen = InitCond_sumET0EarlySen + et0
                     # Adjust canopy decline coefficient for water stress
                     beta = False
 
@@ -441,6 +443,8 @@ def canopy_cover(
 
                     # Reset early senescence counter
                     NewCond.t_early_sen = 0
+                    # Reset ET0 early senescence counter
+                    NewCond.sumET0EarlySen = 0
 
                 # Adjust CCx for effects of withered canopy
                 if NewCond.canopy_cover > InitCond_CCxW:
