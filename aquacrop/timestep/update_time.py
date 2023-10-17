@@ -11,12 +11,14 @@ if TYPE_CHECKING:
     from aquacrop.entities.clockStruct import ClockStruct
     from aquacrop.entities.initParamVariables import InitialCondition
     from aquacrop.entities.paramStruct import ParamStruct
+    from aquacrop.entities.crop import Crop
 
 def update_time(
     clock_struct: "ClockStruct",
     init_cond: "InitialCondition",
     param_struct: "ParamStruct",
-    weather: "ndarray"
+    weather: "ndarray",
+    crop: "Crop",
     ) -> Tuple["ClockStruct","InitialCondition", "ParamStruct"]:
     """
     Function to update current time in model.
@@ -68,7 +70,7 @@ def update_time(
                 ]
                 # Reset initial conditions for start of growing season
                 init_cond, param_struct = reset_initial_conditions(
-                    clock_struct, init_cond, param_struct, weather
+                    clock_struct, init_cond, param_struct, weather, crop
                 )
 
         else:
@@ -96,7 +98,7 @@ def update_time(
                     clock_struct.season_counter = clock_struct.season_counter + 1
                     # Reset initial conditions for start of growing season
                     init_cond, param_struct = reset_initial_conditions(
-                        clock_struct, init_cond, param_struct, weather
+                        clock_struct, init_cond, param_struct, weather, crop
                     )
 
     return clock_struct, init_cond, param_struct

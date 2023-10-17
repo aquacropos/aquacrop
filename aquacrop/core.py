@@ -365,7 +365,7 @@ class AquaCropModel:
 
         # Update time step
         clock_struct, _init_cond, param_struct = update_time(
-            clock_struct, new_cond, param_struct, self._weather
+            clock_struct, new_cond, param_struct, self._weather, self.crop
         )
 
         # Create  _outputsdataframes when model is finished
