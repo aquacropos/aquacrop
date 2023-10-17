@@ -50,6 +50,7 @@ class Crop:
             -6
         )  # Shape factor describing the effects of water stress on root expansion
         self.ETadj = 1  # Adjustment to water stress thresholds depending on daily ET0 (0 = No, 1 = Yes)
+        self.ET0dorm = 0 # Duration of dormant crop period (during early senescence) in terms of cumulative reference ET (mm)
         self.Aer = 5  # Vol (%) below saturation at which stress begins to occur due to deficient aeration
         self.LagAer = (
             3  # Number of days lag before aeration stress affects crop growth
@@ -93,6 +94,7 @@ class Crop:
             "PctZmin",
             "fshape_ex",
             "ETadj",
+            "ET0dorm",
             "Aer",
             "LagAer",
             "beta",
@@ -241,6 +243,7 @@ crop_spec = [
     ("PctZmin", float64),
     ("fshape_ex", float64),
     ("ETadj", float64),
+    ("ET0dorm", float64),
     ("Aer", float64),
     ("LagAer", int64),
     ("beta", float64),
@@ -349,6 +352,7 @@ class CropStruct(object):
             -6
         )  # Shape factor describing the effects of water stress on root expansion
         self.ETadj = 1  # Adjustment to water stress thresholds depending on daily ET0 (0 = No, 1 = Yes)
+        self.ET0dorm = 0 # Duration of dormant crop period (during early senescence) in terms of cumulative reference ET (mm)
         self.Aer = 5  # Vol (%) below saturation at which stress begins to occur due to deficient aeration
         self.LagAer = (
             3  # Number of days lag before aeration stress affects crop growth
