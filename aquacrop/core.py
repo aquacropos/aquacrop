@@ -249,7 +249,7 @@ class AquaCropModel:
 
         # read, calculate inital conditions
         self._param_struct, self._init_cond = read_model_initial_conditions(
-            self._param_struct, self._clock_struct, self.initial_water_content
+            self._param_struct, self._clock_struct, self.initial_water_content, self.crop
         )
 
         self._param_struct = create_soil_profile(self._param_struct)
