@@ -14,12 +14,14 @@ if TYPE_CHECKING:
     from aquacrop.entities.clockStruct import ClockStruct
     from aquacrop.entities.initParamVariables import InitialCondition
     from aquacrop.entities.paramStruct import ParamStruct
+    from aquacrop.entities.crop import Crop
 
 def reset_initial_conditions(
     ClockStruct: "ClockStruct",
     InitCond: "InitialCondition",
     ParamStruct: "ParamStruct",
-    weather: "ndarray") -> Tuple["InitialCondition", "ParamStruct"]:
+    weather: "ndarray",
+    crop: "Crop") -> Tuple["InitialCondition", "ParamStruct"]:
 
     """
     Function to reset initial model conditions for start of growing
@@ -118,6 +120,10 @@ def reset_initial_conditions(
     InitCond.ccx_early_sen = 0
     InitCond.cc_prev = 0
     InitCond.protected_seed = 0
+    InitCond.sumET0EarlySen = 0
+    InitCond.HIfinal = crop.HI0
+    InitCond.DryYield = 0
+    InitCond.FreshYield = 0
 
     # Update CO2 concentration ##
     # Get CO2 concentration
