@@ -6,6 +6,7 @@ from typing import Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
+    from aquacrop.entities.crop import Crop
     from aquacrop.entities.inititalWaterContent import InitialWaterContent
     from aquacrop.entities.clockStruct import ClockStruct
     from aquacrop.entities.paramStruct import ParamStruct
@@ -15,7 +16,8 @@ if TYPE_CHECKING:
 def read_model_initial_conditions(
     ParamStruct: "ParamStruct",
     ClockStruct: "ClockStruct",
-    InitWC: "InitialWaterContent") -> Tuple["InitialCondition", "InitialCondition"]:
+    InitWC: "InitialWaterContent",
+    crop: "Crop") -> Tuple["ParamStruct", "InitialCondition"]:
     """
     Function to set up initial model conditions
 
@@ -27,13 +29,14 @@ def read_model_initial_conditions(
 
         InitWC (InitialWaterContent):  initial water content
 
+        crop (Crop): crop parameters
+
 
     Returns:
 
         ParamStruct (ParamStruct):  updated ParamStruct object
 
         InitCond (InitialCondition):  containing initial model conditions/counters
-
 
     """
 
@@ -53,6 +56,9 @@ def read_model_initial_conditions(
     elif ClockStruct.season_counter == 0:
         InitCond.z_root = ParamStruct.Seasonal_Crop_List[0].Zmin
         InitCond.cc0_adj = ParamStruct.Seasonal_Crop_List[0].CC0
+
+    # Set HIfinal to crop's reference harvest index
+    InitCond.HIfinal = crop.HI0
 
     ##################
     # save field management
