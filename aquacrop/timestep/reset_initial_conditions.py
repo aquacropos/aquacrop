@@ -174,12 +174,12 @@ def reset_initial_conditions(
 
 
     # Select adjusted coefficient for CO2
-        if (CO2conc <= CO2ref):
-            fCO2 = fCO2old
-        elif ((CO2conc <= 550) and (fCO2old < fCO2new)):
-            fCO2 = fCO2old
-        else:
-            fCO2 = fCO2new
+    if (CO2conc <= CO2ref):
+        fCO2 = fCO2old
+    elif ((CO2conc <= 550) and (fCO2old < fCO2new)):
+        fCO2 = fCO2old
+    else:
+        fCO2 = fCO2new
 
     # Consider crop type
     if crop.WP >= 40:
