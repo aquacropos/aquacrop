@@ -45,6 +45,7 @@ class CO2(object):
                     delim_whitespace=True,
                     names=["year", "ppm"],
     )
+            print(self.co2_data)
         self.co2_data_processed = None
 
 
