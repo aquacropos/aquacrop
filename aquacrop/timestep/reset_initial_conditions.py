@@ -153,14 +153,23 @@ def reset_initial_conditions(
             fw = 1 - ((550 - CO2conc) / (550 - CO2ref))
 
     # Determine initial adjustment
-    fCO2old = (CO2conc / CO2ref) / (
-        1
-        + (CO2conc - CO2ref)
-        * (
-            (1 - fw) * crop.bsted
-            + fw * ((crop.bsted * crop.fsink) + (crop.bface * (1 - crop.fsink)))
+    if CO2conc <= 550:
+        # Set weighting factor for CO2
+        if CO2conc <= CO2ref:
+            fw = 0
+        elif CO2conc >= 550:
+            fw = 1
+        else:
+            fw = 1 - ((550 - CO2conc) / (550 - CO2ref))
+        # Set fCO2old within the 'if CO2conc <= 550' block:
+        fCO2old = (CO2conc / CO2ref) / (
+            1
+            + (CO2conc - CO2ref)
+            * (
+                (1 - fw) * crop.bsted
+                + fw * ((crop.bsted * crop.fsink) + (crop.bface * (1 - crop.fsink)))
+            )
         )
-    )
     # New adjusted correction coefficient for CO2 (version 7 of AquaCrop)
     if (CO2conc > CO2ref):
         # Calculate shape factor
@@ -176,10 +185,11 @@ def reset_initial_conditions(
     # Select adjusted coefficient for CO2
     if (CO2conc <= CO2ref):
         fCO2 = fCO2old
-    elif ((CO2conc <= 550) and (fCO2old < fCO2new)):
-        fCO2 = fCO2old
     else:
         fCO2 = fCO2new
+        if ((CO2conc <= 550) and (fCO2old < fCO2new)): 
+            fCO2 = fCO2old
+    
 
     # Consider crop type
     if crop.WP >= 40:
