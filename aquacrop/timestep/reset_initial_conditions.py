@@ -170,18 +170,15 @@ def reset_initial_conditions(
             )
         )
     # New adjusted correction coefficient for CO2 (version 7 of AquaCrop)
-    print(f'CO2conc = {CO2conc}, CO2ref = {CO2ref}')
     if (CO2conc > CO2ref):
         # Calculate shape factor
         fshape = -4.61824 - 3.43831*crop.fsink - 5.32587*crop.fsink*crop.fsink
         # Determine adjustment for CO2
         if (CO2conc >= 2000):
             fCO2new = 1.58  # Maximum CO2 adjustment 
-            print(f'1. fCO2new assigned as: {fCO2new}')
         else:
             CO2rel = (CO2conc-CO2ref)/(2000-CO2ref)
             fCO2new = 1 + 0.58 * ((np.exp(CO2rel*fshape) - 1)/(np.exp(fshape) - 1))
-            print(f'2. fCO2new assigned as: {fCO2new}')
 
 
     # Select adjusted coefficient for CO2
