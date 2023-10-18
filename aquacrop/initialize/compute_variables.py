@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import math
 
 from .compute_crop_calendar import compute_crop_calendar
 from .calculate_HIGC import calculate_HIGC
@@ -176,7 +175,7 @@ def compute_variables(
             fCO2new = 1.58  # Maximum CO2 adjustment 
         else:
             CO2rel = (CO2conc-CO2ref)/(2000-CO2ref)
-            fCO2new = 1 + 0.58 * ((math.exp(CO2rel*fshape) - 1)/(math.exp(fshape) - 1))
+            fCO2new = 1 + 0.58 * ((np.exp(CO2rel*fshape) - 1)/(np.exp(fshape) - 1))
 
 
     # Select adjusted coefficient for CO2

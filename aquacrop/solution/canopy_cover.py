@@ -368,26 +368,38 @@ def canopy_cover(
 
                     # Get new canpy cover size after senescence
                     if NewCond.ccx_early_sen < 0.001:
-                        CCsen = 0
-                    else:
-                        # Get time required to reach canopy_cover at end of previous day, given
-                        # CDCadj
-                        tReq = (np.log(1 + (1 - InitCond_CC / NewCond.ccx_early_sen) / 0.05)) / (
-                            (CDCadj * 3.33) / (NewCond.ccx_early_sen + 2.29)
-                        )
-                        # Calculate gdd's for canopy decline
-                        tmp_tCC = tReq + dtCC
-                        # Determine new canopy size
-                        CCsen = NewCond.ccx_early_sen * (
-                            1
-                            - 0.05
-                            * (
-                                np.exp(tmp_tCC * ((CDCadj * 3.33) / (NewCond.ccx_early_sen + 2.29)))
-                                - 1
-                            )
-                        )
+                        if (Crop.ET0dorm <= 0) or (NewCond.sumET0_EarlySen > Crop.ET0dorm):
+                            CCsen = 0
+                        else:
+                            if CCdorm > Crop.CC0:
+                                CCsen = Crop.CC0 + ((1-(NewCond.sumET0_EarlySen/Crop.Et0dorm)) * (CCdorm-Crop.CC0))
+                            else:
+                                CCsen = Crop.CC0
+                    else: # Get time required to reach canopy_cover at end of previous day, given CDCadj
+                        if (((NewCond.t_early_sen*CDCadj*3.33)/(NewCond.ccx_early_sen+2.29) > 100) or (InitCond_CC >= 1.05 * NewCond.ccx_early_sen)):
+                            if (Crop.ET0dorm <= 0) or (NewCond.sumET0_EarlySen > Crop.ET0dorm):
+                                CCsen = 0
+                            else:
+                                if CCdorm > Crop.CC0:
+                                    CCsen = Crop.CC0 + ((1-(NewCond.sumET0_EarlySen/Crop.Et0dorm)) * (CCdorm-Crop.CC0))
+                                else:
+                                    CCsen = Crop.CC0
+                        else:
+                                    tReq = (np.log(1 + (1 - InitCond_CC / NewCond.ccx_early_sen) / 0.05)) / ((CDCadj * 3.33) / (NewCond.ccx_early_sen + 2.29))
+                                    # Calculate gdd's for canopy decline
+                                    tmp_tCC = tReq + dtCC
+                                    # Determine new canopy size
+                                    CCsen = NewCond.ccx_early_sen * (1 - 0.05 * (np.exp(tmp_tCC * ((CDCadj * 3.33) / (NewCond.ccx_early_sen + 2.29))) - 1))
+
                         if CCsen < 0:
                             CCsen = 0
+                        if (Crop.ET0dorm <= 0) or (NewCond.sumET0_EarlySen > Crop.ET0dorm):
+                            CCsen = 0
+                        else:
+                            if CCdorm > Crop.CC0:
+                                CCsen = Crop.CC0 + ((1-(NewCond.sumET0_EarlySen/Crop.Et0dorm)) * (CCdorm-Crop.CC0))
+                            else:
+                                CCsen = Crop.CC0 
 
                     # Update canopy cover size
                     if tCCadj < Crop.Senescence:
