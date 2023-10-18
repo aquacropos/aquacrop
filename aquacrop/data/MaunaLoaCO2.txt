@@ -1,6 +1,5 @@
 Manua Loa observations 1959-2009 & IPCC projections for A1B scenario with BERN model
-Year     CO2 (ppm by volume)
-============================
+Year	CO2(ppm)
 1959	315.98
 1960	316.91
 1961	317.64
