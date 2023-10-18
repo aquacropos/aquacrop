@@ -170,6 +170,7 @@ def reset_initial_conditions(
             )
         )
     # New adjusted correction coefficient for CO2 (version 7 of AquaCrop)
+    print(f'CO2conc = {CO2conc}, CO2ref = {CO2ref}')
     if (CO2conc > CO2ref):
         # Calculate shape factor
         fshape = -4.61824 - 3.43831*crop.fsink - 5.32587*crop.fsink*crop.fsink
