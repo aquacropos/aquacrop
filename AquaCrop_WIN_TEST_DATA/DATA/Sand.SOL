@@ -1,0 +1,9 @@
+deep uniform 'very sandy' soil profile
+        6.0                 : AquaCrop Version (March 2017)
+       46                   : CN (Curve Number)
+        4                   : Readily evaporable water from top layer (mm)
+        1                   : number of soil horizons
+       -9                   : variable no longer applicable
+  Thickness  Sat   FC    WP     Ksat   Penetrability  Gravel  CRa       CRb           description
+  ---(m)-   ----(vol %)-----  (mm/day)      (%)        (%)    -----------------------------------------
+    4.00    36.0  13.0   6.0  3000.0        100         0     -0.341200  0.440738              sand

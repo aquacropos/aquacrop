@@ -1,0 +1,10 @@
+Wet top soil (30 vol%) and dry sub soil (15 vol%)
+    3.0   : AquaCrop Version (January 2009)
+    0.0   : water stored between soil bunds (if present)
+    1     : soil water content specified at particular depths
+    2     : number of soil depths considered
+
+  Soil depth (m)         Soil water content (vol%)
+==================================================
+      0.30                         30.00
+      0.90                         15.00

@@ -15,7 +15,7 @@ except:
 from typing import NamedTuple, Tuple
 
 
-@cc.export("biomass_accumulation", (CropStructNT_type_sig,i8,i8,f8,f8,f8,f8,f8,f8,f8,b1))
+@cc.export("biomass_accumulation", (CropStructNT_type_sig,i8,i8,f8,f8,f8,f8,f8,f8,f8,b1,f8,f8,f8,f8))
 def biomass_accumulation(
     Crop: NamedTuple,
     NewCond_DAP: int,
@@ -28,7 +28,11 @@ def biomass_accumulation(
     TrPot: float,
     et0: float,
     growing_season: bool,
-    ) -> Tuple[float, float]:
+    NewCond_StressSFadjNEW: float,
+    NewCond_StressSFadjpre: float,
+    NewCond_Tr_ET0_accum: float,
+    NewCond_WPadj: float,
+    ) -> Tuple[float, float, float, float, float, float, NamedTuple]:
     """
     Function to calculate biomass accumulation
 
@@ -96,25 +100,103 @@ def biomass_accumulation(
         WPadj = WPadj * Crop.fCO2
 
         # print(WPadj)
+        if NewCond_StressSFadjNEW==0:
+            NewCond_StressSFadjNEW = Crop.sfertstress
+            NewCond_StressSFadjpre = Crop.sfertstress
+        
+        #update parameters according to NewCond_StressSFadjNEW
+        TopStress=Crop.TR_ET0_fertstress*(1-NewCond_StressSFadjNEW)
+
+        if NewCond_Tr_ET0_accum<TopStress:
+            #adjust for soil fertility stress 
+            NewCond_Tr_ET0_accum=NewCond_Tr_ET0_accum+Tr/et0
+            Kswp=1-(1-Crop.Kswp)*(NewCond_Tr_ET0_accum/TopStress)*(NewCond_Tr_ET0_accum/TopStress)
+        else:
+            Kswp=1-(1-Crop.Kswp)
+
+        NewCond_WPadj=Kswp*WPadj
 
         # Calculate biomass accumulation on current day
         # No water stress
-        dB_NS = WPadj * (TrPot / et0)
+        dB_NS = Kswp*WPadj * (TrPot / et0)
         # With water stress
-        dB = WPadj * (Tr / et0)
+        dB = Kswp*WPadj * (Tr / et0)
         if np.isnan(dB) == True:
             dB = 0
 
         # Update biomass accumulation
         NewCond_B = NewCond_B + dB
         NewCond_B_NS = NewCond_B_NS + dB_NS
+        
+        #update NewCond_StressSFadjNEW based on B
+        loc_=np.argmin(np.abs(Crop.sf_es[0:100]-Crop.sfertstress))
+        FracBiomassPotSF=Crop.relbio_es[loc_]
+
+        try:
+            BioAdj=FracBiomassPotSF+FracBiomassPotSF-NewCond_B/(Crop.Bio_top[NewCond_DAP]*WPadj)
+        except:
+            BioAdj=FracBiomassPotSF
+        NewCond_B_NS=Crop.Bio_top[NewCond_DAP]*WPadj*FracBiomassPotSF
+        
+        if BioAdj>=1 or Crop.sfertstress==0 :
+            NewCond_StressSFadjNEW=0
+        else:
+            if BioAdj<=0.0001:
+                NewCond_StressSFadjNEW=0.8
+            else:
+                loc_=np.argmin(np.abs(Crop.relbio_es[0:100]-BioAdj))
+                NewCond_StressSFadjNEW=Crop.sf_es[loc_]
+                if NewCond_StressSFadjNEW<0:
+                    NewCond_StressSFadjNEW= Crop.sfertstress
+                if NewCond_StressSFadjNEW>0.8:
+                    NewCond_StressSFadjNEW=0.8
+                if NewCond_StressSFadjNEW>Crop.sfertstress:
+                    NewCond_StressSFadjNEW=Crop.sfertstress
+                    
+                if Crop.CropType== 3 and Crop.Determinant==1 and NewCond_DAP-NewCond_DelayedCDs>=Crop.CanopyDevEndCD:
+                    if NewCond_StressSFadjNEW<NewCond_StressSFadjpre:
+                        NewCond_StressSFadjNEW=NewCond_StressSFadjpre
+                    if NewCond_StressSFadjNEW>Crop.sfertstress:
+                        NewCond_StressSFadjNEW=Crop.sfertstress
+        
+        NewCond_StressSFadjpre = NewCond_StressSFadjNEW
+
+        #update parameters according to NewCond_StressSFadjNEW
+        loc_=np.argmin(np.abs(Crop.sf_es[0:100]-NewCond_StressSFadjNEW))
+        
+        #need tp return crop to update crop outside the function, but also need to pass the new value to NewCpnd and then read from NewCond for day+1, new for seperated version
+
+        Crop=Crop._replace(Ksccx=Crop.Ksccx_es[loc_],Ksexpf=Crop.Ksexpf_es[loc_],Kswp=Crop.Kswp_es[loc_],fcdecline=Crop.fcdecline_es[loc_])
+
+        if Crop.Ksccx<1 or Crop.Ksexpf<1:
+            Crop=Crop._replace(MaxCanopyCD = round(Crop.EmergenceCD+(np.log((0.25*Crop.CCx*Crop.Ksccx*Crop.CCx*Crop.Ksccx/Crop.CC0)
+                                                                        /(Crop.CCx*Crop.Ksccx-(0.98*Crop.CCx*Crop.Ksccx)))/Crop.CGC_CD/Crop.Ksexpf)))
+            if Crop.MaxCanopyCD>Crop.CanopyDevEndCD:
+                while Crop.MaxCanopyCD>Crop.CanopyDevEndCD and Crop.Ksexpf<1:
+                    Crop=Crop._replace(Ksexpf=Crop.Ksexpf+0.01)
+                    Crop=Crop._replace(MaxCanopyCD = round(Crop.EmergenceCD+(np.log((0.25*Crop.CCx*Crop.Ksccx*Crop.CCx*Crop.Ksccx/Crop.CC0)
+                                                                    /(Crop.CCx*Crop.Ksccx-(0.98*Crop.CCx*Crop.Ksccx)))/Crop.CGC_CD/Crop.Ksexpf)))
+                while Crop.MaxCanopyCD>Crop.CanopyDevEndCD and Crop.CCx*Crop.Ksccx>0.1 and Crop.Ksccx>0.5:
+                    Crop=Crop._replace(Ksccx=Crop.Ksccx-0.01)
+                    Crop=Crop._replace(MaxCanopyCD = round(Crop.EmergenceCD+(np.log((0.25*Crop.CCx*Crop.Ksccx*Crop.CCx*Crop.Ksccx/Crop.CC0)
+                                                                    /(Crop.CCx*Crop.Ksccx-(0.98*Crop.CCx*Crop.Ksccx)))/Crop.CGC_CD/Crop.Ksexpf)))
+        
+        
     else:
         # No biomass accumulation outside of growing season
         NewCond_B = 0
         NewCond_B_NS = 0
+        NewCond_Tr_ET0_accum=0
+        NewCond_StressSFadjNEW = Crop.sfertstress
+        NewCond_StressSFadjpre = Crop.sfertstress
 
     return (NewCond_B,
-            NewCond_B_NS)
+            NewCond_B_NS,
+            NewCond_StressSFadjNEW,
+            NewCond_StressSFadjpre,
+            NewCond_Tr_ET0_accum,
+            NewCond_WPadj,
+            Crop,)
 
 if __name__ == "__main__":
     cc.compile()

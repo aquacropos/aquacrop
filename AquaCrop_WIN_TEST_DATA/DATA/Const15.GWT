@@ -1,0 +1,7 @@
+constant groundwater table at 1.50 m and with salinity level of 1.5 dS/m
+     4.0   : AquaCrop Version (March 2012)
+     1     : groundwater table at fixed depth and with constant salinity
+
+   Day    Depth (m)    ECw (dS/m)
+====================================
+     1      1.50          1.5

@@ -1,0 +1,9 @@
+deep uniform 'heavy clay' soil profile
+        6.0                 : AquaCrop Version (March 2017)
+       77                   : CN (Curve Number)
+       14                   : Readily evaporable water from top layer (mm)
+        1                   : number of soil horizons
+       -9                   : variable no longer applicable
+  Thickness  Sat   FC    WP     Ksat   Penetrability  Gravel  CRa       CRb           description
+  ---(m)-   ----(vol %)-----  (mm/day)      (%)        (%)    -----------------------------------------
+    4.00    55.0  54.0  39.0    35.0        100         0     -0.608600  0.594642           clay   

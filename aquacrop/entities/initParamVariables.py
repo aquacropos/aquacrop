@@ -77,6 +77,13 @@ InitCond_spec = [
     ("w_stage_2", float64),
     ("depletion", float64),
     ("taw", float64),
+    #for soil fertility stress
+    ('CCx_fertstress', float64),
+    ('CCxadj_dayCD', float64),
+    ('Tr_ET0_accum', float64),
+    ('StressSFadjNEW', float64),
+    ('StressSFadjpre', float64),
+    ('WPadj', float64),
 ]
 
 
@@ -159,6 +166,16 @@ class InitialCondition:
         self.cc_prev = 0
         self.protected_seed = 0
         self.yield_ = 0
+        
+        #add a parameter to record the CCx after consider the decline due to soil-fertility stress
+        self.CCx_fertstress = 0
+        #add a parameter to record the time to reach ccx_adj (GDD)
+        self.CCxadj_dayCD = 0
+        #add a parameter to record the accumulated Tr/ET0
+        self.Tr_ET0_accum = 0
+        self.StressSFadjNEW = 0
+        self.StressSFadjpre = 0
+        self.WPadj=0
 
         self.z_root = 0.0
         self.cc0_adj = 0

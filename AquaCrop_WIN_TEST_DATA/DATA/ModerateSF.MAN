@@ -1,0 +1,11 @@
+moderate soil fertiltiy
+     6.0       : AquaCrop Version (March 2016)
+     0         : percentage (%) of ground surface covered by mulches IN growing period
+    50         : effect (%) of mulches on reduction of soil evaporation
+    44         : Degree of soil fertility stress (%) - Effect is crop specific
+     0.00      : height (m) of soil bunds
+     0         : surface runoff NOT affected by field surface practices
+     0         : N/A (surface runoff is not affected or completely prevented)
+     0         : relative cover of weeds at canopy closure (%)
+     0         : increase of relative cover of weeds in mid-season (+%)
+    -0.01      : shape factor of the CC expansion function in a weed infested field

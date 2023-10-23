@@ -22,7 +22,8 @@ def adjust_CCx(
     dt: float,
     tSum: float,
     Crop_CanopyDevEnd: float,
-    Crop_CCx: float
+    Crop_CCx: float,
+    Crop_Ksccx: float=1,
     ) -> float:
     """
     Function to adjust CCx value for changes in CGC due to water stress during the growing season
@@ -57,7 +58,8 @@ def adjust_CCx(
 
 
     """
-
+    CCx=CCx*Crop_Ksccx
+    Crop_CCx=Crop_CCx*Crop_Ksccx
     ## Get time required to reach canopy_cover on previous day ##
     tCCtmp = cc_required_time(cc_prev, CCo, CCx, CGC, CDC, "CGC")
 

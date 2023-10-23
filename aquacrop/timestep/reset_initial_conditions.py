@@ -118,6 +118,16 @@ def reset_initial_conditions(
     InitCond.cc_prev = 0
     InitCond.protected_seed = 0
 
+    #add a parameter to record the CCx after consider the decline due to soil-fertility stress
+    InitCond.CCx_fertstress = 0
+    #add a parameter to record the time to reach ccx_adj (GDD)
+    InitCond.CCxadj_dayCD = 0
+    #add a parameter to record the accumulated Tr/ET0
+    InitCond.Tr_ET0_accum = 0
+    InitCond.WPadj=0
+    InitCond.StressSFadjNEW = 0
+    InitCond.StressSFadjpre = 0
+
     # Update CO2 concentration ##
     # Get CO2 concentration
 
@@ -231,6 +241,30 @@ def reset_initial_conditions(
         crop.HIendCD = (gdd_cum > crop.HIend).argmax() + 1
         # 5. Duration of yield_ formation in calendar days
         crop.YldFormCD = crop.HIendCD - crop.HIstartCD
+        
+        #used for soil fertility stress
+        crop.SenescenceCD = (gdd_cum>crop.Senescence).argmax()+1
+        crop.EmergenceCD = (gdd_cum>crop.Emergence).argmax()+1
+        
+        #Aquacrop-win has this strage correction for the crop canlendar, otherwise for some cases, the simulation will not be the same, especially when both GDD and CD are available for crops
+        if crop.Ksccx<1 or crop.Ksexpf<1:
+            if crop.CGC_CD==-1:
+                crop.CGC_CD=crop.MaxCanopy/crop.MaxCanopyCD*crop.CGC
+            
+            crop.MaxCanopyCD = round(crop.EmergenceCD+(np.log((0.25*crop.CCx*crop.Ksccx*crop.CCx*crop.Ksccx/crop.CC0)
+                                                                        /(crop.CCx*crop.Ksccx-(0.98*crop.CCx*crop.Ksccx)))/crop.CGC_CD/crop.Ksexpf))
+
+            if crop.MaxCanopyCD>crop.CanopyDevEndCD:
+                while crop.MaxCanopyCD>crop.CanopyDevEndCD and crop.Ksexpf<1:
+                    crop.Ksexpf=crop.Ksexpf+0.01
+                    crop.MaxCanopyCD = round(crop.EmergenceCD+(np.log((0.25*crop.CCx*crop.Ksccx*crop.CCx*crop.Ksccx/crop.CC0)
+                                                                    /(crop.CCx*crop.Ksccx-(0.98*crop.CCx*crop.Ksccx)))/crop.CGC_CD/crop.Ksexpf))
+                while crop.MaxCanopyCD>crop.CanopyDevEndCD and crop.CCx*crop.Ksccx>0.1 and crop.Ksccx>0.5:
+                    crop.Ksccx=crop.Ksccx-0.01
+                    crop.MaxCanopyCD = round(crop.EmergenceCD+(np.log((0.25*crop.CCx*crop.Ksccx*crop.CCx*crop.Ksccx/crop.CC0)
+                                                                    /(crop.CCx*crop.Ksccx-(0.98*crop.CCx*crop.Ksccx)))/crop.CGC_CD/crop.Ksexpf))
+            crop.MaxCanopy=gdd_cum[crop.MaxCanopyCD-1]
+
         if crop.CropType == 3:
             # 1. Calendar days from sowing to end of flowering
             FloweringEnd = (gdd_cum > crop.FloweringEnd).argmax() + 1
@@ -238,6 +272,123 @@ def reset_initial_conditions(
             crop.FloweringCD = FloweringEnd - crop.HIstartCD
         else:
             crop.FloweringCD = ModelConstants.NO_VALUE
+        
+        
+        #calculate the normalized Tr for soil fertility stress, it is a theritically one, could be derived without simulation 
+        CCx=crop.CCx#*crop.Ksccx
+        CGC=crop.CGC#*crop.Ksexpf
+        
+        Half_CCx = round(crop.Emergence+(np.log(0.5*CCx/crop.CC0)/CGC))
+        Full_CCx = round(crop.Emergence+(np.log((0.25*CCx*CCx/crop.CC0)
+                                                                    /(CCx-(0.98*CCx)))/CGC))
+        
+        
+        if gdd_cum[-1] < crop.Maturity:
+            Half_CCx = Half_CCx*gdd_cum[-1]/crop.Maturity
+            Full_CCx = Full_CCx*gdd_cum[-1]/crop.Maturity
+
+        Half_CCxCD = (gdd_cum>Half_CCx).argmax()+1
+        Full_CCxCD = (gdd_cum>Full_CCx).argmax()+1
+        
+        #Full_CCxCD=crop.MaxCanopyCD
+
+        Ks_Tr=[]# cold stress 
+        Kc_Tr=[]# crop transpiration coefficient with soil fertility stress 
+        Ksc_Total=[]
+        max_cc=0
+
+        for day_ in range(1,np.min([crop.MaturityCD+1,len(gdd_cum)])):
+            #cold tress
+            GDD_=gdd_cum[day_]-gdd_cum[day_-1]
+            
+            #copy from solution.py
+            if crop.TrColdStress == 0:
+            # Cold temperature stress does not affect transpiration
+                KsCold = 1
+            elif crop.TrColdStress == 1:
+                # Transpiration can be affected by cold temperature stress
+                if GDD_ >= crop.GDD_up:
+                    # No cold temperature stress
+                    KsCold = 1
+                elif GDD_ <= crop.GDD_lo:
+                    # Transpiration fully inhibited by cold temperature stress
+                    KsCold = 0
+                else:
+                    # Transpiration partially inhibited by cold temperature stress
+                    # Get parameters for logistic curve
+                    KsTr_up = 1
+                    KsTr_lo = 0.02
+                    fshapeb = (-1) * (
+                        np.log(((KsTr_lo * KsTr_up) - 0.98 * KsTr_lo) / (0.98 * (KsTr_up - KsTr_lo)))
+                    )
+                    # Calculate cold stress level
+                    GDDrel = (GDD_ - crop.GDD_lo) / (crop.GDD_up - crop.GDD_lo)
+                    KsCold = (KsTr_up * KsTr_lo) / (
+                        KsTr_lo + (KsTr_up - KsTr_lo) * np.exp(-fshapeb * GDDrel)
+                    )
+                    KsCold = KsCold - KsTr_lo * (1 - GDDrel)
+            #record cold stress 
+            Ks_Tr.append(KsCold)
+
+            if gdd_cum[day_]<crop.Emergence:
+                CC=0
+                Kctr=crop.Kcb
+            
+            elif gdd_cum[day_] <= Half_CCx:
+                CC=crop.CC0*np.exp((gdd_cum[day_]-crop.Emergence)*CGC)
+                if CC>CCx/2:
+                    CC=CCx-0.25*CCx*CCx/crop.CC0*np.exp(-(gdd_cum[day_]-crop.Emergence)*CGC)
+                Kctr=crop.Kcb
+
+                max_cc=CC
+
+            elif gdd_cum[day_] > Half_CCx and gdd_cum[day_] <= Full_CCx:
+                CC=CCx-0.25*CCx*CCx/crop.CC0*np.exp(-(gdd_cum[day_]-crop.Emergence)*CGC)
+                Kctr=crop.Kcb
+                
+                max_cc=CC
+                 
+            elif gdd_cum[day_] > Full_CCx and gdd_cum[day_-5] <= Full_CCx:
+                
+                if gdd_cum[day_]<crop.CanopyDevEnd:
+                    CC=CCx-0.25*CCx*CCx/crop.CC0*np.exp(-(gdd_cum[day_]-crop.Emergence)*CGC)
+                    max_cc=CC
+                else:
+                    CC=max_cc
+
+                Kctr=crop.Kcb
+
+            elif gdd_cum[day_-5] > Full_CCx and gdd_cum[day_] <= crop.Senescence:
+                
+                if gdd_cum[day_]<crop.CanopyDevEnd:
+                    CC=CCx-0.25*CCx*CCx/crop.CC0*np.exp(-(gdd_cum[day_]-crop.Emergence)*CGC)
+                    max_cc=CC
+                else:
+                    CC=max_cc
+                    
+                Kctr=crop.Kcb-(day_-Full_CCxCD-5)*(crop.fage / 100)*max_cc
+
+            elif gdd_cum[day_] > crop.Senescence and gdd_cum[day_] <= crop.Maturity:
+                
+                CDC = crop.CDC*((max_cc+2.29)/(crop.CCx+2.29))
+                CC_adj=max_cc#-crop.fcdecline*(crop.SenescenceCD-Full_CCxCD)#*(day_-Full_CCxCD)/(crop.SenescenceCD-Full_CCxCD)
+                CC=CC_adj*(1-0.05*(np.exp(3.33*CDC*(gdd_cum[day_]-crop.Senescence)/(CC_adj+2.29))-1))
+                Kctr=(crop.Kcb-(day_-Full_CCxCD-5)*(crop.fage / 100)*max_cc)*(CC/max_cc)**crop.a_Tr
+                
+            if CC<=0:
+                CC=0
+            CC_star=1.72*CC-CC*CC+0.3*CC*CC*CC
+            
+            Kc_TrCo2=1            
+            if CO2conc>369.41:
+                Kc_TrCo2=1-0.05*(CO2conc-369.41)/(550-369.41)
+            
+            Kc_Tr_=CC_star*Kctr*Kc_TrCo2
+            Kc_Tr.append(Kc_Tr_)
+
+            Ksc_Total.append(Kc_Tr_*KsCold)
+        crop.TR_ET0_fertstress=np.sum(Ksc_Total[:])
+
 
         # Update harvest index growth coefficient
         crop.HIGC = calculate_HIGC(
@@ -257,6 +408,42 @@ def reset_initial_conditions(
             # No linear switch for leafy vegetable or root/tiber crops
             crop.tLinSwitch = 0
             crop.dHILinear = 0.0
+        
+        #define the maximum biomass in theory    
+        Bio_top=0
+        for i_ in range(len(Ksc_Total)):
+            #print(Bio_top)
+            crop.Bio_top[i_]=Bio_top
+            if i_>=crop.HIstartCD:
+
+                if ((crop.CropType == 2) or (crop.CropType == 3)):
+                
+                    if crop.CropType == 2:
+                        PctLagPhase_=100
+                    else:
+                        if (i_-crop.HIstartCD) < crop.tLinSwitch:
+                            PctLagPhase_ = 100*((i_-crop.HIstartCD)/crop.tLinSwitch)
+                        else:
+                            PctLagPhase_=100
+
+                    # Adjust WP for reproductive stage
+                    if crop.Determinant == 1:
+                        fswitch = PctLagPhase_/100
+                    else:
+                        if (i_-crop.HIstartCD) < (crop.YldFormCD/3):
+                            fswitch = (i_-crop.HIstartCD)/(crop.YldFormCD/3)
+                        else:
+                            fswitch = 1
+
+                    if fswitch>1:
+                        fswitch=1
+                        
+                    Bio_top+= Ksc_Total[i_]*(1-(1-crop.WPy/100)*fswitch)
+                else:
+                    Bio_top+= Ksc_Total[i_]
+            else:
+                Bio_top+= Ksc_Total[i_]
+        crop.Bio_top[len(Ksc_Total):len(Ksc_Total)+100]=Bio_top
 
     # Update global variables
     ParamStruct.Seasonal_Crop_List[ClockStruct.season_counter] = crop

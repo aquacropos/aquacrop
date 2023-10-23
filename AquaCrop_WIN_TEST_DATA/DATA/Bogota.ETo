@@ -1,0 +1,20 @@
+Bogota (Colombia) - monthly data: January - December
+     3  : Monthly records (1=daily, 2=10-daily and 3=monthly data)
+     1  : First day of record (1, 11 or 21 for 10-day or 1 for months)
+     1  : First month of record
+  1901  : First year of record (1901 if not linked to a specific year)
+
+  Average ETo (mm/day)
+=======================
+         2.8
+         2.9
+         2.9
+         2.5
+         2.4
+         2.5
+         2.6
+         2.7
+         2.8
+         2.5
+         2.4
+         2.6

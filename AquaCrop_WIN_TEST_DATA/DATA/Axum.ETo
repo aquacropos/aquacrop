@@ -1,0 +1,20 @@
+Axum strategy
+     3  : Monthly records (1=daily, 2=10-daily and 3=monthly data)
+     1  : First day of record (1, 11 or 21 for 10-day or 1 for months)
+     1  : First month of record
+  1901  : First year of record (1901 if not linked to a specific year)
+
+  Average ETo (mm/day)
+=======================
+       3.4
+       3.5
+       4.6
+       4.9
+       5.4
+       4.8
+       3.5
+       3.2
+       4.1
+       4.2
+       3.4
+       3.0

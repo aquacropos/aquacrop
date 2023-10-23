@@ -1,0 +1,20 @@
+mean monthly data
+     3  : Monthly records (1=daily, 2=10-daily and 3=monthly data)
+     1  : First day of record (1, 11 or 21 for 10-day or 1 for months)
+     1  : First month of record
+  1901  : First year of record (1901 if not linked to a specific year)
+
+  Tmin (C)   TMax (C)
+========================
+      -1.2       4.3
+       0.3       6.7
+       2.2      10.3
+       5.1      14.2
+       7.9      18.4
+      10.9      22.0
+      12.1      22.7
+      12.2      22.3
+      10.6      20.5
+       7.3      15.4
+       3.1       8.9
+       0.2       5.6
