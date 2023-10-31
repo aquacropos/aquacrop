@@ -128,13 +128,14 @@ class AquaCropModel:
         iwc_layers = len(initial_water_content.value)
         soil_layers = self.soil.nLayer
 
+        ########################### No longer believe the below check is required, I think that the number of layers in soil and initWC can be mismatched, they're separate.
         # If number of layers in IWC do not match number of soil layers in soil profile, change them to match and warn user of changes made
-        if check_iwc_soil_match(iwc_layers, soil_layers) is False:
-            new_water_layers = ['FC'] * soil_layers
-            new_water_depths = list(range(1, soil_layers+1,1))
-            self.initial_water_content.value=new_water_layers
-            self.initial_water_content.depth_layer=new_water_depths
-            warnings.warn("Initial water content layers ({}) do not match number of soil layers ({}), initial water content layers now set to: {}".format(iwc_layers, soil_layers,self.initial_water_content.value), stacklevel=1)
+        # if check_iwc_soil_match(iwc_layers, soil_layers) is False:
+        #     new_water_layers = ['FC'] * soil_layers
+        #     new_water_depths = list(range(1, soil_layers+1,1))
+        #     self.initial_water_content.value=new_water_layers
+        #     self.initial_water_content.depth_layer=new_water_depths
+        #     print(f"Initial water content layers ({iwc_layers}) do not match number of soil layers ({soil_layers}), initial water content layers now set to: {self.initial_water_content.value}")
             
         self.irrigation_management = irrigation_management
         self.field_management = field_management
