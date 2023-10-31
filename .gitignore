@@ -541,3 +541,15 @@ AquaCropV60/AquaCropV60/SIMUL/Rainfall.PAR
 AquaCropV60/AquaCropV60/SIMUL/Soil.PAR
 AquaCropV60/AquaCropV60/SIMUL/SOILS.DIR
 AquaCropV60/AquaCropV60/SIMUL/Temperature.PAR
+
+tests/both_outputs.csv
+
+tests/combined-annual.csv
+
+tests/hyderabad.csv
+
+tests/test_outputs.csv
+
+tests/test.csv
+
+*.csv

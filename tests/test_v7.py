@@ -8,7 +8,6 @@ from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent, IrrigationM
 from aquacrop.utils import prepare_weather, get_filepath
 
 filepath=get_filepath('tunis_climate.txt')
-
 weather_data = prepare_weather(filepath)
 
 # soil
