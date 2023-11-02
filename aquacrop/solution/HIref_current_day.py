@@ -30,7 +30,7 @@ def HIref_current_day(
     NewCond_CCxW: float,
     Crop: "CropStructNT",
     growing_season: bool,
-    ) -> Tuple[float, bool, float, float]:
+    ) -> Tuple[float, bool, float]: #, float
     """
     Function to calculate reference (no adjustment for stress effects)
     harvest index on current day
@@ -159,7 +159,7 @@ def HIref_current_day(
     return (NewCond_HIref,
             NewCond_YieldForm,
             NewCond_PctLagPhase,
-            NewCond_HIfinal,
+            #NewCond_HIfinal,
             )
 
 if __name__ == "__main__":
