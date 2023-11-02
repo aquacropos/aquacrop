@@ -148,6 +148,8 @@ def harvest_index(
         # Get time for harvest index build-up
         HIt = NewCond.dap - NewCond.delayed_cds - Crop.HIstartCD - 1
 
+        print(f'NewCond.biomass={NewCond.biomass}, NewCond.canopy_cover={NewCond.canopy_cover}')
+
         # Calculate harvest index
         if (NewCond.yield_form == True) and (HIt >= 0):
             # print(NewCond.dap)
