@@ -28,7 +28,7 @@ class IrrigationManagement:
 
         NetIrrSMT (float): Net irrigation threshold moisture level (% of taw that will be maintained, for irrigation_method=4)
 
-        Depth (float): constant depth to apply on each day
+        Depth (float): constant depth to apply on each day (mm)
 
     """
 
