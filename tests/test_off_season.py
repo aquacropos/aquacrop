@@ -41,7 +41,7 @@ model1 = AquaCropModel(sim_start_time=f'{1982}/10/01',
                       crop=wheat,
                       irrigation_management=irr_mngt,
                       initial_water_content=InitWC,
-                      off_season=True)
+                      off_season=False)
 
 # run model till termination
 model1.run_model(till_termination=True)
@@ -55,7 +55,7 @@ model2 = AquaCropModel(sim_start_time=f'{1982}/10/01',
                       crop=wheat,
                       irrigation_management=irr_mngt,
                       initial_water_content=InitWC,
-                      fallow_field_management=fal_fld,
+                      #fallow_field_management=fal_fld,
                       off_season=True)
 
 model2.run_model(till_termination=True)
@@ -68,6 +68,7 @@ model2.run_model(till_termination=True)
 
 model1_water=pd.DataFrame(model1._outputs.water_flux)
 model2_water=pd.DataFrame(model2._outputs.water_flux)
+print(model1_water.columns)
 # Test all outputs
 water_flux = [
                 "Wr",
@@ -97,13 +98,16 @@ for y_var in water_flux:
                     y=y_var,
                     ax=ax[1])
     
-    fig.savefig(f'../plots/off_season/water_flux_fallow/{y_var}.png')
+    fig.savefig(f'../plots/off_season/water_flux/{y_var}.png')
     fig.clf()
     plt.cla()
+    plt.close()
     plt.close(fig)
 
 model1_crop=pd.DataFrame(model1._outputs.crop_growth)
 model2_crop=pd.DataFrame(model2._outputs.crop_growth)
+
+print(model1_crop.columns)
 
 crop_growth=[
                 "gdd",
@@ -115,7 +119,7 @@ crop_growth=[
                 "biomass_ns",
                 "harvest_index",
                 "harvest_index_adj",
-                "yield_",
+                "DryYield",
             ]
 
 for y_var in crop_growth:
@@ -130,7 +134,8 @@ for y_var in crop_growth:
                     y=y_var,
                     ax=ax[1])
     
-    fig.savefig(f'../plots/off_season/crop_growth_fallow/{y_var}.png')
+    fig.savefig(f'../plots/off_season/crop_growth/{y_var}.png')
     fig.clf()
     plt.cla()
+    plt.close()
     plt.close(fig)
