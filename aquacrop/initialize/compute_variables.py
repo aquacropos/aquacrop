@@ -198,6 +198,7 @@ def compute_variables(
 
         # Total adjustment
         crop.fCO2 = 1 + ftype * (fCO2 - 1)
+        print('crop.fCO2:')
         print(crop.fCO2)
 
         param_struct.CropList[i] = crop
