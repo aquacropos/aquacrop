@@ -198,10 +198,9 @@ def compute_variables(
 
         # Total adjustment
         crop.fCO2 = 1 + ftype * (fCO2 - 1)
-        print('crop.fCO2:')
-        print(crop.fCO2)
 
         param_struct.CropList[i] = crop
+
 
     # change this later
     if param_struct.NCrops == 1:
@@ -233,5 +232,8 @@ def compute_variables(
             fallow_struct.__setattr__(a, v)
 
     param_struct.Fallow_Crop = fallow_struct
+
+    print('crop.fCO2: {}')
+    print(crop.fCO2)
 
     return param_struct
