@@ -179,27 +179,27 @@ def compute_variables(
 
 
     # Select adjusted coefficient for CO2
-        if (CO2conc <= CO2ref):
-            fCO2 = fCO2old
-        elif ((CO2conc <= 550) and (fCO2old < fCO2new)):
-            fCO2 = fCO2old
-        else:
-            fCO2 = fCO2new
+    if (CO2conc <= CO2ref):
+        fCO2 = fCO2old
+    elif ((CO2conc <= 550) and (fCO2old < fCO2new)):
+        fCO2 = fCO2old
+    else:
+        fCO2 = fCO2new
 
         # Consider crop type
-        if crop.WP >= 40:
-            # No correction for C4 crops
-            ftype = 0
-        elif crop.WP <= 20:
-            # Full correction for C3 crops
-            ftype = 1
-        else:
-            ftype = (40 - crop.WP) / (40 - 20)
+    if crop.WP >= 40:
+        # No correction for C4 crops
+        ftype = 0
+    elif crop.WP <= 20:
+        # Full correction for C3 crops
+        ftype = 1
+    else:
+        ftype = (40 - crop.WP) / (40 - 20)
 
         # Total adjustment
-        crop.fCO2 = 1 + ftype * (fCO2 - 1)
+    crop.fCO2 = 1 + ftype * (fCO2 - 1)
 
-        param_struct.CropList[i] = crop
+    param_struct.CropList[i] = crop
 
 
     # change this later
