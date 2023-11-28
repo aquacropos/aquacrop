@@ -233,6 +233,4 @@ def compute_variables(
 
     param_struct.Fallow_Crop = fallow_struct
 
-    print(f'crop.fCO2: {crop.fCO2}')
-
     return param_struct
