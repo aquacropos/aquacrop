@@ -179,7 +179,7 @@ def solution_single_time_step(
 
     # Run simulations %%
     # 1. Check for groundwater table
-    NewCond.th_fc_Adj, _, NewCond.wt_in_soil = check_groundwater_table(
+    NewCond.th_fc_Adj, NewCond.wt_in_soil = check_groundwater_table(
         Soil.Profile,
         NewCond.z_gw,
         NewCond.th,
