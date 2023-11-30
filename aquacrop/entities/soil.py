@@ -388,8 +388,9 @@ class Soil:
             ths = soil.th_s
             Ksat = soil.Ksat
 
-            aCR = 0
-            bCR = 0
+            # usually just initialise here (both 0), but temporarily hard-coding for clay-loam for testing
+            aCR = -0.6366 + 8*Ksat/10000
+            bCR = -1.9165 + 0.7063*np.log(Ksat)
 
             # Define aCR and bCR calculations for each Soil Class 
             aCR_sandy=-0.3112 - Ksat/100000
@@ -404,34 +405,41 @@ class Soil:
             aCR_silty_clayey=-0.6366 + 8*Ksat/10000
             bCR_silty_clayey=-1.9165 + 0.7063*np.log(Ksat)
 
+            # NEW (V7) aCR bCR calculations logic
             # Assign aCR/bCR based on soil class definition from FAO
-            if ths <= 0.55:
-                if thwp >= 0.20:
-                    if (ths >= 0.49) and (thfc >= 0.40):
-                        aCR=aCR_silty_clayey
-                        bCR=bCR_silty_clayey
-                    else:
-                        aCR=aCR_sandy_clayey
-                        bCR=bCR_sandy_clayey
-                else:
-                    if thfc < 0.23:
-                        aCR=aCR_sandy
-                        bCR=bCR_sandy
-                    else:
-                        if (thwp > 0.16) and (Ksat < 100):
-                            aCR=aCR_sandy_clayey
-                            bCR=bCR_sandy_clayey
-                        else:
-                            if (thwp < 0.06) and (thfc < 0.28) and (Ksat > 750):
-                                aCR=aCR_sandy
-                                bCR=bCR_sandy
-                            else:
-                                aCR=aCR_loamy
-                                bCR=bCR_loamy
-            else:
-                aCR=aCR_silty_clayey
-                bCR=bCR_silty_clayey
+            # if ths <= 0.55:
+            #     if thwp >= 0.20:
+            #         if (ths >= 0.49) and (thfc >= 0.40):
+            #             aCR=aCR_silty_clayey
+            #             bCR=bCR_silty_clayey
+            #         else:
+            #             aCR=aCR_sandy_clayey
+            #             bCR=bCR_sandy_clayey
+            #     else:
+            #         if thfc < 0.23:
+            #             aCR=aCR_sandy
+            #             bCR=bCR_sandy
+            #         else:
+            #             if (thwp > 0.16) and (Ksat < 100):
+            #                 aCR=aCR_sandy_clayey
+            #                 bCR=bCR_sandy_clayey
+            #             else:
+            #                 if (thwp < 0.06) and (thfc < 0.28) and (Ksat > 750):
+            #                     aCR=aCR_sandy
+            #                     bCR=bCR_sandy
+            #                 else:
+            #                     aCR=aCR_loamy
+            #                     bCR=bCR_loamy
+            # else:
+            #     aCR=aCR_silty_clayey
+            #     bCR=bCR_silty_clayey
 
+
+
+
+
+
+            # OLD (V6) aCR bCR calculation logic
             # if (
             #     (thwp >= 0.04)
             #     and (thwp <= 0.15)
