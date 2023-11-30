@@ -393,14 +393,14 @@ def solution_single_time_step(
     # 15. Reference harvest index
     (NewCond.hi_ref, NewCond.yield_form, NewCond.pct_lag_phase) = HIref_current_day( # ,NewCond.HIfinal
         NewCond.hi_ref,
-        #NewCond.HIfinal,
+        NewCond.HIfinal,
         NewCond.dap,
         NewCond.delayed_cds,
         NewCond.yield_form,
         NewCond.pct_lag_phase,
-        NewCond.cc_prev,
-       # NewCond.canopy_cover,
-       # NewCond.ccx_w,
+        #NewCond.cc_prev,
+        NewCond.canopy_cover,
+        NewCond.ccx_w,
         Crop,
         growing_season,
     )
