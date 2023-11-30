@@ -95,6 +95,8 @@ def biomass_accumulation(
         # Adjust WP for CO2 effects
         WPadj = WPadj * Crop.fCO2
 
+        # print(WPadj)
+
         # Calculate biomass accumulation on current day
         # No water stress
         dB_NS = WPadj * (TrPot / et0)
