@@ -94,9 +94,9 @@ def solution_single_time_step(
     # Store initial conditions in structure for updating %%
     NewCond = init_cond
     if param_struct.water_table == 1:
-        NewCond.z_gw = param_struct.z_gw[clock_struct.time_step_counter]
+        GroundWater = param_struct.z_gw[clock_struct.time_step_counter]
     else:
-        NewCond.z_gw = 0
+        GroundWater = 0
 
     # Check if growing season is active on current time step %%
     if clock_struct.season_counter >= 0:
@@ -185,6 +185,7 @@ def solution_single_time_step(
         NewCond.th,
         NewCond.th_fc_Adj,
         param_struct.water_table,
+        GroundWater
     )
 
     NewCond.wt_in_soil=wt_in_soil
