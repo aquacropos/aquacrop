@@ -80,10 +80,10 @@ def check_groundwater_table(
                 NewCond_WTinSoil = True
 
         # If water table is in soil profile, adjust water contents
-        if NewCond_WTinSoil == True:
-            idx = np.argwhere(zMid >= NewCond_zGW).flatten()[0]
-            for ii in range(idx, len(prof.Comp)):
-                NewCond_th[ii] = prof.th_s[ii]
+        # if NewCond_WTinSoil == True:
+        #     idx = np.argwhere(zMid >= NewCond_zGW).flatten()[0]
+        #     for ii in range(idx, len(prof.Comp)):
+        #         NewCond_th[ii] = prof.th_s[ii]
 
         # Adjust compartment field capacity
         compi = len(prof.Comp) - 1
