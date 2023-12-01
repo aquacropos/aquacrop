@@ -65,10 +65,12 @@ def capillary_rise(
         zBot = prof.dzsum[-1]
         zBotMid = prof.zMid[-1]
         prof = prof
+        print(f'Cap rise L68, Ksat = {prof.Ksat[-1]}')
         if (prof.Ksat[-1] > 0) and (z_gw > 0) and ((z_gw - zBotMid) < 4):
             if zBotMid >= z_gw:
                 MaxCR = 99
             else:
+                print(f'Cap rise L73, aCR = {prof.aCR[-1]}, bCR = {prof.bCR[-1]}')
                 MaxCR = np.exp((np.log(z_gw - zBotMid) - prof.bCR[-1]) / prof.aCR[-1])
                 if MaxCR > 99:
                     MaxCR = 99
@@ -78,41 +80,41 @@ def capillary_rise(
 
         ######################### this needs fixing, will currently break####################
 
-        #         # Find top of next soil layer that is not within modelled soil profile
-        #         zTopLayer = 0
-        #         for layeri in np.sort(np.unique(prof.Layer)):
-        #             # Calculate layer thickness
-        #             l_idx = np.argwhere(prof.Layer==layeri).flatten()
+        # # Find top of next soil layer that is not within modelled soil profile
+        # zTopLayer = 0
+        # for layeri in np.sort(np.unique(prof.Layer)):
+        #     # Calculate layer thickness
+        #     l_idx = np.argwhere(prof.Layer==layeri).flatten()
 
-        #             LayThk = prof.dz[l_idx].sum()
-        #             zTopLayer = zTopLayer+LayThk
+        #     LayThk = prof.dz[l_idx].sum()
+        #     zTopLayer = zTopLayer+LayThk
 
-        #         # Check for restrictions on upward flow caused by properties of
-        #         # compartments that are not modelled in the soil water balance
-        #         layeri = prof.Layer[-1]
+        # # Check for restrictions on upward flow caused by properties of
+        # # compartments that are not modelled in the soil water balance
+        # layeri = prof.Layer[-1]
 
-        #         assert layeri == Soil_nLayer
+        # assert layeri == Soil_nLayer
 
-        #         while (zTopLayer < z_gw) and (layeri < Soil_nLayer):
-        #             # this needs fixing, will currently break
+        # while (zTopLayer < z_gw) and (layeri < Soil_nLayer):
+        #     # this needs fixing, will currently break
 
-        #             layeri = layeri+1
-        #             compdf = prof.Layer[layeri]
-        #             if (compdf.Ksat > 0) and (z_gw > 0) and ((z_gw-zTopLayer) < 4):
-        #                 if zTopLayer >= z_gw:
-        #                     LimCR = 99
-        #                 else:
-        #                     LimCR = np.exp((np.log(z_gw-zTopLayer)-compdf.bCR)/compdf.aCR)
-        #                     if LimCR > 99:
-        #                         LimCR = 99
+        #     layeri = layeri+1
+        #     compdf = prof.Layer[layeri]
+        #     if (compdf.Ksat > 0) and (z_gw > 0) and ((z_gw-zTopLayer) < 4):
+        #         if zTopLayer >= z_gw:
+        #             LimCR = 99
+        #         else:
+        #             LimCR = np.exp((np.log(z_gw-zTopLayer)-compdf.bCR)/compdf.aCR)
+        #             if LimCR > 99:
+        #                 LimCR = 99
 
-        #             else:
-        #                 LimCR = 0
+        #     else:
+        #         LimCR = 0
 
-        #             if MaxCR > LimCR:
-        #                 MaxCR = LimCR
+        #     if MaxCR > LimCR:
+        #         MaxCR = LimCR
 
-        #             zTopLayer = zTopLayer+compdf.dz
+        #     zTopLayer = zTopLayer+compdf.dz
 
         #####################################################################################
 
@@ -177,10 +179,12 @@ def capillary_rise(
             if compi > -1:
 
                 zBotMid = zBot - (prof.dz[compi] / 2)
+                print(f'Cap rise L182, Ksat = {prof.Ksat[compi]}')
                 if (prof.Ksat[compi] > 0) and (z_gw > 0) and ((z_gw - zBotMid) < 4):
                     if zBotMid >= z_gw:
                         LimCR = 99
                     else:
+                        print(f'Cap rise L187, aCR = {prof.aCR[compi]}, bCR = {prof.bCR[compi]}')
                         LimCR = np.exp((np.log(z_gw - zBotMid) - prof.bCR[compi]) / prof.aCR[compi])
                         if LimCR > 99:
                             LimCR = 99
