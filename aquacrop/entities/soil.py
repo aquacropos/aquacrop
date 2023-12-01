@@ -389,8 +389,8 @@ class Soil:
             Ksat = soil.Ksat
 
             # usually just initialise here (both 0), but temporarily hard-coding for clay-loam for testing
-            aCR = -0.6366 + 8*Ksat/10000
-            bCR = -1.9165 + 0.7063*np.log(Ksat)
+            aCR =  -0.572700
+            bCR =  -0.859573
 
             # Define aCR and bCR calculations for each Soil Class 
             aCR_sandy=-0.3112 - Ksat/100000
