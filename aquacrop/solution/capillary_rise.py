@@ -65,12 +65,12 @@ def capillary_rise(
         zBot = prof.dzsum[-1]
         zBotMid = prof.zMid[-1]
         prof = prof
-        print(f'Cap rise L68, Ksat = {prof.Ksat[-1]}')
+        # print(f'Cap rise L68, Ksat = {prof.Ksat[-1]}')
         if (prof.Ksat[-1] > 0) and (z_gw > 0) and ((z_gw - zBotMid) < 4):
             if zBotMid >= z_gw:
                 MaxCR = 99
             else:
-                print(f'Cap rise L73, aCR = {prof.aCR[-1]}, bCR = {prof.bCR[-1]}')
+                # print(f'Cap rise L73, aCR = {prof.aCR[-1]}, bCR = {prof.bCR[-1]}')
                 MaxCR = np.exp((np.log(z_gw - zBotMid) - prof.bCR[-1]) / prof.aCR[-1])
                 if MaxCR > 99:
                     MaxCR = 99
@@ -179,12 +179,12 @@ def capillary_rise(
             if compi > -1:
 
                 zBotMid = zBot - (prof.dz[compi] / 2)
-                print(f'Cap rise L182, Ksat = {prof.Ksat[compi]}')
+                # print(f'Cap rise L182, Ksat = {prof.Ksat[compi]}')
                 if (prof.Ksat[compi] > 0) and (z_gw > 0) and ((z_gw - zBotMid) < 4):
                     if zBotMid >= z_gw:
                         LimCR = 99
                     else:
-                        print(f'Cap rise L187, aCR = {prof.aCR[compi]}, bCR = {prof.bCR[compi]}')
+                        # print(f'Cap rise L187, aCR = {prof.aCR[compi]}, bCR = {prof.bCR[compi]}')
                         LimCR = np.exp((np.log(z_gw - zBotMid) - prof.bCR[compi]) / prof.aCR[compi])
                         if LimCR > 99:
                             LimCR = 99
