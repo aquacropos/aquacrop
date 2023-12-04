@@ -72,7 +72,6 @@ def capillary_rise(
             else:
                 # print(f'Cap rise L73, aCR = {prof.aCR[-1]}, bCR = {prof.bCR[-1]}')
                 MaxCR = np.exp((np.log(z_gw - zBotMid) - prof.bCR[-1]) / prof.aCR[-1])
-                print(f'MaxCR L75 = {MaxCR}')
                 if MaxCR > 99:
                     MaxCR = 99
 
@@ -163,7 +162,6 @@ def capillary_rise(
             # Store water if room is available
             if (dth > 0) and ((zBot - prof.dz[compi] / 2) < z_gw):
                 dthMax = Krel * Df * MaxCR / (1000 * prof.dz[compi])
-                print(f'At compi: {compi}, dthMax = {dthMax} and dth = {dth}')
                 if dth >= dthMax:
                     NewCond.th[compi] = NewCond.th[compi] + dthMax
                     CRcomp = dthMax * 1000 * prof.dz[compi]
@@ -203,4 +201,3 @@ def capillary_rise(
         CrTot = WCr
 
     return NewCond, CrTot
-
