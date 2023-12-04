@@ -163,7 +163,7 @@ def capillary_rise(
             # Store water if room is available
             if (dth > 0) and ((zBot - prof.dz[compi] / 2) < z_gw):
                 dthMax = Krel * Df * MaxCR / (1000 * prof.dz[compi])
-                print(f'L164, dthMax = {dthMax} and dth = {dth}')
+                print(f'At compi: {compi}, dthMax = {dthMax} and dth = {dth}')
                 if dth >= dthMax:
                     NewCond.th[compi] = NewCond.th[compi] + dthMax
                     CRcomp = dthMax * 1000 * prof.dz[compi]
