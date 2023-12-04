@@ -72,6 +72,7 @@ def capillary_rise(
             else:
                 # print(f'Cap rise L73, aCR = {prof.aCR[-1]}, bCR = {prof.bCR[-1]}')
                 MaxCR = np.exp((np.log(z_gw - zBotMid) - prof.bCR[-1]) / prof.aCR[-1])
+                print(f'MaxCR L75 = {MaxCR}')
                 if MaxCR > 99:
                     MaxCR = 99
 
