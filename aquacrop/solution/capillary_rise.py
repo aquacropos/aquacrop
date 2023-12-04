@@ -82,40 +82,42 @@ def capillary_rise(
         ######################### this needs fixing, will currently break####################
 
         # # Find top of next soil layer that is not within modelled soil profile
-        # zTopLayer = 0
-        # for layeri in np.sort(np.unique(prof.Layer)):
-        #     # Calculate layer thickness
-        #     l_idx = np.argwhere(prof.Layer==layeri).flatten()
+        zTopLayer = 0
+        for layeri in np.sort(np.unique(prof.Layer)):
+            # Calculate layer thickness
+            l_idx = np.argwhere(prof.Layer==layeri).flatten()
 
-        #     LayThk = prof.dz[l_idx].sum()
-        #     zTopLayer = zTopLayer+LayThk
+            LayThk = prof.dz[l_idx].sum()
+            zTopLayer = zTopLayer+LayThk
 
-        # # Check for restrictions on upward flow caused by properties of
-        # # compartments that are not modelled in the soil water balance
-        # layeri = prof.Layer[-1]
+        # Check for restrictions on upward flow caused by properties of
+        # compartments that are not modelled in the soil water balance
+        layeri = prof.Layer[-1]
 
-        # assert layeri == Soil_nLayer
+        assert layeri == Soil_nLayer
 
-        # while (zTopLayer < z_gw) and (layeri < Soil_nLayer):
-        #     # this needs fixing, will currently break
+        while (zTopLayer < z_gw) and (layeri < Soil_nLayer):
+            # this needs fixing, will currently break
 
-        #     layeri = layeri+1
-        #     compdf = prof.Layer[layeri]
-        #     if (compdf.Ksat > 0) and (z_gw > 0) and ((z_gw-zTopLayer) < 4):
-        #         if zTopLayer >= z_gw:
-        #             LimCR = 99
-        #         else:
-        #             LimCR = np.exp((np.log(z_gw-zTopLayer)-compdf.bCR)/compdf.aCR)
-        #             if LimCR > 99:
-        #                 LimCR = 99
+            
+            compdf = prof.Layer[layeri]
+            if (compdf.Ksat > 0) and (z_gw > 0) and ((z_gw-zTopLayer) < 4):
+                if zTopLayer >= z_gw:
+                    LimCR = 99
+                else:
+                    LimCR = np.exp((np.log(z_gw-zTopLayer)-compdf.bCR)/compdf.aCR)
+                    if LimCR > 99:
+                        LimCR = 99
 
-        #     else:
-        #         LimCR = 0
+            else:
+                LimCR = 0
 
-        #     if MaxCR > LimCR:
-        #         MaxCR = LimCR
+            if MaxCR > LimCR:
+                MaxCR = LimCR
 
-        #     zTopLayer = zTopLayer+compdf.dz
+            zTopLayer = zTopLayer+compdf.dz
+
+            layeri = layeri+1 # could be that the increment should be at the end of the loop rather than at the start (bad indexing otherwise)
 
         #####################################################################################
 
