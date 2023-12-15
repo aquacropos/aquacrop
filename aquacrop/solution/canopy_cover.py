@@ -96,7 +96,24 @@ def canopy_cover(
         taw = TAW()
         root_zone_depletion = Dr()
         # thRZ = RootZoneWater()
-        _, root_zone_depletion.Zt, root_zone_depletion.Rz, taw.Zt, taw.Rz, _,_,_,_,_,_ = root_zone_water(
+        (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            root_zone_depletion.Zt,
+            root_zone_depletion.Rz,
+            taw.Zt,
+            taw.Rz,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+        ) = root_zone_water(
             prof,
             float(NewCond.z_root),
             NewCond.th,
@@ -120,7 +137,13 @@ def canopy_cover(
         # Determine if water stress is occurring
         beta = True
         water_stress_coef = Ksw()
-        water_stress_coef.exp, water_stress_coef.sto, water_stress_coef.sen, water_stress_coef.pol, water_stress_coef.sto_lin = water_stress(
+        (
+            water_stress_coef.exp,
+            water_stress_coef.sto,
+            water_stress_coef.sen,
+            water_stress_coef.pol,
+            water_stress_coef.sto_lin,
+        ) = water_stress(
             Crop.p_up,
             Crop.p_lo,
             Crop.ETadj,

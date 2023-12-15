@@ -121,6 +121,11 @@ def irrigation(
         # thRZ = RootZoneWater()
         (
             WrAct,
+            _,
+            _,
+            _,
+            _,
+            _,
             Dr_Zt,
             Dr_Rz,
             TAW_Zt,

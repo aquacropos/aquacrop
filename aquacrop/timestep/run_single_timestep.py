@@ -441,7 +441,24 @@ def solution_single_time_step(
     _water_root_depletion = Dr()
     # thRZ = RootZoneWater()
 
-    Wr, _water_root_depletion.Zt, _water_root_depletion.Rz, _TAW.Zt, _TAW.Rz, _, _, _, _, _, _ = root_zone_water(
+    (
+        Wr,
+        WrS,
+        WrFC,
+        WrWP,
+        WrDry,
+        WrAer,
+        _water_root_depletion.Zt,
+        _water_root_depletion.Rz,
+        _TAW.Zt,
+        _TAW.Rz,
+        _,
+        _,
+        _,
+        _,
+        _,
+        _
+    ) = root_zone_water(
         Soil.Profile,
         float(NewCond.z_root),
         NewCond.th,
@@ -488,6 +505,11 @@ def solution_single_time_step(
         clock_struct.season_counter,
         NewCond.dap,
         Wr,
+        WrS,
+        WrFC,
+        WrWP,
+        WrDry,
+        WrAer,
         NewCond.z_gw,
         NewCond.surface_storage,
         IrrDay,
