@@ -179,14 +179,14 @@ class Soil:
             self.add_layer(1.5, 0.39, 0.54, 0.55, 2, 100)
 
         elif soil_type == "ac_TunisLocal":
-            self.cn = 46
+            self.cn = 72
             self.calc_cn = 0
-            self.rew = 7
+            self.rew = 11
             dz = [0.1] * 6 + [0.15] * 5 + [0.2]
             self.create_df(dz)
             self.add_layer(0.3, 0.24, 0.40, 0.50, 155, 100)
             self.add_layer(1.7, 0.11, 0.33, 0.46, 500, 100)
-
+ 
         else:
             print("wrong soil type")
             assert 1 == 2
