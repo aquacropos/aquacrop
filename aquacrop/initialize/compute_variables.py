@@ -78,39 +78,7 @@ def compute_variables(
 
         assert ksat > 0
 
-    for i in range(param_struct.NCrops):
 
-        crop = param_struct.CropList[i]
-        # crop.calculate_additional_params()
-
-        # Crop calander
-        crop = compute_crop_calendar(
-            crop,
-            clock_struct.planting_dates,
-            clock_struct.simulation_start_date,
-            clock_struct.time_span,
-            weather_df,
-        )
-
-        # Harvest index param_struct.Seasonal_Crop_List[clock_struct.season_counter].Paramsgrowth coefficient
-        crop.HIGC = calculate_HIGC(
-            crop.YldFormCD,
-            crop.HI0,
-            crop.HIini,
-        )
-
-        # Days to linear harvest_index switch point
-        if crop.CropType == 3:
-            # Determine linear switch point and HIGC rate for fruit/grain crops
-            crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
-                crop.YldFormCD, crop.HIini, crop.HI0, crop.HIGC
-            )
-        else:
-            # No linear switch for leafy vegetable or root/tiber crops
-            crop.tLinSwitch = 0
-            crop.dHILinear = 0.0
-
-        param_struct.CropList[i] = crop
 
     # Calculate WP adjustment factor for elevation in CO2 concentration
     # Load CO2 data
@@ -152,6 +120,42 @@ def compute_variables(
             fw = 1
         else:
             fw = 1 - ((550 - CO2conc) / (550 - CO2ref))
+            
+    #move it here, need co2 data for soil fertility initialization
+    for i in range(param_struct.NCrops):
+
+        crop = param_struct.CropList[i]
+        # crop.calculate_additional_params()
+
+        # Crop calander
+        crop = compute_crop_calendar(
+            crop,
+            clock_struct.planting_dates,
+            clock_struct.simulation_start_date,
+            clock_struct.time_span,
+            weather_df,
+            param_struct,
+        )
+
+        # Harvest index param_struct.Seasonal_Crop_List[clock_struct.season_counter].Paramsgrowth coefficient
+        crop.HIGC = calculate_HIGC(
+            crop.YldFormCD,
+            crop.HI0,
+            crop.HIini,
+        )
+
+        # Days to linear harvest_index switch point
+        if crop.CropType == 3:
+            # Determine linear switch point and HIGC rate for fruit/grain crops
+            crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
+                crop.YldFormCD, crop.HIini, crop.HI0, crop.HIGC
+            )
+        else:
+            # No linear switch for leafy vegetable or root/tiber crops
+            crop.tLinSwitch = 0
+            crop.dHILinear = 0.0
+
+        param_struct.CropList[i] = crop
 
     # Determine adjustment for each crop in first year of simulation
     for i in range(param_struct.NCrops):
