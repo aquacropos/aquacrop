@@ -31,11 +31,13 @@ print(model_results)
 
 ## About
 
-AquaCrop-OSPy is a python implementation of the popular crop-water model AquaCrop, built from the AquaCrop-OS source code.
+AquaCrop-OSPy is a python implementation of the popular crop-water model AquaCrop, built from the AquaCrop-OS source code. 
 
 AquaCrop-OS, an open source version of FAO’s multi-crop model, was released in August 2016 and is the result of collaboration between researchers at the University of Manchester, Water for Food Global Institute, U.N. Food and Agriculture Organization, and Imperial College London.
 
 AquaCrop-OSPy has been designed in way that users can conduct cutting edge research with only basic python experience. In particular for the design and testing of irrigation stratgeies.
+
+AquaCrop-OSPy is currently up to date with AquaCrop FAO version 6.0, with exception of some features not yet included in Python code (salinity and fertility stress, and weed management)
 
 Open access journal article <a href=https://doi.org/10.1016/j.agwat.2021.106976> here </a>
 
@@ -69,3 +71,9 @@ If you receive an error message such as "No module named aquacrop.scripts.initia
 2. If Step 1 doesn't help, then you can run aquacrop in pure python (this will be slower) using: <br>
 ```import os```<br>
 ```os.environ['DEVELOPMENT'] = 'DEVELOPMENT'```
+
+More information, including screenshots and gifs, can be found at The University of Manchester's [article](https://www.manchester.ac.uk/discover/news/manchester-scientists-launch-new-interactive-tool-for-agricultural-water-management-and-climate-risk-assessment/), Tim Foster's medium [post](https://medium.com/@agwater/aquaplan-a-new-interactive-tool-for-agricultural-water-management-and-climate-risk-assessment-82c50cb10144), or twitter [thread](https://twitter.com/tim_foster_88/status/1557728807758737408).
+
+A seperate [category](https://github.com/aquacropos/aquacrop/discussions/categories/aquaplan) inside the AquaCrop-OSPy forum has been created to discuss
+AquaPlan, including any issues, questions, or suggestions.
+
