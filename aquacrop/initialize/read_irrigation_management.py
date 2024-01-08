@@ -38,10 +38,8 @@ def read_irrigation_management(
     if IrrMngt.irrigation_method == 3:
 
         df = IrrMngt.Schedule.copy()
-        print(f'Original schedule df: {df}')
         # change the index to the date
         df.index = pd.DatetimeIndex(df.Date)
-        print(f'Newly indexed schedule df: {df}')
 
         try:
             # create a dateframe containing the daily irrigation to
@@ -49,8 +47,6 @@ def read_irrigation_management(
             df = df.reindex(ClockStruct.time_span, fill_value=0).drop("Date", axis=1)
 
             IrrMngt.Schedule = np.array(df.values, dtype=float).flatten()
-            print('Check structure of irr schedule:')
-            print(IrrMngt.Schedule)
             
         except TypeError:
             # older version of pandas with not reindex
@@ -80,9 +76,6 @@ def read_irrigation_management(
 
     ParamStruct.IrrMngt = irr_mngt_struct
     ParamStruct.FallowIrrMngt = IrrMngtStruct(len(ClockStruct.time_span))
-
-    print('Final setup schedule:')
-    print(irr_mngt_struct)
 
     return ParamStruct
 

@@ -205,7 +205,6 @@ def irrigation(
             idx = NewCond_TimeStepCounter
             # Find irrigation value corresponding to current date
             Irr = IrrMngt_Schedule[idx]
-            print(f'Irrigation index: {idx}, leads to irrigation amount: {Irr}')
 
             assert Irr >= 0
 
