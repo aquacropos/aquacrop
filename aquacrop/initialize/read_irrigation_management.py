@@ -49,7 +49,8 @@ def read_irrigation_management(
             df = df.reindex(ClockStruct.time_span, fill_value=0).drop("Date", axis=1)
 
             IrrMngt.Schedule = np.array(df.values, dtype=float).flatten()
-            print(f'Check structure of irr schedule: {IrrMngt.Schedule}')
+            print('Check structure of irr schedule:')
+            print(IrrMngt.Schedule)
             
         except TypeError:
             # older version of pandas with not reindex
@@ -79,6 +80,9 @@ def read_irrigation_management(
 
     ParamStruct.IrrMngt = irr_mngt_struct
     ParamStruct.FallowIrrMngt = IrrMngtStruct(len(ClockStruct.time_span))
+
+    print('Final setup schedule:')
+    print(irr_mngt_struct)
 
     return ParamStruct
 
