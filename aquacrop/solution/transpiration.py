@@ -356,9 +356,12 @@ def transpiration(
                 # Adjust stomatal stress threshold for et0 on current day
                 p_up_sto = Crop.p_up[1] + (0.04 * (5 - et0)) * (np.log10(10 - 9 * Crop.p_up[1]))
 
-            # Determine critical water content at which stomatal closure will
-            # occur in compartment
-            thCrit = prof.th_fc[comp] - (thTAW * p_up_sto)
+                # Determine critical water content at which stomatal closure will
+                # occur in compartment
+                thCrit = prof.th_fc[comp] - (thTAW * p_up_sto) # TEMP INDENT
+
+            else: # TEMP
+                thCrit = prof.th_fc[comp] - (thTAW) # TEMP
 
             # Check for soil water stress
             if NewCond.th[comp] >= thCrit:
