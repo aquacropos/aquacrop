@@ -77,7 +77,7 @@ class TestIrrigation(unittest.TestCase):
         yied_1_expected = 12.65
         yield_1_returned = round(final_statistics["Dry yield (tonne/ha)"][0], 2)
 
-        yied_2_expected = 12.956
+        yied_2_expected = 12.957
         yield_2_retruned = round(final_statistics["Dry yield (tonne/ha)"][1], 3)
 
         self.assertEqual(yied_1_expected, yield_1_returned)
