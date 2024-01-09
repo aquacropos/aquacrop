@@ -50,7 +50,7 @@ class TestIrrigation(unittest.TestCase):
 
         final_statistics = model_os.get_simulation_results().head(10)
         yield_expected = 10.78
-        yield_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
+        yield_returned = round(final_statistics["Dry yield (tonne/ha)"][0], 2)
 
         self.assertEqual(yield_expected, yield_returned)
 
@@ -75,10 +75,10 @@ class TestIrrigation(unittest.TestCase):
         final_statistics = model_os.get_simulation_results().head(10)
 
         yied_1_expected = 12.65
-        yield_1_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
+        yield_1_returned = round(final_statistics["Dry yield (tonne/ha)"][0], 2)
 
         yied_2_expected = 12.956
-        yield_2_retruned = round(final_statistics["Yield (tonne/ha)"][1], 3)
+        yield_2_retruned = round(final_statistics["Dry yield (tonne/ha)"][1], 3)
 
         self.assertEqual(yied_1_expected, yield_1_returned)
 
@@ -106,10 +106,10 @@ class TestIrrigation(unittest.TestCase):
         final_statistics = model_os.get_simulation_results().head(10)
 
         yield_1_expected = 12.65
-        yield_1_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
+        yield_1_returned = round(final_statistics["Dry yield (tonne/ha)"][0], 2)
 
         yield_2_expected = 12.98
-        yield_2_returned = round(final_statistics["Yield (tonne/ha)"][1], 2)
+        yield_2_returned = round(final_statistics["Dry yield (tonne/ha)"][1], 2)
 
         self.assertEqual(yield_1_expected, yield_1_returned)
         self.assertEqual(yield_2_expected, yield_2_returned)
@@ -142,10 +142,10 @@ class TestIrrigation(unittest.TestCase):
         final_statistics = model_os.get_simulation_results().head(10)
 
         yield_1_expected = 12.13
-        yield_1_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
+        yield_1_returned = round(final_statistics["Dry yield (tonne/ha)"][0], 2)
 
         yield_2_expected = 9.46
-        yield_2_returned = round(final_statistics["Yield (tonne/ha)"][1], 2)
+        yield_2_returned = round(final_statistics["Dry yield (tonne/ha)"][1], 2)
 
         self.assertEqual(yield_1_expected, yield_1_returned)
         self.assertEqual(yield_2_expected, yield_2_returned)
@@ -172,10 +172,10 @@ class TestIrrigation(unittest.TestCase):
         final_statistics = model_os.get_simulation_results().head(10)
 
         yield_1_expected = 12.66
-        yield_1_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
+        yield_1_returned = round(final_statistics["Dry yield (tonne/ha)"][0], 2)
 
         yield_2_expected = 12.97
-        yield_2_returned = round(final_statistics["Yield (tonne/ha)"][1], 2)
+        yield_2_returned = round(final_statistics["Dry yield (tonne/ha)"][1], 2)
 
         self.assertEqual(yield_1_expected, yield_1_returned)
         self.assertEqual(yield_2_expected, yield_2_returned)

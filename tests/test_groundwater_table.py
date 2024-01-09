@@ -42,7 +42,7 @@ class TestModelExceptions(unittest.TestCase):
         """
         yield_expected = 7.987
         yield_returned = round(
-            self._model_os.get_simulation_results()["Yield (tonne/ha)"][0], 3
+            self._model_os.get_simulation_results()["Dry yield (tonne/ha)"][0], 3
         )
         self.assertEqual(yield_expected, yield_returned)
 
