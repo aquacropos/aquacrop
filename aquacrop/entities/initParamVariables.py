@@ -40,6 +40,7 @@ InitCond_spec = [
     ("s_cor1", float64),
     ("s_cor2", float64),
     ("hi_ref", float64),
+    ("HIfinal", float64),
     ("growth_stage", float64),
     ("tr_ratio", float64),
     ("r_cor", float64),
@@ -49,6 +50,7 @@ InitCond_spec = [
     ("canopy_cover_adj_ns", float64),
     ("biomass", float64),
     ("biomass_ns", float64),
+    ("YieldPot", float64),
     ("harvest_index", float64),
     ("harvest_index_adj", float64),
     ("ccx_act", float64),
@@ -58,7 +60,8 @@ InitCond_spec = [
     ("ccx_early_sen", float64),
     ("cc_prev", float64),
     ("protected_seed", int64),
-    ("yield_", float64),
+    ("DryYield", float64),
+    ("FreshYield", float64),
     ("z_root", float64),
     ("cc0_adj", float64),
     ("surface_storage", float64),
@@ -71,6 +74,7 @@ InitCond_spec = [
     ("temp_max", float64),
     ("temp_min", float64),
     ("et0", float64),
+    ("sumET0EarlySen", float64),
     ("gdd", float64),
     ("w_surf", float64),
     ("evap_z", float64),
@@ -133,6 +137,7 @@ class InitialCondition:
         self.s_cor1 = 0
         self.s_cor2 = 0
         self.hi_ref = 0.0
+        self.HIfinal = 0.0
 
         # GS
         self.growth_stage = 0
@@ -149,6 +154,7 @@ class InitialCondition:
         self.canopy_cover_adj_ns = 0
         self.biomass = 0
         self.biomass_ns = 0
+        self.YieldPot = 0
         self.harvest_index = 0
         self.harvest_index_adj = 0
         self.ccx_act = 0
@@ -158,7 +164,8 @@ class InitialCondition:
         self.ccx_early_sen = 0
         self.cc_prev = 0
         self.protected_seed = 0
-        self.yield_ = 0
+        self.DryYield = 0
+        self.FreshYield = 0
 
         self.z_root = 0.0
         self.cc0_adj = 0
@@ -175,6 +182,7 @@ class InitialCondition:
         self.temp_max = 0
         self.temp_min = 0
         self.et0 = 0
+        self.sumET0EarlySen = 0
         self.gdd = 0
 
         self.w_surf = 0

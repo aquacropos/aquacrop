@@ -85,7 +85,9 @@ def outputs_when_model_is_finished(
                 "biomass_ns",
                 "harvest_index",
                 "harvest_index_adj",
-                "yield_",
+                "DryYield",
+                "FreshYield",
+                "YieldPot",
             ],
         )
 

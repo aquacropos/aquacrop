@@ -65,7 +65,7 @@ def harvest_index(
 
         Soil_zTop (float): topsoil depth
 
-        Crop (CropStructNT): Crop paramaters
+        Crop (CropStructNT): Crop parameters
 
         InitCond (InitialCondition): InitCond object containing model paramaters
 

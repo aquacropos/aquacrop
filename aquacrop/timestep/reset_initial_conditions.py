@@ -13,12 +13,14 @@ if TYPE_CHECKING:
     from aquacrop.entities.clockStruct import ClockStruct
     from aquacrop.entities.initParamVariables import InitialCondition
     from aquacrop.entities.paramStruct import ParamStruct
+    from aquacrop.entities.crop import Crop
 
 def reset_initial_conditions(
     ClockStruct: "ClockStruct",
     InitCond: "InitialCondition",
     ParamStruct: "ParamStruct",
-    weather: "ndarray") -> Tuple["InitialCondition", "ParamStruct"]:
+    weather: "ndarray",
+    crop: "Crop") -> Tuple["InitialCondition", "ParamStruct"]:
 
     """
     Function to reset initial model conditions for start of growing
@@ -117,6 +119,10 @@ def reset_initial_conditions(
     InitCond.ccx_early_sen = 0
     InitCond.cc_prev = 0
     InitCond.protected_seed = 0
+    InitCond.sumET0EarlySen = 0
+    InitCond.HIfinal = crop.HI0
+    InitCond.DryYield = 0
+    InitCond.FreshYield = 0
 
     # Update CO2 concentration ##
     # Get CO2 concentration
@@ -146,14 +152,43 @@ def reset_initial_conditions(
             fw = 1 - ((550 - CO2conc) / (550 - CO2ref))
 
     # Determine initial adjustment
-    fCO2 = (CO2conc / CO2ref) / (
-        1
-        + (CO2conc - CO2ref)
-        * (
-            (1 - fw) * crop.bsted
-            + fw * ((crop.bsted * crop.fsink) + (crop.bface * (1 - crop.fsink)))
+    if CO2conc <= 550:
+        # Set weighting factor for CO2
+        if CO2conc <= CO2ref:
+            fw = 0
+        elif CO2conc >= 550:
+            fw = 1
+        else:
+            fw = 1 - ((550 - CO2conc) / (550 - CO2ref))
+        # Set fCO2old within the 'if CO2conc <= 550' block:
+        fCO2old = (CO2conc / CO2ref) / (
+            1
+            + (CO2conc - CO2ref)
+            * (
+                (1 - fw) * crop.bsted
+                + fw * ((crop.bsted * crop.fsink) + (crop.bface * (1 - crop.fsink)))
+            )
         )
-    )
+    # New adjusted correction coefficient for CO2 (version 7 of AquaCrop)
+    if (CO2conc > CO2ref):
+        # Calculate shape factor
+        fshape = -4.61824 - 3.43831*crop.fsink - 5.32587*crop.fsink*crop.fsink
+        # Determine adjustment for CO2
+        if (CO2conc >= 2000):
+            fCO2new = 1.58  # Maximum CO2 adjustment 
+        else:
+            CO2rel = (CO2conc-CO2ref)/(2000-CO2ref)
+            fCO2new = 1 + 0.58 * ((np.exp(CO2rel*fshape) - 1)/(np.exp(fshape) - 1))
+
+
+    # Select adjusted coefficient for CO2
+    if (CO2conc <= CO2ref):
+        fCO2 = fCO2old
+    else:
+        fCO2 = fCO2new
+        if ((CO2conc <= 550) and (fCO2old < fCO2new)): 
+            fCO2 = fCO2old
+    
 
     # Consider crop type
     if crop.WP >= 40:

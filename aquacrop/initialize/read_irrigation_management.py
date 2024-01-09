@@ -38,7 +38,6 @@ def read_irrigation_management(
     if IrrMngt.irrigation_method == 3:
 
         df = IrrMngt.Schedule.copy()
-
         # change the index to the date
         df.index = pd.DatetimeIndex(df.Date)
 

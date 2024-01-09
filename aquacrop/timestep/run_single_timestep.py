@@ -86,11 +86,6 @@ def solution_single_time_step(
     # Unpack structures
     Soil = param_struct.Soil
     CO2 = param_struct.CO2
-    if param_struct.water_table == 1:
-        Groundwater = param_struct.z_gw[clock_struct.time_step_counter]
-    else:
-        Groundwater = 0
-
     precipitation = weather_step[2]
     temp_max = weather_step[1]
     temp_min = weather_step[0]
@@ -98,6 +93,10 @@ def solution_single_time_step(
 
     # Store initial conditions in structure for updating %%
     NewCond = init_cond
+    if param_struct.water_table == 1:
+        GroundWater = param_struct.z_gw[clock_struct.time_step_counter]
+    else:
+        GroundWater = 0
 
     # Check if growing season is active on current time step %%
     if clock_struct.season_counter >= 0:
@@ -170,6 +169,7 @@ def solution_single_time_step(
     NewCond.temp_min = weather_step[0]
     NewCond.et0 = weather_step[3]
 
+
     class_args = {
         key: value
         for key, value in Crop_.__dict__.items()
@@ -179,13 +179,13 @@ def solution_single_time_step(
 
     # Run simulations %%
     # 1. Check for groundwater table
-    (NewCond.th_fc_Adj, _) = check_groundwater_table(
+    NewCond.th_fc_Adj, NewCond.wt_in_soil = check_groundwater_table(
         Soil.Profile,
         NewCond.z_gw,
         NewCond.th,
         NewCond.th_fc_Adj,
         param_struct.water_table,
-        Groundwater,
+        GroundWater
     )
 
     # 2. Root development
@@ -389,13 +389,16 @@ def solution_single_time_step(
     NewCond, GwIn = groundwater_inflow(Soil.Profile, NewCond)
 
     # 15. Reference harvest index
-    (NewCond.hi_ref, NewCond.yield_form, NewCond.pct_lag_phase,) = HIref_current_day(
+    (NewCond.hi_ref, NewCond.yield_form, NewCond.pct_lag_phase) = HIref_current_day( # ,NewCond.HIfinal
         NewCond.hi_ref,
+        NewCond.HIfinal,
         NewCond.dap,
         NewCond.delayed_cds,
         NewCond.yield_form,
         NewCond.pct_lag_phase,
-        NewCond.cc_prev,
+        #NewCond.cc_prev,
+        NewCond.canopy_cover,
+        NewCond.ccx_w,
         Crop,
         growing_season,
     )
@@ -420,10 +423,14 @@ def solution_single_time_step(
         Soil.Profile, Soil.z_top, Crop, NewCond, et0, temp_max, temp_min, growing_season
     )
 
-    # 18. Crop yield_
+    # 18. Yield potential
+    NewCond.YieldPot = (NewCond.biomass_ns / 100) * NewCond.harvest_index
+
+    # 19. Crop yield_ (dry and fresh)
     if growing_season is True:
         # Calculate crop yield_ (tonne/ha)
-        NewCond.yield_ = (NewCond.biomass / 100) * NewCond.harvest_index_adj
+        NewCond.DryYield = (NewCond.biomass / 100) * NewCond.harvest_index_adj
+        NewCond.FreshYield = NewCond.DryYield / (1 - (Crop.YldWC / 100))
         # print( clock_struct.time_step_counter,(NewCond.biomass/100),NewCond.harvest_index_adj)
         # Check if crop has reached maturity
         if ((Crop.CalendarType == 1) and (NewCond.dap >= Crop.Maturity)) or (
@@ -434,9 +441,10 @@ def solution_single_time_step(
 
     elif growing_season is False:
         # Crop yield_ is zero outside of growing season
-        NewCond.yield_ = 0
+        NewCond.DryYield = 0
+        NewCond.FreshYield = 0
 
-    # 19. Root zone water
+    # 20. Root zone water
     _TAW = TAW()
     _water_root_depletion = Dr()
     # thRZ = RootZoneWater()
@@ -450,7 +458,7 @@ def solution_single_time_step(
         Crop.Aer,
     )
 
-    # 20. Update net irrigation to add any pre irrigation
+    # 21. Update net irrigation to add any pre irrigation
     IrrNet = IrrNet + PreIrr
     NewCond.irr_net_cum = NewCond.irr_net_cum + PreIrr
 
@@ -483,6 +491,7 @@ def solution_single_time_step(
     outputs.water_storage[row_day, 3:] = NewCond.th
 
     # Water fluxes
+    # print(f'Saving NewCond.z_gw to outputs: {NewCond.z_gw}')
     outputs.water_flux[row_day, :] = [
         clock_struct.time_step_counter,
         clock_struct.season_counter,
@@ -516,7 +525,9 @@ def solution_single_time_step(
         NewCond.biomass_ns,
         NewCond.harvest_index,
         NewCond.harvest_index_adj,
-        NewCond.yield_,
+        NewCond.DryYield,
+        NewCond.FreshYield,
+        NewCond.YieldPot,
     ]
 
     # Final output (if at end of growing season)
@@ -536,7 +547,9 @@ def solution_single_time_step(
                 Crop_Name,
                 clock_struct.step_end_time,
                 clock_struct.time_step_counter,
-                NewCond.yield_,
+                NewCond.DryYield,
+                NewCond.FreshYield,
+                NewCond.YieldPot,
                 IrrTot,
             ]
 

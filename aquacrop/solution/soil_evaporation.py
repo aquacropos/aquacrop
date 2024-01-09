@@ -39,7 +39,7 @@ cc = CC("solution_soil_evaporation")
 )
 def soil_evaporation(
     ClockStruct_EvapTimeSteps: int,
-    ClockStruct_SimOffSeason: int,
+    ClockStruct_SimOffSeason: bool,
     ClockStruct_TimeStepCounter: int,
     prof: "SoilProfileNT",
     Soil_EvapZmin: float,
@@ -89,7 +89,7 @@ def soil_evaporation(
 
         ClockStruct_EvapTimeSteps (int): number of evaportation time steps
 
-        ClockStruct_SimOffSeason (int): simulate off season? (0=no, 1=yes)
+        ClockStruct_SimOffSeason (bool): simulate off season? (False=no, True=yes)
         
         ClockStruct_TimeStepCounter (int): time step counter
 

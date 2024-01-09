@@ -18,8 +18,6 @@ class InitialWaterContent:
 
     def __init__(self, wc_type="Prop", method="Layer", depth_layer=[1], value=["FC"]):
 
-        assert len(depth_layer) == len(value)
-
         self.wc_type = wc_type
         self.method = method
         self.depth_layer = depth_layer

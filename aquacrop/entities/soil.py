@@ -179,14 +179,14 @@ class Soil:
             self.add_layer(1.5, 0.39, 0.54, 0.55, 2, 100)
 
         elif soil_type == "ac_TunisLocal":
-            self.cn = 46
+            self.cn = 72
             self.calc_cn = 0
-            self.rew = 7
+            self.rew = 11
             dz = [0.1] * 6 + [0.15] * 5 + [0.2]
             self.create_df(dz)
             self.add_layer(0.3, 0.24, 0.40, 0.50, 155, 100)
             self.add_layer(1.7, 0.11, 0.33, 0.46, 500, 100)
-
+ 
         else:
             print("wrong soil type")
             assert 1 == 2
@@ -388,88 +388,137 @@ class Soil:
             ths = soil.th_s
             Ksat = soil.Ksat
 
-            aCR = 0
-            bCR = 0
+            # usually just initialise here (both 0), but temporarily hard-coding for sandy-loam for testing
+            aCR =  0
+            bCR =  0
 
-            if (
-                (thwp >= 0.04)
-                and (thwp <= 0.15)
-                and (thfc >= 0.09)
-                and (thfc <= 0.28)
-                and (ths >= 0.32)
-                and (ths <= 0.51)
-            ):
+            # Define aCR and bCR calculations for each Soil Class 
+            aCR_sandy=-0.3112 - Ksat/100000
+            bCR_sandy=-1.4936 + 0.2416*np.log(Ksat)
 
-                # Sandy soil class
-                if (Ksat >= 200) and (Ksat <= 2000):
-                    aCR = -0.3112 - (Ksat * (1e-5))
-                    bCR = -1.4936 + (0.2416 * np.log(Ksat))
-                elif Ksat < 200:
-                    aCR = -0.3112 - (200 * (1e-5))
-                    bCR = -1.4936 + (0.2416 * np.log(200))
-                elif Ksat > 2000:
-                    aCR = -0.3112 - (2000 * (1e-5))
-                    bCR = -1.4936 + (0.2416 * np.log(2000))
+            aCR_loamy=-0.4986 + 9*Ksat/100000
+            bCR_loamy=-2.1320 + 0.4778*np.log(Ksat)
 
-            elif (
-                (thwp >= 0.06)
-                and (thwp <= 0.20)
-                and (thfc >= 0.23)
-                and (thfc <= 0.42)
-                and (ths >= 0.42)
-                and (ths <= 0.55)
-            ):
+            aCR_sandy_clayey=-0.5677 - 4*Ksat/100000
+            bCR_sandy_clayey=-3.7189 + 0.5922*np.log(Ksat)
 
-                # Loamy soil class
-                if (Ksat >= 100) and (Ksat <= 750):
-                    aCR = -0.4986 + (9 * (1e-5) * Ksat)
-                    bCR = -2.132 + (0.4778 * np.log(Ksat))
-                elif Ksat < 100:
-                    aCR = -0.4986 + (9 * (1e-5) * 100)
-                    bCR = -2.132 + (0.4778 * np.log(100))
-                elif Ksat > 750:
-                    aCR = -0.4986 + (9 * (1e-5) * 750)
-                    bCR = -2.132 + (0.4778 * np.log(750))
+            aCR_silty_clayey=-0.6366 + 8*Ksat/10000
+            bCR_silty_clayey=-1.9165 + 0.7063*np.log(Ksat)
 
-            elif (
-                (thwp >= 0.16)
-                and (thwp <= 0.34)
-                and (thfc >= 0.25)
-                and (thfc <= 0.45)
-                and (ths >= 0.40)
-                and (ths <= 0.53)
-            ):
+            # NEW (V7) aCR bCR calculations logic
+            # Assign aCR/bCR based on soil class definition from FAO
+            if ths <= 0.55:
+                if thwp >= 0.20:
+                    if (ths >= 0.49) and (thfc >= 0.40):
+                        aCR=aCR_silty_clayey
+                        bCR=bCR_silty_clayey
+                    else:
+                        aCR=aCR_sandy_clayey
+                        bCR=bCR_sandy_clayey
+                else:
+                    if thfc < 0.23:
+                        aCR=aCR_sandy
+                        bCR=bCR_sandy
+                    else:
+                        if (thwp > 0.16) and (Ksat < 100):
+                            aCR=aCR_sandy_clayey
+                            bCR=bCR_sandy_clayey
+                        else:
+                            if (thwp < 0.06) and (thfc < 0.28) and (Ksat > 750):
+                                aCR=aCR_sandy
+                                bCR=bCR_sandy
+                            else:
+                                aCR=aCR_loamy
+                                bCR=bCR_loamy
+            else:
+                aCR=aCR_silty_clayey
+                bCR=bCR_silty_clayey
 
-                # Sandy clayey soil class
-                if (Ksat >= 5) and (Ksat <= 150):
-                    aCR = -0.5677 - (4 * (1e-5) * Ksat)
-                    bCR = -3.7189 + (0.5922 * np.log(Ksat))
-                elif Ksat < 5:
-                    aCR = -0.5677 - (4 * (1e-5) * 5)
-                    bCR = -3.7189 + (0.5922 * np.log(5))
-                elif Ksat > 150:
-                    aCR = -0.5677 - (4 * (1e-5) * 150)
-                    bCR = -3.7189 + (0.5922 * np.log(150))
 
-            elif (
-                (thwp >= 0.20)
-                and (thwp <= 0.42)
-                and (thfc >= 0.40)
-                and (thfc <= 0.58)
-                and (ths >= 0.49)
-                and (ths <= 0.58)
-            ):
 
-                # Silty clayey soil class
-                if (Ksat >= 1) and (Ksat <= 150):
-                    aCR = -0.6366 + (8 * (1e-4) * Ksat)
-                    bCR = -1.9165 + (0.7063 * np.log(Ksat))
-                elif Ksat < 1:
-                    aCR = -0.6366 + (8 * (1e-4) * 1)
-                    bCR = -1.9165 + (0.7063 * np.log(1))
-                elif Ksat > 150:
-                    aCR = -0.6366 + (8 * (1e-4) * 150)
-                    bCR = -1.9165 + (0.7063 * np.log(150))
+
+
+
+            # OLD (V6) aCR bCR calculation logic
+            # if (
+            #     (thwp >= 0.04)
+            #     and (thwp <= 0.15)
+            #     and (thfc >= 0.09)
+            #     and (thfc <= 0.28)
+            #     and (ths >= 0.32)
+            #     and (ths <= 0.51)
+            # ):
+
+            #     # Sandy soil class
+            #     if (Ksat >= 200) and (Ksat <= 2000):
+            #         aCR = -0.3112 - (Ksat * (1e-5))
+            #         bCR = -1.4936 + (0.2416 * np.log(Ksat))
+            #     elif Ksat < 200:
+            #         aCR = -0.3112 - (200 * (1e-5))
+            #         bCR = -1.4936 + (0.2416 * np.log(200))
+            #     elif Ksat > 2000:
+            #         aCR = -0.3112 - (2000 * (1e-5))
+            #         bCR = -1.4936 + (0.2416 * np.log(2000))
+
+            # elif (
+            #     (thwp >= 0.06)
+            #     and (thwp <= 0.20)
+            #     and (thfc >= 0.23)
+            #     and (thfc <= 0.42)
+            #     and (ths >= 0.42)
+            #     and (ths <= 0.55)
+            # ):
+
+            #     # Loamy soil class
+            #     if (Ksat >= 100) and (Ksat <= 750):
+            #         aCR = -0.4986 + (9 * (1e-5) * Ksat)
+            #         bCR = -2.132 + (0.4778 * np.log(Ksat))
+            #     elif Ksat < 100:
+            #         aCR = -0.4986 + (9 * (1e-5) * 100)
+            #         bCR = -2.132 + (0.4778 * np.log(100))
+            #     elif Ksat > 750:
+            #         aCR = -0.4986 + (9 * (1e-5) * 750)
+            #         bCR = -2.132 + (0.4778 * np.log(750))
+
+            # elif (
+            #     (thwp >= 0.16)
+            #     and (thwp <= 0.34)
+            #     and (thfc >= 0.25)
+            #     and (thfc <= 0.45)
+            #     and (ths >= 0.40)
+            #     and (ths <= 0.53)
+            # ):
+
+            #     # Sandy clayey soil class
+            #     if (Ksat >= 5) and (Ksat <= 150):
+            #         aCR = -0.5677 - (4 * (1e-5) * Ksat)
+            #         bCR = -3.7189 + (0.5922 * np.log(Ksat))
+            #     elif Ksat < 5:
+            #         aCR = -0.5677 - (4 * (1e-5) * 5)
+            #         bCR = -3.7189 + (0.5922 * np.log(5))
+            #     elif Ksat > 150:
+            #         aCR = -0.5677 - (4 * (1e-5) * 150)
+            #         bCR = -3.7189 + (0.5922 * np.log(150))
+
+            # elif (
+            #     (thwp >= 0.20)
+            #     and (thwp <= 0.42)
+            #     and (thfc >= 0.40)
+            #     and (thfc <= 0.58)
+            #     and (ths >= 0.49)
+            #     and (ths <= 0.58)
+            # ):
+
+            #     # Silty clayey soil class
+            #     if (Ksat >= 1) and (Ksat <= 150):
+            #         aCR = -0.6366 + (8 * (1e-4) * Ksat)
+            #         bCR = -1.9165 + (0.7063 * np.log(Ksat))
+            #     elif Ksat < 1:
+            #         aCR = -0.6366 + (8 * (1e-4) * 1)
+            #         bCR = -1.9165 + (0.7063 * np.log(1))
+            #     elif Ksat > 150:
+            #         aCR = -0.6366 + (8 * (1e-4) * 150)
+            #         bCR = -1.9165 + (0.7063 * np.log(150))
 
             assert aCR != 0
             assert bCR != 0

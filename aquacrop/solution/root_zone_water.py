@@ -24,7 +24,7 @@ cc = CC("solution_root_zone_water")
 @njit
 @cc.export("root_zone_water", (SoilProfileNT_typ_sig,f8,f8[:],f8,f8,f8))
 def root_zone_water(
-    prof: "SoilProfileNT",
+    prof: "SoilProfileNT_typ_sig",
     InitCond_Zroot: float,
     InitCond_th: "ndarray",
     Soil_zTop: float,

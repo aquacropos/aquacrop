@@ -50,6 +50,7 @@ class Crop:
             -6
         )  # Shape factor describing the effects of water stress on root expansion
         self.ETadj = 1  # Adjustment to water stress thresholds depending on daily ET0 (0 = No, 1 = Yes)
+        self.ET0dorm = 0 # Duration of dormant crop period (during early senescence) in terms of cumulative reference ET (mm)
         self.Aer = 5  # Vol (%) below saturation at which stress begins to occur due to deficient aeration
         self.LagAer = (
             3  # Number of days lag before aeration stress affects crop growth
@@ -93,6 +94,7 @@ class Crop:
             "PctZmin",
             "fshape_ex",
             "ETadj",
+            "ET0dorm",
             "Aer",
             "LagAer",
             "beta",
@@ -117,6 +119,7 @@ class Crop:
             "HIstart",
             "Flowering",
             "YldForm",
+            "YldWC",
             "GDDmethod",
             "Tbase",
             "Tupp",
@@ -240,6 +243,7 @@ crop_spec = [
     ("PctZmin", float64),
     ("fshape_ex", float64),
     ("ETadj", float64),
+    ("ET0dorm", float64),
     ("Aer", float64),
     ("LagAer", int64),
     ("beta", float64),
@@ -274,6 +278,7 @@ crop_spec = [
     ("HIend", float64),
     ("CanopyDevEnd", float64),
     ("MaxCanopy", float64),
+    ("YldWC", float64),
     ("GDDmethod", int64),
     ("Tbase", float64),
     ("Tupp", float64),
@@ -347,6 +352,7 @@ class CropStruct(object):
             -6
         )  # Shape factor describing the effects of water stress on root expansion
         self.ETadj = 1  # Adjustment to water stress thresholds depending on daily ET0 (0 = No, 1 = Yes)
+        self.ET0dorm = 0 # Duration of dormant crop period (during early senescence) in terms of cumulative reference ET (mm)
         self.Aer = 5  # Vol (%) below saturation at which stress begins to occur due to deficient aeration
         self.LagAer = (
             3  # Number of days lag before aeration stress affects crop growth
@@ -402,7 +408,7 @@ class CropStruct(object):
         self.MaxCanopy = 0
         self.CanopyDevEnd = 0
         self.Canopy10Pct = 0
-
+        self.YldWC = 0
         self.GDDmethod = 2  # Growing degree day calculation method
         self.Tbase = (
             8  # Base temperature (degC) below which growth does not progress

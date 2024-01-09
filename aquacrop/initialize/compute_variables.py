@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+
 from .compute_crop_calendar import compute_crop_calendar
 from .calculate_HIGC import calculate_HIGC
 from .calculate_HI_linear import calculate_HI_linear
@@ -157,7 +158,7 @@ def compute_variables(
     for i in range(param_struct.NCrops):
         crop = param_struct.CropList[i]
         # Determine initial adjustment
-        fCO2 = (CO2conc / CO2ref) / (
+        fCO2old = (CO2conc / CO2ref) / (
             1
             + (CO2conc - CO2ref)
             * (
@@ -165,21 +166,41 @@ def compute_variables(
                 + fw * ((crop.bsted * crop.fsink) + (crop.bface * (1 - crop.fsink)))
             )
         )
+        # New adjusted correction coefficient for CO2 (version 7 of AquaCrop)
+    if (CO2conc > CO2ref):
+        # Calculate shape factor
+        fshape = -4.61824 - 3.43831*crop.fsink - 5.32587*crop.fsink*crop.fsink
+        # Determine adjustment for CO2
+        if (CO2conc >= 2000):
+            fCO2new = 1.58  # Maximum CO2 adjustment 
+        else:
+            CO2rel = (CO2conc-CO2ref)/(2000-CO2ref)
+            fCO2new = 1 + 0.58 * ((np.exp(CO2rel*fshape) - 1)/(np.exp(fshape) - 1))
+
+
+    # Select adjusted coefficient for CO2
+    if (CO2conc <= CO2ref):
+        fCO2 = fCO2old
+    elif ((CO2conc <= 550) and (fCO2old < fCO2new)):
+        fCO2 = fCO2old
+    else:
+        fCO2 = fCO2new
 
         # Consider crop type
-        if crop.WP >= 40:
-            # No correction for C4 crops
-            ftype = 0
-        elif crop.WP <= 20:
-            # Full correction for C3 crops
-            ftype = 1
-        else:
-            ftype = (40 - crop.WP) / (40 - 20)
+    if crop.WP >= 40:
+        # No correction for C4 crops
+        ftype = 0
+    elif crop.WP <= 20:
+        # Full correction for C3 crops
+        ftype = 1
+    else:
+        ftype = (40 - crop.WP) / (40 - 20)
 
         # Total adjustment
-        crop.fCO2 = 1 + ftype * (fCO2 - 1)
+    crop.fCO2 = 1 + ftype * (fCO2 - 1)
 
-        param_struct.CropList[i] = crop
+    param_struct.CropList[i] = crop
+
 
     # change this later
     if param_struct.NCrops == 1:
