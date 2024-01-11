@@ -4,6 +4,9 @@ Test file for irrigation
 import unittest
 import pandas as pd
 
+import os
+os.environ['DEVELOPMENT'] = 'True'
+
 from aquacrop import (
     AquaCropModel,
     Soil,

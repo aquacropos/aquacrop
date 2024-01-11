@@ -6,6 +6,8 @@ import pandas as pd
 from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent, GroundWater, CO2
 from aquacrop.utils import prepare_weather, get_filepath
 
+import os
+os.environ['DEVELOPMENT'] = 'True'
 
 class TestModelExceptions(unittest.TestCase):
     """
