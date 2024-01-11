@@ -90,8 +90,6 @@ def biomass_accumulation(
         else:
             WPadj = Crop.WP
 
-        # print(WPadj)
-
         # Adjust WP for CO2 effects
         WPadj = WPadj * Crop.fCO2
 

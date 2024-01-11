@@ -6,6 +6,8 @@ import pandas as pd
 from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent, GroundWater, CO2
 from aquacrop.utils import prepare_weather, get_filepath
 
+import os
+os.environ['DEVELOPMENT'] = 'True'
 
 class TestModelExceptions(unittest.TestCase):
     """
@@ -42,7 +44,7 @@ class TestModelExceptions(unittest.TestCase):
         """
         yield_expected = 8.627
         yield_returned = round(
-            self._model_os.get_simulation_results()["Yield (tonne/ha)"].mean(), 3
+            self._model_os.get_simulation_results()["Dry yield (tonne/ha)"].mean(), 3
         )
         self.assertEqual(yield_expected, yield_returned)
 

@@ -3,6 +3,9 @@ import unittest
 from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent
 from aquacrop.utils import prepare_weather, get_filepath
 
+import os
+os.environ['DEVELOPMENT'] = 'True'
+
 
 class TestModelByStepNotFinished(unittest.TestCase):
     """
@@ -32,7 +35,7 @@ class TestModelByStepNotFinished(unittest.TestCase):
         """
         final_statistics = self._model_os.get_simulation_results().head()
         yied_1_expected = 8.81
-        yield_1_returned = round(final_statistics["Yield (tonne/ha)"][0], 2)
+        yield_1_returned = round(final_statistics["Dry yield (tonne/ha)"][0], 2)
 
         self.assertEqual(yied_1_expected, yield_1_returned)
 

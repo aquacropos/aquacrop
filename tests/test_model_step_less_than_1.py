@@ -3,6 +3,9 @@ import unittest
 from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent
 from aquacrop.utils import prepare_weather, get_filepath
 
+import os
+os.environ['DEVELOPMENT'] = 'True'
+
 
 class TestModelStepLessThan1(unittest.TestCase):
     """
