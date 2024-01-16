@@ -100,6 +100,13 @@ class Soil:
             self.create_df(dz)
             self.add_layer(sum(dz), 0.23, 0.39, 0.5, 125, 100)
 
+        elif soil_type == 'Default':
+            self.cn = 61
+            self.calc_cn = 0
+            self.rew = 9
+            self.create_df(dz)
+            self.add_layer(sum(dz), 0.1, 0.3, 0.5, 500, 100)
+
         elif soil_type == "Loam":
             self.cn = 61
             self.calc_cn = 0
