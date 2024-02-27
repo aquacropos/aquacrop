@@ -140,6 +140,7 @@ def read_model_parameters(
             clock_struct.time_span,
             weather_df,
             param_struct,#for soil fertility stress
+            clock_struct.harvest_dates,
         )
         mature = int(crop.MaturityCD + 30)
         plant = pd.to_datetime("1990/" + crop.planting_date)

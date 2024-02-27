@@ -152,7 +152,7 @@ def canopy_cover(
         CCxSF=Crop.CCx*Crop.Ksccx
 
         ## Canopy development (potential), considering soil fertility/salinity, weed stress (to be included)##
-        if (tCCadj < Crop.Emergence) or (round(tCCadj) > Crop.Maturity):
+        if (tCCadj < Crop.Emergence) or ((round(tCCadj) > Crop.Maturity) and not Crop.crop_perennial):
             # No canopy development before emergence/germination or after
             # maturity
             NewCond.canopy_cover_ns = 0
@@ -216,7 +216,7 @@ def canopy_cover(
                     NewCond.canopy_cover_ns=0
 
         ## Canopy development (actual) ##
-        if (tCCadj < Crop.Emergence) or (round(tCCadj) > Crop.Maturity):
+        if (tCCadj < Crop.Emergence) or ((round(tCCadj) > Crop.Maturity) and not Crop.crop_perennial):
             # No canopy development before emergence/germination or after
             # maturity
             NewCond.canopy_cover = 0
@@ -250,7 +250,8 @@ def canopy_cover(
                     # stress effects
                     CGCadj = Crop.CGC * water_stress_coef.exp*Crop.Ksexpf
                     if CGCadj > 0:
-
+                    
+                        NewCond.cc0_adj = max(NewCond.cc0_adj, Crop.CC0)
                         # Adjust CCx for change in CGC
                         CCXadj = adjust_CCx(
                             InitCond_CC,
@@ -394,7 +395,9 @@ def canopy_cover(
                         NewCond.canopy_cover=NewCond.CCx_fertstress
                     if NewCond.canopy_cover<0:
                         NewCond.canopy_cover=0
-
+            
+            if Crop.crop_perennial: 
+                NewCond.canopy_cover = max(NewCond.canopy_cover, Crop.CC0)
             # Check for crop growth termination
             if (NewCond.canopy_cover < 0.001) and (InitCond_CropDead == False):
                 # Crop has died
@@ -406,7 +409,7 @@ def canopy_cover(
             if (tCCadj < Crop.Senescence) or (InitCond_tEarlySen > 0):
                 # Check for early canopy senescence  due to severe water
                 # stress.
-                if (water_stress_coef.sen < 1) and (InitCond_ProtectedSeed == False):
+                if (water_stress_coef.sen < 1) and (InitCond_ProtectedSeed == False) and ((NewCond.dap-NewCond.delayed_cds)>30):
 
                     # Early canopy senescence
                     NewCond.premat_senes = True
@@ -459,6 +462,9 @@ def canopy_cover(
                                 - 1
                             )
                         )
+                        if NewCond.growth_stage < 4: 
+                            CCsen = max(CCsen,Crop.CCmin)
+                        
                         if CCsen < 0:
                             CCsen = 0
 
@@ -488,7 +494,9 @@ def canopy_cover(
                         # to water stress
                         if CCsen < NewCond.canopy_cover:
                             NewCond.canopy_cover = CCsen
-
+                            
+                    if Crop.crop_perennial: 
+                        NewCond.canopy_cover = max(NewCond.canopy_cover, Crop.CC0)
                     # Check for crop growth termination
                     if (NewCond.canopy_cover < 0.001) and (InitCond_CropDead == False):
                         # Crop has died
@@ -514,6 +522,8 @@ def canopy_cover(
                         NewCond.canopy_cover = cc_development(
                             NewCond.cc0_adj, CCXadj, Crop.CGC, CDCadj, tmp_tCC, "Decline", CCXadj
                         )
+                        if Crop.crop_perennial: 
+                            NewCond.canopy_cover = max(NewCond.canopy_cover, Crop.CC0)
                         # Check for crop growth termination
                         if (NewCond.canopy_cover < 0.001) and (InitCond_CropDead == False):
                             NewCond.canopy_cover = 0

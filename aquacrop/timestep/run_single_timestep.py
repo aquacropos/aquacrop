@@ -105,16 +105,19 @@ def solution_single_time_step(
         CurrentDate = clock_struct.step_start_time
         planting_date = clock_struct.planting_dates[clock_struct.season_counter]
         harvest_date = clock_struct.harvest_dates[clock_struct.season_counter]
+        harvest_date = harvest_date + ((harvest_date-planting_date) * param_struct.Seasonal_Crop_List[clock_struct.season_counter].crop_gs_increase/100).round('D')
 
-        if (
-            (planting_date <= CurrentDate)
-            and (harvest_date >= CurrentDate)
-            and (NewCond.crop_mature is False)
-            and (NewCond.crop_dead is False)
-        ):
-            growing_season = True
-        else:
-            growing_season = False
+        growing_season = False
+        if param_struct.Seasonal_Crop_List[clock_struct.season_counter].crop_perennial == False: # Annual crops
+            if (planting_date <= CurrentDate) and (harvest_date >= CurrentDate) and \
+               (NewCond.crop_mature == False) and (NewCond.crop_dead == False):
+                growing_season = True
+        elif planting_date <= CurrentDate: # Perennial crops
+            if clock_struct.season_counter+1 == clock_struct.n_seasons:
+                if CurrentDate < (clock_struct.simulation_end_date - pd.Timedelta(1, unit="d")):
+                    growing_season = True
+            elif CurrentDate < (clock_struct.planting_dates[clock_struct.season_counter+1] - pd.Timedelta(1, unit="d")):
+                growing_season = True
 
         # Assign crop, irrigation management, and field management structures
         Crop_ = param_struct.Seasonal_Crop_List[clock_struct.season_counter]
@@ -467,7 +470,7 @@ def solution_single_time_step(
     # 19. Crop yield_ (dry and fresh)
     if growing_season is True:
         # Calculate crop yield_ (tonne/ha)
-        NewCond.DryYield = (NewCond.biomass / 100) * NewCond.harvest_index_adj
+        NewCond.DryYield = round((NewCond.biomass / 100) * NewCond.harvest_index_adj,3)
         NewCond.FreshYield = NewCond.DryYield / (1 - (Crop.YldWC / 100))
         # print( clock_struct.time_step_counter,(NewCond.biomass/100),NewCond.harvest_index_adj)
         # Check if crop has reached maturity
@@ -599,20 +602,32 @@ def solution_single_time_step(
         sum(NewCond.S_irr),
         sum(NewCond.S_cr),
     ]
-    plnt_date = clock_struct.planting_dates[clock_struct.season_counter]
+
     # Final output (if at end of growing season)
+    
+    hrv_date = clock_struct.harvest_dates[clock_struct.season_counter]
+    plnt_date = clock_struct.planting_dates[clock_struct.season_counter]
+    hrv_date_max = hrv_date + ((hrv_date-plnt_date) * Crop.crop_gs_increase/100).round('D')
+    if clock_struct.season_counter+1 == clock_struct.n_seasons: 
+        hrv_date_crit = clock_struct.simulation_end_date-pd.Timedelta(1, unit="d")
+    else: 
+        hrv_date_crit = clock_struct.planting_dates[clock_struct.season_counter+1]-pd.Timedelta(14, unit="d")
+    if hrv_date_max >= hrv_date_crit: 
+        hrv_date_max = hrv_date_crit
+    
+    
     if clock_struct.season_counter > -1:
-        if (
-            (NewCond.crop_mature is True)
-            or (NewCond.crop_dead is True)
-            or (
-                clock_struct.harvest_dates[clock_struct.season_counter]
-                == clock_struct.step_end_time
-            )
-        ) and (NewCond.harvest_flag is False):
-            anthesis_date = clock_struct.planting_dates[clock_struct.season_counter] + pd.Timedelta(Crop.HIstartCD, unit="d")
+        if ((NewCond.crop_mature == True) or (NewCond.crop_dead == True) or (clock_struct.step_end_time >= hrv_date_max)) \
+        and (NewCond.harvest_flag == False):
+            
+            if NewCond.Wr_end == 0: 
+                NewCond.Wr_end,_,_,_,_,_,_,_,_,_,_ = root_zone_water(Soil.Profile,Soil.Profile.dzsum[-1],NewCond.th,Soil.z_top,float(Crop.Zmin),Crop.Aer)
+            
             # Store final outputs
-            outputs.final_stats.loc[row_gs] = [
+            anthesis_date = clock_struct.planting_dates[clock_struct.season_counter] + pd.Timedelta(Crop.HIstartCD, unit="d")
+            if not clock_struct.season_counter in outputs.final_stats.index:
+                # Store final outputs
+                outputs.final_stats.loc[row_gs] = [
                     clock_struct.season_counter,
                     Crop_Name,
                     plnt_date,
@@ -634,8 +649,11 @@ def solution_single_time_step(
                     NewCond.Tcum, 
                     NewCond.Rcum, 
                     NewCond.Percum,
-                ]
-            outputs.final_watercolor.loc[clock_struct.season_counter] = [clock_struct.season_counter,
+                ]           
+
+            if Crop.crop_perennial == False: # Annual crops
+            
+                outputs.final_watercolor.loc[clock_struct.season_counter] = [clock_struct.season_counter,
                     sum(NewCond.ET_rain),
                     sum(NewCond.ET_irr), 
                     sum(NewCond.ET_cr),
@@ -643,7 +661,36 @@ def solution_single_time_step(
                     sum(NewCond.S_irr), 
                     sum(NewCond.S_cr),]
 
-            # Set harvest flag
-            NewCond.harvest_flag = True
+                NewCond.harvest_flag = True # Set harvest flag
+            else: # Perennial crops
+                temp_flag_=False
+                if clock_struct.season_counter+1 == clock_struct.n_seasons:
+                    if clock_struct.step_end_time == (clock_struct.simulation_end_date-pd.Timedelta(1, unit="d")):
+                        temp_flag_=True
+
+                elif clock_struct.step_end_time == (clock_struct.planting_dates[clock_struct.season_counter+1] - pd.Timedelta(1, unit="d")):
+                    temp_flag_=True
+                    
+                if temp_flag_:
+                    outputs.final_watercolor.loc[clock_struct.season_counter] = [clock_struct.season_counter,
+                            sum(NewCond.ET_rain),
+                            sum(NewCond.ET_irr), 
+                            sum(NewCond.ET_cr),
+                            sum(NewCond.S_rain), 
+                            sum(NewCond.S_irr), 
+                            sum(NewCond.S_cr),]
+                    NewCond.harvest_flag = True # Set harvest flag
+                    outputs.final_stats.iloc[clock_struct.season_counter,11:] = [
+                            NewCond.Wr0, 
+                            NewCond.Pcum, 
+                            IrrTot, 
+                            NewCond.CRcum, 
+                            NewCond.GWcum,
+                            NewCond.Wr_end, 
+                            NewCond.Ecum, 
+                            NewCond.Tcum, 
+                            NewCond.Rcum, 
+                            NewCond.Percum,
+                        ]
 
     return NewCond, param_struct, outputs

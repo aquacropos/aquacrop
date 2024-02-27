@@ -2,7 +2,7 @@
 Crop class module
 """
 import numpy as np
-from numba import float64, int64, types
+from numba import float64, int64, boolean, types
 import typing
 
 try:
@@ -76,6 +76,21 @@ class Crop:
         self.sfertstress=0#0-1, 0 for no stress, the total soil fertility stress, as input for calibration, it is 1-realtiveBio
         self.TR_ET0_fertstress = 0
         self.CGC_CD=-1
+        
+        self.crop_gs_increase = 0
+        self.crop_perennial = False
+        self.coefs = np.ones(1)
+        self.coef_years = np.ones(1, dtype=('int64'))
+        self.phenology_calibration = False
+        self.temp_CDC = 0.
+        self.temp_CGC = 0.
+        self.temp_Emergence = 0
+        self.temp_MaxRooting = 0
+        self.temp_Senescence = 0
+        self.temp_Maturity = 0
+        self.temp_HIstart = 0
+        self.temp_Flowering = 0
+        self.temp_YldForm = 0
         
         #for soil fertility stress calibration
         self.need_calib=0 #0, no calibration; 1 yes,default 1 output; 2 all possibilities
@@ -197,6 +212,20 @@ class Crop:
             "HIstartCD",
             "FloweringCD",
             "YldFormCD",
+            'crop_gs_increase',
+            'crop_perennial',
+            'phenology_calibration',
+            'coefs', 
+            'coef_years',
+            'temp_CGC',
+            'temp_CDC', 
+            'temp_Emergence',
+            'temp_MaxRooting',
+            'temp_Senescence',
+            'temp_Maturity',
+            'temp_HIstart',
+            'temp_Flowering', 
+            'temp_YldForm',
             #soil fertility stress parameters
             'Ksccx',
             'Ksexpf',
@@ -367,6 +396,20 @@ crop_spec = [
     ("fCO2", float64),
     ("FloweringCD", int64),
     ("FloweringEnd", float64),
+    ('crop_gs_increase',int64),
+    ('crop_perennial',boolean),
+    ('phenology_calibration',boolean), 
+    ('coefs',float64[:]), 
+    ('coef_years',int64[:]),
+    ('temp_CGC',float64),
+    ('temp_CDC',float64), 
+    ('temp_Emergence',float64),
+    ('temp_MaxRooting',float64),
+    ('temp_Senescence',float64),
+    ('temp_Maturity',float64),
+    ('temp_HIstart',float64), 
+    ('temp_Flowering',float64), 
+    ('temp_YldForm',float64),
     ('Ksccx',float64),
     ('Ksexpf',float64),
     ('Kswp',float64),
@@ -537,6 +580,21 @@ class CropStruct(object):
 
         self.FloweringCD = 0
         self.FloweringEnd = 0.0
+        
+        self.crop_gs_increase = 0
+        self.crop_perennial = False
+        self.coefs = np.ones(1)
+        self.coef_years = np.ones(1, dtype=('int64'))
+        self.phenology_calibration = False
+        self.temp_CDC = 0.
+        self.temp_CGC = 0.
+        self.temp_Emergence = 0
+        self.temp_MaxRooting = 0
+        self.temp_Senescence = 0
+        self.temp_Maturity = 0
+        self.temp_HIstart = 0
+        self.temp_Flowering = 0
+        self.temp_YldForm = 0
 
         #soil fertility stress, default values would lead to no soil fertility stress
         self.Ksccx=1#0-1

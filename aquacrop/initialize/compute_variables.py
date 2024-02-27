@@ -136,6 +136,7 @@ def compute_variables(
             clock_struct.time_span,
             weather_df,
             param_struct,
+            clock_struct.harvest_dates,
         )
 
         # Harvest index param_struct.Seasonal_Crop_List[clock_struct.season_counter].Paramsgrowth coefficient

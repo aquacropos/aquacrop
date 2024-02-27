@@ -92,7 +92,7 @@ def germination(
             WcProp = 1 - ((WrFC - Wr) / (WrFC - WrWP))
 
             # Check if water content is above germination threshold
-            if (WcProp >= Crop_GermThr):
+            if (WcProp >= Crop_GermThr or InitCond.delayed_cds > 30):
                 # Crop has germinated
                 NewCond.germination = True
                 # If crop sown as seedling, turn on seedling protection
