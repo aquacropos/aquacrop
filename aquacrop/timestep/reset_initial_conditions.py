@@ -243,10 +243,65 @@ def reset_initial_conditions(
 
     # Update crop parameters (if in gdd mode)
     if crop.CalendarType == 2:
+    
+        if crop.phenology_calibration:
+            _year = ClockStruct.planting_dates[ClockStruct.season_counter].year
+            _coef = crop.coefs[crop.coef_years==_year][0]
+
+            # Canopy growth coefficient
+            CCini = crop.PlantPop * crop.SeedSize * 10**-8
+            tgrowth = -1/crop.temp_CGC * np.log(0.08*CCini/crop.CCx) * _coef
+            crop.CGC = float(-1/tgrowth * np.log(0.08*CCini/crop.CCx))
+            
+            # Canopy decline coefficient
+            CCend = (np.exp(crop.temp_CDC * (crop.temp_Maturity - crop.temp_Senescence)/crop.CCx)-21)/-20 * crop.CCx
+            crop.CDC = float( crop.CCx/(crop.temp_Maturity * _coef - crop.temp_Senescence * _coef) * np.log(21-20*CCend/crop.CCx))
+
+            crop.HIstart = int(crop.temp_HIstart * _coef)
+            crop.YldForm = int(crop.temp_YldForm * _coef)
+            crop.Flowering = int(crop.temp_Flowering * _coef)
+            crop.Maturity = int(crop.temp_Maturity * _coef)
+            crop.Senescence = int(crop.temp_Senescence * _coef)
+            crop.MaxRooting = int(crop.temp_MaxRooting * _coef)
+            crop.Emergence = int(crop.temp_Emergence * _coef)
+            
+            # Time from sowing to end of vegatative growth period
+            if crop.Determinant == 1: 
+                crop.CanopyDevEnd = round(crop.HIstart+(crop.Flowering/2))
+            else: 
+                crop.CanopyDevEnd = crop.Senescence
+    
+            # Time from sowing to 10# canopy cover (non-stressed conditions)
+            crop.Canopy10Pct = round(crop.Emergence+(np.log(0.1/crop.CC0)/crop.CGC))
+            if crop.crop_perennial: 
+                crop.Canopy10Pct = crop.Emergence
+                
+            # Time from sowing to maximum canopy cover (non-stressed conditions)
+            crop.MaxCanopy = round(crop.Emergence+(np.log((0.25*crop.CCx*crop.CCx/crop.CC0)
+                                                                        /(crop.CCx-(0.98*crop.CCx)))/crop.CGC))
+    
+            crop.HIend = crop.HIstart+crop.YldForm # Time from sowing to end of yield formation
+            if crop.CropType == 3:  
+                crop.FloweringEnd = crop.HIstart+crop.Flowering  # Time from sowing to end of flowering (if fruit/grain crop)
+
+    
         # Extract weather data for upcoming growing season
         weather_df = weather[
             weather[:, 4] >= ClockStruct.planting_dates[ClockStruct.season_counter]
         ]
+        
+        hrv_date_max = ClockStruct.harvest_dates[ClockStruct.season_counter] + \
+                        ((ClockStruct.harvest_dates[ClockStruct.season_counter]-ClockStruct.planting_dates[ClockStruct.season_counter]) * \
+                         crop.crop_gs_increase/100).round('D')
+                        
+        if ClockStruct.season_counter+1 == ClockStruct.n_seasons:
+            hrv_date_crit = ClockStruct.simulation_end_date-pd.Timedelta(1, unit="d")
+        else:
+            hrv_date_crit = ClockStruct.planting_dates[ClockStruct.season_counter+1]-pd.Timedelta(14, unit="d")
+        if hrv_date_max >= hrv_date_crit: 
+            hrv_date_max = hrv_date_crit
+        
+        weather_df = weather_df[weather_df[:,4]<=hrv_date_max]
 
         temp_min = weather_df[:, 0]
         temp_max = weather_df[:, 1]
@@ -273,12 +328,26 @@ def reset_initial_conditions(
             gdd = Tmean - crop.Tbase
 
         gdd_cum = np.cumsum(gdd)
-
+        
         assert (
-            gdd_cum[-1] > crop.Maturity
+            gdd_cum[-1] > crop.Maturity*.1
         ), f"not enough growing degree days in simulation ({gdd_cum[-1]}) to reach maturity ({crop.Maturity})"
+        
+        if gdd_cum[-1] < crop.Maturity:
+            reduction_coef = gdd_cum[-1]/crop.Maturity
+            crop.Maturity = gdd_cum[-1]
+            crop.MaxCanopy = int(crop.MaxCanopy * reduction_coef)
+            crop.CanopyDevEnd = int(crop.CanopyDevEnd * reduction_coef)
+            crop.HIstart = int(crop.HIstart * reduction_coef)
+            crop.HIend = int(crop.HIend * reduction_coef)
+            crop.FloweringEnd = int(crop.HIend * reduction_coef)
+            if not crop.crop_perennial: 
+                crop.Canopy10Pct = int(crop.Canopy10Pct * reduction_coef)
+            crop.CanopyDevEnd = int(crop.CanopyDevEnd * reduction_coef)
+            crop.Senescence = int(crop.Senescence * reduction_coef)
 
-        crop.MaturityCD = np.argmax((gdd_cum > crop.Maturity)) + 1
+
+        crop.MaturityCD = (gdd_cum > crop.Maturity).argmax() + 1
 
         assert crop.MaturityCD < 365, "crop will take longer than 1 year to mature"
 
@@ -292,6 +361,8 @@ def reset_initial_conditions(
         crop.HIendCD = (gdd_cum > crop.HIend).argmax() + 1
         # 5. Duration of yield_ formation in calendar days
         crop.YldFormCD = crop.HIendCD - crop.HIstartCD
+        
+        if crop.YldFormCD <= 0: raise ValueError("It's too cold in this cell brrrr")
         
         #used for soil fertility stress
         crop.SenescenceCD = (gdd_cum>crop.Senescence).argmax()+1

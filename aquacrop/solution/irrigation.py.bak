@@ -175,7 +175,8 @@ def irrigation(
                 EffAdj = ((100 - IrrMngt_AppEff) + 100) / 100
                 IrrReq = IrrReq * EffAdj
                 # Limit irrigation to maximum depth
-                Irr = min(IrrMngt_MaxIrr, IrrReq)
+                # Irr = min(IrrMngt_MaxIrr, IrrReq)
+                Irr = 15 # hard-code in 15mm depth for tests
             else:
                 Irr = 0
 

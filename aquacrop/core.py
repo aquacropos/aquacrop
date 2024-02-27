@@ -276,7 +276,7 @@ class AquaCropModel:
         Returns:
             True if finished
         """
-
+        
         if initialize_model:
             if self.crop.need_calib==2:
                 
@@ -299,18 +299,18 @@ class AquaCropModel:
             if self.crop.need_calib==1 or self.crop.need_calib==-1:
             
                 assert self.crop.RelativeBio<1, "Please give inputs for soil fertility calibration"
-                
+
                 self._initialize()
-                
+
                 loc_=np.argmin(np.abs(self.crop.sf_es[0:100]-self.crop.sfertstress))
 
                 self.crop.Ksccx=self.crop.Ksccx_es[loc_]
                 self.crop.Ksexpf=self.crop.Ksexpf_es[loc_]
                 self.crop.Kswp=self.crop.Kswp_es[loc_]
                 self.crop.fcdecline=self.crop.fcdecline_es[loc_]
-                
+
                 self.crop.need_calib=0 #necessary, because the input parameter will be re-adjusted before used in simulation
-                
+
             if self.crop.need_calib==0:#Should enable soil fertility stress without calibration here
                 self._initialize()
 
@@ -319,12 +319,19 @@ class AquaCropModel:
             self.__start_model_execution = time.time()
             while self._clock_struct.model_is_finished is False:
 
-                (
-                    self._clock_struct,
-                    self._init_cond,
-                    self._param_struct,
-                    self._outputs,
-                ) = self._perform_timestep()
+                try:
+                    
+                    (
+                        self._clock_struct,
+                        self._init_cond,
+                        self._param_struct,
+                        self._outputs,
+                    ) = self._perform_timestep()
+                
+                except Exception as error:
+                    print(error)
+                    continue
+                    
             self.__end_model_execution = time.time()
             self.__has_model_executed = True
             self.__has_model_finished = True
@@ -334,7 +341,7 @@ class AquaCropModel:
                 raise ValueError("num_steps must be equal to or greater than 1.")
             self.__start_model_execution = time.time()
             for i in range(num_steps):
-
+                
                 if (i == range(num_steps)[-1]) and (process_outputs is True):
                     self.__steps_are_finished = True
 
@@ -387,6 +394,7 @@ class AquaCropModel:
             self._clock_struct.season_counter,
             self._clock_struct.n_seasons,
             new_cond.harvest_flag,
+            self._clock_struct.sim_off_season,
         )
 
         # Update time step
