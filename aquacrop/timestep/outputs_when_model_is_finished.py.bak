@@ -88,6 +88,11 @@ def outputs_when_model_is_finished(
                 "DryYield",
                 "FreshYield",
                 "YieldPot",
+                'Tr',
+                'TrPot_NS',
+                'TrPot',
+                'Tr/Et0',
+                'NewCond.WPadj',
             ],
         )
 

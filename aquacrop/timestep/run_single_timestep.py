@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pandas as pd
 
 from aquacrop.entities.output import Output
 
@@ -153,6 +154,11 @@ def solution_single_time_step(
         NewCond.gdd_cum = NewCond.gdd_cum + gdd
 
         NewCond.growing_season = True
+        
+        if NewCond.Wr0 == 0: 
+            NewCond.Wr0,_,_,_,_,_,_,_,_,_,_ = root_zone_water(Soil.Profile,Soil.Profile.dzsum[-1],NewCond.th,Soil.z_top,float(Crop_.Zmin),Crop_.Aer)
+        
+        
     else:
         NewCond.growing_season = False
 
@@ -176,14 +182,15 @@ def solution_single_time_step(
         if not key.startswith("__") and not callable(key)
     }
     Crop = CropStructNT(**class_args)
-
+    
     # Run simulations %%
     # 1. Check for groundwater table
-    NewCond.th_fc_Adj, NewCond.wt_in_soil = check_groundwater_table(
+    NewCond.th_fc_Adj, NewCond.wt_in_soil, NewCond.S_cr = check_groundwater_table(
         Soil.Profile,
         NewCond.z_gw,
         NewCond.th,
         NewCond.th_fc_Adj,
+        NewCond.S_cr,
         param_struct.water_table,
         GroundWater
     )
@@ -217,10 +224,13 @@ def solution_single_time_step(
 
     # 4. Drainage
 
-    NewCond.th, DeepPerc, FluxOut = drainage(
+    NewCond.th, DeepPerc, FluxOut, NewCond.S_rain,NewCond.S_irr,NewCond.S_cr = drainage(
         Soil.Profile,
         NewCond.th,
         NewCond.th_fc_Adj,
+        NewCond.S_rain,
+        NewCond.S_irr,
+        NewCond.S_cr,
     )
 
     # 5. Surface runoff
@@ -273,6 +283,8 @@ def solution_single_time_step(
         Runoff,
         Infl,
         FluxOut,
+        NewCond.S_rain, 
+        NewCond.S_irr,
     ) = infiltration(
         Soil.Profile,
         NewCond.surface_storage,
@@ -287,6 +299,8 @@ def solution_single_time_step(
         DeepPerc,
         Runoff,
         growing_season,
+        NewCond.S_rain, 
+        NewCond.S_irr,
     )
     # 8. Capillary Rise
     NewCond, CR = capillary_rise(
@@ -328,6 +342,12 @@ def solution_single_time_step(
         NewCond.evap_z,
         Es,
         EsPot,
+        NewCond.ET_rain,
+        NewCond.ET_irr,
+        NewCond.ET_cr,
+        NewCond.S_rain,
+        NewCond.S_irr,
+        NewCond.S_cr,
     ) = soil_evaporation(
         clock_struct.evap_time_steps,
         clock_struct.sim_off_season,
@@ -368,6 +388,13 @@ def solution_single_time_step(
         precipitation,
         Irr,
         growing_season,
+        NewCond.Wetted_area,
+        NewCond.ET_rain,
+        NewCond.ET_irr,
+        NewCond.ET_cr,
+        NewCond.S_rain,
+        NewCond.S_irr,
+        NewCond.S_cr,
     )
 
     # 13. Crop transpiration
@@ -479,6 +506,15 @@ def solution_single_time_step(
 
     # Irrigation
     if growing_season is True:
+
+        NewCond.Pcum = NewCond.Pcum + precipitation
+        NewCond.Ecum = NewCond.Ecum + Es
+        NewCond.Tcum = NewCond.Tcum + Tr
+        NewCond.Rcum = NewCond.Rcum + Runoff
+        NewCond.Percum = NewCond.Percum + DeepPerc
+        NewCond.CRcum = NewCond.CRcum + CR
+        NewCond.GWcum = NewCond.GWcum + GwIn
+    
         if IrrMngt.irrigation_method == 4:
             # Net irrigation
             IrrDay = IrrNet
@@ -545,7 +581,25 @@ def solution_single_time_step(
         Tr/et0,
         NewCond.WPadj
     ]
-
+    
+    outputs.ET_color[row_day, :] = [
+        clock_struct.time_step_counter,
+        clock_struct.season_counter,
+        NewCond.dap,
+        sum(NewCond.ET_rain),
+        sum(NewCond.ET_irr),
+        sum(NewCond.ET_cr),
+    ]
+    
+    outputs.S_color[row_day, :] = [
+        clock_struct.time_step_counter,
+        clock_struct.season_counter,
+        NewCond.dap,
+        sum(NewCond.S_rain),
+        sum(NewCond.S_irr),
+        sum(NewCond.S_cr),
+    ]
+    plnt_date = clock_struct.planting_dates[clock_struct.season_counter]
     # Final output (if at end of growing season)
     if clock_struct.season_counter > -1:
         if (
@@ -556,18 +610,38 @@ def solution_single_time_step(
                 == clock_struct.step_end_time
             )
         ) and (NewCond.harvest_flag is False):
-
+            anthesis_date = clock_struct.planting_dates[clock_struct.season_counter] + pd.Timedelta(Crop.HIstartCD, unit="d")
             # Store final outputs
             outputs.final_stats.loc[row_gs] = [
-                clock_struct.season_counter,
-                Crop_Name,
-                clock_struct.step_end_time,
-                clock_struct.time_step_counter,
-                NewCond.DryYield,
-                NewCond.FreshYield,
-                NewCond.YieldPot,
-                IrrTot,
-            ]
+                    clock_struct.season_counter,
+                    Crop_Name,
+                    plnt_date,
+                    anthesis_date,
+                    clock_struct.step_end_time,
+                    clock_struct.time_step_counter,
+                    NewCond.DryYield,
+                    NewCond.FreshYield,
+                    NewCond.YieldPot,
+                    IrrTot,
+                    NewCond.gdd_cum,
+                    NewCond.Wr0, 
+                    NewCond.Pcum, 
+                    IrrTot, 
+                    NewCond.CRcum, 
+                    NewCond.GWcum,
+                    NewCond.Wr_end, 
+                    NewCond.Ecum, 
+                    NewCond.Tcum, 
+                    NewCond.Rcum, 
+                    NewCond.Percum,
+                ]
+            outputs.final_watercolor.loc[clock_struct.season_counter] = [clock_struct.season_counter,
+                    sum(NewCond.ET_rain),
+                    sum(NewCond.ET_irr), 
+                    sum(NewCond.ET_cr),
+                    sum(NewCond.S_rain), 
+                    sum(NewCond.S_irr), 
+                    sum(NewCond.S_cr),]
 
             # Set harvest flag
             NewCond.harvest_flag = True

@@ -72,8 +72,8 @@ def read_model_initial_conditions(
         ):
             # Get initial storage between surface bunds
             InitCond.surface_storage = float(ParamStruct.FallowFieldMngt.bund_water)
-            if InitCond.surface_storage > float(ParamStruct.FallowFieldMngt.z_bund*1000):
-                InitCond.surface_storage = float(ParamStruct.FallowFieldMngt.z_bund*1000)
+            if InitCond.surface_storage > float(ParamStruct.FallowFieldMngt.z_bund):
+                InitCond.surface_storage = float(ParamStruct.FallowFieldMngt.z_bund)
         else:
             # No surface bunds
             InitCond.surface_storage = 0
@@ -85,8 +85,8 @@ def read_model_initial_conditions(
         if (FieldMngtTmp.bunds) and (float(FieldMngtTmp.z_bund) > 0.001):
             # Get initial storage between surface bunds
             InitCond.surface_storage = float(FieldMngtTmp.bund_water)
-            if InitCond.surface_storage > float(FieldMngtTmp.z_bund*1000):
-                InitCond.surface_storage = float(FieldMngtTmp.z_bund*1000)
+            if InitCond.surface_storage > float(FieldMngtTmp.z_bund):
+                InitCond.surface_storage = float(FieldMngtTmp.z_bund)
         else:
             # No surface bunds
             InitCond.surface_storage = 0
@@ -309,14 +309,11 @@ def read_model_initial_conditions(
         for ii in range(idx, len(profile)):
             layeri = profile.loc[ii].Layer
             InitCond.th[ii] = hydf.th_s.loc[layeri]
-            InitCond.S_cr[ii] = np.around(InitCond.th[ii] * profile.dz[ii] * 10**3,3)
 
     InitCond.thini = InitCond.th
 
     ParamStruct.Soil.profile = profile
     ParamStruct.Soil.Hydrology = hydf
-    
-    InitCond.S_rain[InitCond.S_cr==0] = np.around((InitCond.thini[InitCond.S_cr==0] * profile.dz[InitCond.S_cr==0] *10**3).values,3) #acea_change_id5
 
     return ParamStruct, InitCond
 

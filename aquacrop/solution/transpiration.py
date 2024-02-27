@@ -106,7 +106,7 @@ def transpiration(
     ## Store initial conditions ##
     NewCond = InitCond
 
-    InitCond_th = InitCond.th
+    InitCond_th = InitCond.th*1
 
     prof = Soil_Profile
 
@@ -550,6 +550,33 @@ def transpiration(
         # No irrigation if not in growing season
         IrrNet = 0
         NewCond.irr_net_cum = 0
+
+    if growing_season == True:
+        s_tot = NewCond.S_rain + NewCond.S_irr + NewCond.S_cr
+        
+        water_allocated = 0 # Track allocated water from soil storage
+        for comp in range(0, len(prof.Comp)):
+            if (InitCond_th[comp] - NewCond.th[comp]) > 0:
+                water = (InitCond_th[comp] - NewCond.th[comp]) * prof.dz[comp] * 10**3
+
+                if s_tot[comp] > 0:
+                    water_allocated = water_allocated + water
+                    # Assign according to the type of ET
+                    NewCond.ET_rain[comp] = np.around(NewCond.ET_rain[comp] + water * NewCond.S_rain[comp]/s_tot[comp],3)
+                    NewCond.ET_irr[comp] = np.around(NewCond.ET_irr[comp] + water * NewCond.S_irr[comp]/s_tot[comp],3)
+                    NewCond.ET_cr[comp] = np.around(NewCond.ET_cr[comp] + water * NewCond.S_cr[comp]/s_tot[comp],3)
+                    
+                    # Update storages
+                    NewCond.S_rain[comp] = np.around(NewCond.S_rain[comp] - water * NewCond.S_rain[comp]/s_tot[comp],3)
+                    NewCond.S_irr[comp] = np.around(NewCond.S_irr[comp] - water * NewCond.S_irr[comp]/s_tot[comp],3)
+                    NewCond.S_cr[comp] = np.around(NewCond.S_cr[comp] - water * NewCond.S_cr[comp]/s_tot[comp],3)
+                    
+                    if NewCond.S_rain[comp] < 0.01: NewCond.S_rain[comp] = 0
+                    if NewCond.S_irr[comp] < 0.01: NewCond.S_irr[comp] = 0
+                    if NewCond.S_cr[comp] < 0.01: NewCond.S_cr[comp] = 0
+                    
+        if (TrAct-water_allocated)>.001:# For crops with soil bunds account for ET from surface storage (assume it green)
+            NewCond.ET_rain[0] = np.around(NewCond.ET_rain[0] + (TrAct-water_allocated),3)  
 
     ## Store potential transpiration for irrigation calculations on next day ##
     NewCond.t_pot = TrPot0

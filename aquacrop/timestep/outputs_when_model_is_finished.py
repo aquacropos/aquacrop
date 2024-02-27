@@ -10,6 +10,8 @@ def outputs_when_model_is_finished(
     flux_output: "ndarray",
     water_output: "ndarray",
     growth_outputs: "ndarray",
+    ET_color_outputs: "ndarray",
+    S_color_outputs: "ndarray",
     steps_are_finished: bool,
 ):
     """
@@ -95,7 +97,31 @@ def outputs_when_model_is_finished(
                 'NewCond.WPadj',
             ],
         )
+        
+        ET_color_outputs_df = pd.DataFrame(
+            ET_color_outputs,
+            columns=[
+                "time_step_counter",
+                "season_counter",
+                "dap",
+                "ET_rain",
+                "ET_irr",
+                "ET_cr",
+            ],
+        )
+        
+        S_color_outputs_df = pd.DataFrame(
+            S_color_outputs,
+            columns=[
+                "time_step_counter",
+                "season_counter",
+                "dap",
+                "S_rain",
+                "S_irr",
+                "S_cr",
+            ],
+        )
 
-        return flux_output_df, water_output_df, growth_outputs_df
+        return flux_output_df, water_output_df, growth_outputs_df, ET_color_outputs_df, S_color_outputs_df
 
     return False

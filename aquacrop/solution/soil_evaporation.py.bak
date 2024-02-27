@@ -35,7 +35,7 @@ cc = CC("solution_soil_evaporation")
 @cc.export(
     "soil_evaporation", (i8,i8,i8,SoilProfileNT_typ_sig,
     f8,f8,f8,f8,f8,f8,f8,i8,f8,i8,f8,b1,f8,f8,i8,f8,f8,f8,f8[:],f8,f8,f8,f8,f8,f8,
-        f8,b1,f8,f8,f8,f8,f8,f8,f8,b1,f8,f8[:],f8[:],f8[:],f8[:],f8[:],f8[:]),
+        f8,b1,f8,f8,f8,f8,f8,f8,f8,b1),
 )
 def soil_evaporation(
     ClockStruct_EvapTimeSteps: int,
@@ -77,14 +77,7 @@ def soil_evaporation(
     Rain: float,
     Irr: float,
     growing_season: bool,
-    NewCond_Wetted_area: float,
-    NewCond_ET_rain: "ndarray",
-    NewCond_ET_irr: "ndarray",
-    NewCond_ET_cr: "ndarray",
-    NewCond_S_rain: "ndarray",
-    NewCond_S_irr: "ndarray",
-    NewCond_S_cr: "ndarray",
-) -> Tuple[float, "ndarray", bool, float, float, float, float, float, float,"ndarray","ndarray","ndarray","ndarray","ndarray","ndarray"]:
+) -> Tuple[float, "ndarray", bool, float, float, float, float, float, float]:
 
     """
     Function to calculate daily soil evaporation
@@ -199,8 +192,6 @@ def soil_evaporation(
 
     ## Store initial conditions in new structure that will be updated ##
     # NewCond = InitCond
-    
-    InitCond_th = NewCond_th*1 
 
     ## Prepare stage 2 evaporation (rew gone) ##
     # Only do this if it is first day of simulation, or if it is first day of
@@ -306,25 +297,20 @@ def soil_evaporation(
         # mulches
         EsPotMul = EsPot
 
+    # Partial surface wetting by irrigation
+    if (Irr > 0) and (IrrMngt_IrrMethod != 4):
+        # Only apply adjustment if irrigation occurs and not in net irrigation
+        # mode
+        if (Rain > 1) or (NewCond_SurfaceStorage > 0):
+            # No adjustment for partial wetting - assume surface is fully wet
+            EsPotIrr = EsPot
+        else:
+            # Adjust for proprtion of surface area wetted by irrigation
+            EsPotIrr = EsPot * (IrrMngt_WetSurf / 100)
 
-    if (Rain > 0) or (NewCond_SurfaceStorage > 0): NewCond_Wetted_area = 1
-    elif Irr > 0: NewCond_Wetted_area = IrrMngt_WetSurf/100
-    EsPotIrr = EsPot * NewCond_Wetted_area
-
-    ## Partial surface wetting by irrigation
-    #if (Irr > 0) and (IrrMngt_IrrMethod != 4):
-    #    # Only apply adjustment if irrigation occurs and not in net irrigation
-    #    # mode
-    #    if (Rain > 1) or (NewCond_SurfaceStorage > 0):
-    #        # No adjustment for partial wetting - assume surface is fully wet
-    #        EsPotIrr = EsPot
-    #    else:
-    #        # Adjust for proprtion of surface area wetted by irrigation
-    #        EsPotIrr = EsPot * (IrrMngt_WetSurf / 100)
-
-    #else:
-    #    # No adjustment for partial surface wetting
-    #    EsPotIrr = EsPot
+    else:
+        # No adjustment for partial surface wetting
+        EsPotIrr = EsPot
 
     # Assign minimum value (mulches and partial wetting don't combine)
     EsPot = min(EsPotIrr, EsPotMul)
@@ -352,7 +338,7 @@ def soil_evaporation(
 
     ## stage 1 evaporation ##
     # Determine total water to be extracted
-    ToExtract = np.around(EsPot-EsAct,5)
+    ToExtract = EsPot - EsAct
     # Determine total water to be extracted in stage one (limited by surface
     # layer water storage)
     ExtractPotStg1 = min(ToExtract, NewCond_Wsurf)
@@ -517,33 +503,7 @@ def soil_evaporation(
 
                 # Update water content
                 NewCond_th[comp] = W / (1000 * prof.dz[comp])
-    
-    
-    s_tot = NewCond_S_rain + NewCond_S_irr + NewCond_S_cr
-    water_allocated = 0 # Track allocated water from soil storage
-    
-    for comp in range(0, len(prof.Comp)):
-        if (InitCond_th[comp] - NewCond_th[comp]) > 0 and s_tot[comp] > 0:
-            water = (InitCond_th[comp] - NewCond_th[comp]) * prof.dz[comp] * 10**3
-            
-            if growing_season == True: # Assign according to the type of ET
-                water_allocated = water_allocated + water
-                NewCond_ET_rain[comp] = np.around(NewCond_ET_rain[comp] + water * NewCond_S_rain[comp]/s_tot[comp],3)
-                NewCond_ET_irr[comp] = np.around( NewCond_ET_irr[comp] + water * NewCond_S_irr[comp]/s_tot[comp],3)
-                NewCond_ET_cr[comp] = np.around(NewCond_ET_cr[comp] + water * NewCond_S_cr[comp]/s_tot[comp],3)
-            
-            # Update storages
-            NewCond_S_rain[comp] = np.around(NewCond_S_rain[comp] - water * NewCond_S_rain[comp]/s_tot[comp],3)
-            NewCond_S_irr[comp] = np.around(NewCond_S_irr[comp] - water * NewCond_S_irr[comp]/s_tot[comp],3)
-            NewCond_S_cr[comp] = np.around(NewCond_S_cr[comp] - water * NewCond_S_cr[comp]/s_tot[comp],3)
-            
-            if NewCond_S_rain[comp] < 0.01: NewCond_S_rain[comp] = 0
-            if NewCond_S_irr[comp] < 0.01: NewCond_S_irr[comp] = 0
-            if NewCond_S_cr[comp] < 0.01: NewCond_S_cr[comp] = 0
-    
-    if (growing_season==True) and (EsAct-water_allocated)>.001: # For crops with soil bunds account for ET from surface storage (assume it green)
-        NewCond_ET_rain[0] = np.around(NewCond_ET_rain[0] + (EsAct-water_allocated), 3)
-    
+
     ## Store potential evaporation for irrigation calculations on next day ##
     NewCond_Epot = EsPot
 
@@ -557,12 +517,6 @@ def soil_evaporation(
         NewCond_EvapZ,
         EsAct,
         EsPot,
-        NewCond_ET_rain,
-        NewCond_ET_irr,
-        NewCond_ET_cr,
-        NewCond_S_rain,
-        NewCond_S_irr,
-        NewCond_S_cr,
     )
 
 if __name__ == "__main__":

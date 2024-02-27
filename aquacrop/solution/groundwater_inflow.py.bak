@@ -56,14 +56,12 @@ def groundwater_inflow(
 
         for ii in range(idx, len(prof.Comp)):
             # Get soil layer
-            if np.around(NewCond.th[ii],5) < prof.th_s[ii]:
+            if NewCond.th[ii] < prof.th_s[ii]:
                 # Update water content
                 dth = prof.th_s[ii] - NewCond.th[ii]
                 NewCond.th[ii] = prof.th_s[ii]
                 # Update groundwater inflow
-                GwIn = GwIn +  np.around((dth * 1000 * prof.dz[ii]),5)
-                
-                NewCond.S_cr[ii] = np.around(NewCond.S_cr[ii] + dth * prof.dz[ii] * 10**3,3)
+                GwIn = GwIn + (dth * 1000 * prof.dz[ii])
 
     return NewCond, GwIn
 
