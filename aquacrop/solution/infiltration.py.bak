@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from aquacrop.entities.soilProfile import SoilProfileNT
     from numpy import ndarray
 
-@cc.export("infiltration", (SoilProfileNT_typ_sig,f8,f8[:],f8[:],f8,f8,f8,b1,f8,f8[:],f8,f8,b1,f8[:],f8[:]))
+@cc.export("infiltration", (SoilProfileNT_typ_sig,f8,f8[:],f8[:],f8,f8,f8,b1,f8,f8[:],f8,f8,b1))
 def infiltration(
      prof: "SoilProfileNT",
      NewCond_SurfaceStorage: float, 
@@ -34,9 +34,7 @@ def infiltration(
      DeepPerc0: float, 
      Runoff0: float, 
      growing_season: bool,
-     NewCond_S_rain: "ndarray", 
-     NewCond_S_irr: "ndarray",
-) -> Tuple["ndarray", float, float, float, float, "ndarray","ndarray","ndarray"]:
+) -> Tuple["ndarray", float, float, float, float, "ndarray"]:
     """
     Function to infiltrate incoming water (rainfall and irrigation)
 
@@ -99,11 +97,11 @@ def infiltration(
     InitCond_th = NewCond_th*1
 
     thnew = NewCond_th*1.
-    
+
     Soil_nComp = thnew.shape[0]
 
     Infl = max(Infl,0.)
-    Infl_ini = Infl *1
+
     ## Update infiltration rate for irrigation ##
     # Note: irrigation amount adjusted for specified application efficiency
     if growing_season == True:
@@ -270,16 +268,6 @@ def infiltration(
                     # Any leftover water not stored becomes runoff
                     Runoff = Runoff + excess
 
-        if np.any((thnew-NewCond_th) > 0) and Infl > 0:
-            f_rain = Infl_ini/Infl
-            f_irr = 1 - f_rain
-            for comp in range(0, len(prof.Comp)):
-                if (thnew[comp] - NewCond_th[comp]) > 0:
-                    # Update water storages
-                    water = (thnew[comp] - InitCond_th[comp]) * prof.dz[comp] * 10**3
-                    NewCond_S_rain[comp] = np.around(NewCond_S_rain[comp] + water * f_rain,3) # Assume that infiltration proportionally distributes water types
-                    NewCond_S_irr[comp] = np.around(NewCond_S_irr[comp] + water * f_irr,3)
-
         # Infiltration left to store after bottom compartment becomes deep
         # percolation (mm)
         DeepPerc = ToStore
@@ -315,7 +303,7 @@ def infiltration(
     Infl = Infl - Runoff
     RunoffTot = Runoff + Runoff0
 
-    return NewCond_th,NewCond_SurfaceStorage, DeepPerc, RunoffTot, Infl, FluxOut, NewCond_S_rain, NewCond_S_irr
+    return NewCond_th,NewCond_SurfaceStorage, DeepPerc, RunoffTot, Infl, FluxOut
 
 if __name__ == "__main__":
     cc.compile()

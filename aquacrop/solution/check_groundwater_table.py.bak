@@ -23,13 +23,12 @@ if TYPE_CHECKING:
 
 
 
-@cc.export("check_groundwater_table", (SoilProfileNT_typ_sig,f8,f8[:],f8[:],f8[:],i8,f8))
+@cc.export("check_groundwater_table", (SoilProfileNT_typ_sig,f8,f8[:],f8[:],i8,f8))
 def check_groundwater_table(
     prof: "SoilProfileNT",
     NewCond_zGW: float,
     NewCond_th: "ndarray",
     NewCond_th_fc_Adj: "ndarray",
-    NewCond_S_cr: "ndarray",
     water_table_presence: int,
     z_gw: float,
 ) -> "ndarray":
@@ -63,7 +62,7 @@ def check_groundwater_table(
 
 
     """
-    InitCond_th = NewCond_th *1
+    
     ## Perform calculations (if variable water table is present) ##
     if water_table_presence == 1:
 
@@ -81,10 +80,10 @@ def check_groundwater_table(
                 NewCond_WTinSoil = True
 
         # If water table is in soil profile, adjust water contents
-        if NewCond_WTinSoil == True:
-            idx = np.argwhere(zMid >= NewCond_zGW).flatten()[0]
-            for ii in range(idx, len(prof.Comp)):
-                NewCond_th[ii] = prof.th_s[ii]
+        # if NewCond_WTinSoil == True:
+        #     idx = np.argwhere(zMid >= NewCond_zGW).flatten()[0]
+        #     for ii in range(idx, len(prof.Comp)):
+        #         NewCond_th[ii] = prof.th_s[ii]
 
         # Adjust compartment field capacity
         compi = len(prof.Comp) - 1
@@ -120,18 +119,11 @@ def check_groundwater_table(
                 compi = compi - 1
 
         # Store adjusted field capacity values
-        thfcAdj = np.around(thfcAdj, 3, np.empty_like(thfcAdj))
         NewCond_th_fc_Adj = thfcAdj
         # prof.th_fc_Adj = thfcAdj
-        
-        for comp in range(0, len(prof.Comp)):
-            if (NewCond_th[comp] - InitCond_th[comp]) > 0:
-                NewCond_S_cr[comp] = np.around(NewCond_S_cr[comp] + (NewCond_th[comp] - InitCond_th[comp]) * prof.dz[comp] * 10**3,3)
-        
-        
-        return (NewCond_th_fc_Adj, NewCond_WTinSoil,NewCond_S_cr)
+        return (NewCond_th_fc_Adj, NewCond_WTinSoil)
 
-    return (NewCond_th_fc_Adj, None, NewCond_S_cr)
+    return (NewCond_th_fc_Adj, None)
 
 if __name__ == "__main__":
     cc.compile()

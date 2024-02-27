@@ -172,7 +172,8 @@ def irrigation(
                 # Irrigation occurs
                 IrrReq = max(0, NewCond_Depletion)
                 # Adjust irrigation requirements for application efficiency
-                EffAdj = ((100 - IrrMngt_AppEff) + 100) / 100
+                #EffAdj = ((100 - IrrMngt_AppEff) + 100) / 100
+                EffAdj = 100/IrrMngt_AppEff
                 IrrReq = IrrReq * EffAdj
                 # Limit irrigation to maximum depth
                 Irr = min(IrrMngt_MaxIrr, IrrReq)
@@ -191,7 +192,7 @@ def irrigation(
                 # Irrigation occurs
                 IrrReq = max(0, Dr)
                 # Adjust irrigation requirements for application efficiency
-                EffAdj = ((100 - IrrMngt_AppEff) + 100) / 100
+                EffAdj = 100/IrrMngt_AppEff
                 IrrReq = IrrReq * EffAdj
                 # Limit irrigation to maximum depth
                 Irr = min(IrrMngt_MaxIrr, IrrReq)

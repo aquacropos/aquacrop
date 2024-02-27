@@ -52,7 +52,7 @@ def capillary_rise(
 
 
     """
-
+    InitCond_th = NewCond.th *1
     ## Get groundwater table elevation on current day ##
     z_gw = NewCond.z_gw
 
@@ -192,7 +192,11 @@ def capillary_rise(
 
                 if MaxCR > LimCR:
                     MaxCR = LimCR
-
+        
+        for comp in range(0, len(prof.Comp)):
+            if (NewCond.th[comp] - InitCond_th[comp]) > 0:
+                NewCond.S_cr[comp] = np.around(NewCond.S_cr[comp] + (NewCond.th[comp] - InitCond_th[comp]) * prof.dz[comp] * 10**3,3)
+        
         # Store total depth of capillary rise
         CrTot = WCr
 

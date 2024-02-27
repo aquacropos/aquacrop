@@ -81,6 +81,22 @@ InitCond_spec = [
     ("w_stage_2", float64),
     ("depletion", float64),
     ("taw", float64),
+    ('Pcum', float64),
+    ('Ecum', float64),
+    ('Tcum', float64),
+    ('Rcum', float64),
+    ('Percum', float64),
+    ('CRcum', float64),
+    ('GWcum', float64),
+    ('Wr0', float64),
+    ('Wr_end', float64),
+    ('S_irr', float64[:]),
+    ('S_cr', float64[:]),
+    ('S_rain', float64[:]),
+    ('ET_irr', float64[:]),
+    ('ET_cr', float64[:]),
+    ('ET_rain', float64[:]),
+    ('Wetted_area', float64),
     #for soil fertility stress
     ('CCx_fertstress', float64),
     ('CCxadj_dayCD', float64),
@@ -117,6 +133,24 @@ class InitialCondition:
         self.dap = 0
         self.e_pot = 0
         self.t_pot = 0
+        
+        self.Pcum = 0
+        self.Ecum = 0
+        self.Tcum = 0
+        self.Rcum = 0
+        self.Percum = 0
+        self.CRcum = 0
+        self.GWcum = 0
+        self.Wr0 = 0
+        self.Wr_end = 0
+
+        self.S_irr = np.zeros(num_comp)
+        self.S_cr = np.zeros(num_comp)
+        self.S_rain = np.zeros(num_comp)
+        self.ET_irr = np.zeros(num_comp)
+        self.ET_cr= np.zeros(num_comp)
+        self.ET_rain = np.zeros(num_comp)
+        self.Wetted_area = 1
 
         # States
         self.pre_adj = False

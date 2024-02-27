@@ -99,17 +99,17 @@ def root_zone_water(
             factor = 1
 
         # Actual water storage in root zone (mm)
-        WrAct = WrAct + round(factor * 1000 * InitCond_th[ii] * prof.dz[ii], 3)
+        WrAct = WrAct + round(factor * 1000 * InitCond_th[ii] * prof.dz[ii], 2)
         # Water storage in root zone at saturation (mm)
-        WrS = WrS + round(factor * 1000 * prof.th_s[ii] * prof.dz[ii], 3)
+        WrS = WrS + round(factor * 1000 * prof.th_s[ii] * prof.dz[ii], 2)
         # Water storage in root zone at field capacity (mm)
-        WrFC = WrFC + round(factor * 1000 * prof.th_fc[ii] * prof.dz[ii], 3)
+        WrFC = WrFC + round(factor * 1000 * prof.th_fc[ii] * prof.dz[ii], 2)
         # Water storage in root zone at permanent wilting point (mm)
-        WrWP = WrWP + round(factor * 1000 * prof.th_wp[ii] * prof.dz[ii], 3)
+        WrWP = WrWP + round(factor * 1000 * prof.th_wp[ii] * prof.dz[ii], 2)
         # Water storage in root zone at air dry (mm)
-        WrDry = WrDry + round(factor * 1000 * prof.th_dry[ii] * prof.dz[ii], 3)
+        WrDry = WrDry + round(factor * 1000 * prof.th_dry[ii] * prof.dz[ii], 2)
         # Water storage in root zone at aeration stress threshold (mm)
-        WrAer = WrAer + round(factor * 1000 * (prof.th_s[ii] - (Crop_Aer / 100)) * prof.dz[ii], 3)
+        WrAer = WrAer + round(factor * 1000 * (prof.th_s[ii] - (Crop_Aer / 100)) * prof.dz[ii], 2)
 
     if WrAct < 0:
         WrAct = 0

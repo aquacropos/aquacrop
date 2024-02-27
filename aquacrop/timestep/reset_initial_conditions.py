@@ -69,6 +69,22 @@ def reset_initial_conditions(
     InitCond.day_submerged = 0
     InitCond.irr_net_cum = 0
     InitCond.dap = 0
+    
+    InitCond.Pcum = 0
+    InitCond.Ecum = 0
+    InitCond.Tcum = 0
+    InitCond.Rcum = 0
+    InitCond.Percum = 0
+    InitCond.CRcum = 0
+    InitCond.GWcum = 0
+    InitCond.Wr0 = 0
+    InitCond.Wr_end = 0
+
+    if ClockStruct.sim_off_season=='N' and ClockStruct.season_counter>0:
+        InitCond.S_irr, InitCond.S_cr = (np.zeros(int(Soil.nComp)) for _ in range(2))
+        InitCond.S_rain = np.around((InitCond.thini * Soil.profile.dz *10**3).values,3)
+        
+    InitCond.ET_irr, InitCond.ET_cr, InitCond.ET_rain = (np.zeros(int(Soil.nComp)) for _ in range(3))
 
     InitCond.aer_days_comp = np.zeros(int(Soil.nComp))
 
@@ -220,7 +236,7 @@ def reset_initial_conditions(
         # Reset surface storage
         if (FieldMngt.bunds) and (FieldMngt.z_bund > 0.001):
             # Get initial storage between surface bunds
-            InitCond.surface_storage = min(FieldMngt.bund_water, FieldMngt.z_bund)
+            InitCond.surface_storage = min(FieldMngt.bund_water, FieldMngt.z_bund*1000)
         else:
             # No surface bunds
             InitCond.surface_storage = 0

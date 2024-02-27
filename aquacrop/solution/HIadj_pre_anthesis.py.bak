@@ -48,7 +48,7 @@ def HIadj_pre_anthesis(
     if Crop_dHI_pre > 0:
         ## Calculate adjustment ##
         # Get parameters
-        Br = NewCond_B / NewCond_B_NS if NewCond_B_NS > 0 else 0 
+        Br = NewCond_B / NewCond_B_NS
         Br_range = np.log(Crop_dHI_pre) / 5.62
         Br_upp = 1
         Br_low = 1 - Br_range

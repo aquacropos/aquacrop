@@ -20,15 +20,12 @@ if TYPE_CHECKING:
 
 
 
-@cc.export("drainage", (SoilProfileNT_typ_sig, f8[:], f8[:], f8[:], f8[:], f8[:]))
+@cc.export("drainage", (SoilProfileNT_typ_sig, f8[:], f8[:]))
 def drainage(
     prof: "SoilProfileNT",
     th_init: "ndarray",
     th_fc_Adj_init: "ndarray",
-    NewCond_S_rain: "ndarray",
-    NewCond_S_irr: "ndarray",
-    NewCond_S_cr: "ndarray",
-    ) -> Tuple["ndarray", float, float,"ndarray","ndarray","ndarray"]:
+    ) -> Tuple["ndarray", float, float]:
     """
     Function to redistribute stored soil water
 
@@ -338,34 +335,6 @@ def drainage(
                     thnew[precomp] = prof.th_s[precomp]
                 else:
                     excess = 0
-                    
-        if FluxOut[ii] > 0:
-            # Fractions of water types drained
-            s_tot = NewCond_S_rain[ii] + NewCond_S_irr[ii] + NewCond_S_cr[ii]
-            if s_tot > 0: # Sometimes there is a small FluxOut but storage is empty, so to avoid divison by 0, skip the next steps
-                water_rain = FluxOut[ii] * NewCond_S_rain[ii]/s_tot
-                water_irr = FluxOut[ii] * NewCond_S_irr[ii]/s_tot
-                water_cr = FluxOut[ii] - water_rain - water_irr
-                if water_cr < 0.01: 
-                    water_cr = 0
-                # Update water storages in the current compartment
-                NewCond_S_rain[ii] = np.around(NewCond_S_rain[ii] - water_rain,3)
-                NewCond_S_irr[ii] = np.around(NewCond_S_irr[ii] - water_irr,3)
-                NewCond_S_cr[ii] = np.around(NewCond_S_cr[ii] - water_cr,3)
-                
-                if NewCond_S_rain[ii] < 0.01: 
-                    NewCond_S_rain[ii] = 0
-                if NewCond_S_irr[ii] < 0.01: 
-                    NewCond_S_irr[ii] = 0
-                if NewCond_S_cr[ii] < 0.01: 
-                    NewCond_S_cr[ii] = 0
-                    
-                # Update water storages in the compartment below
-                if ii+1 < len(FluxOut):
-                    NewCond_S_rain[ii+1] = np.around(NewCond_S_rain[ii+1] + water_rain,3)
-                    NewCond_S_irr[ii+1] = np.around(NewCond_S_irr[ii+1] + water_irr,3)
-                    NewCond_S_cr[ii+1] = np.around(NewCond_S_cr[ii+1] + water_cr,3)
-
 
     ## Update conditions and outputs ##
     # Total deep percolation (mm)
@@ -373,7 +342,7 @@ def drainage(
     # Water contents
     # NewCond.th = thnew
 
-    return thnew, DeepPerc, FluxOut,NewCond_S_rain,NewCond_S_irr,NewCond_S_cr
+    return thnew, DeepPerc, FluxOut
 
 
 if __name__ == "__main__":
