@@ -309,7 +309,7 @@ class AquaCropModel:
                 self.crop.Kswp=self.crop.Kswp_es[loc_]
                 self.crop.fcdecline=self.crop.fcdecline_es[loc_]
                 
-                self.crop.need_calib==0 #necessary, because the input parameter will be re-adjusted before used in simulation
+                self.crop.need_calib=0 #necessary, because the input parameter will be re-adjusted before used in simulation
                 
             if self.crop.need_calib==0:#Should enable soil fertility stress without calibration here
                 self._initialize()
