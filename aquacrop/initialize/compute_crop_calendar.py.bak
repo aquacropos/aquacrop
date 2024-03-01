@@ -330,9 +330,192 @@ def compute_crop_calendar(
         #soil fertility stress initialization and calibration, basically calculate the whole crop growth under ideal conditions (no water stress)  
 
         #This part can be optimized(shorten) later for the final version
+        
+        #print(crop.EmergenceCD)
+        #print(crop.MaxCanopy)
+        #print(crop.MaxCanopyCD)
+        #print(crop.CanopyDevEndCD)
 
         #calculate the normalized Tr for soil fertility stress, it is a theritically one, could be derived without simulation 
+        CCx=crop.CCx#*crop.Ksccx
+        CGC=crop.CGC#*crop.Ksexpf
+        
+        Half_CCx = round(crop.Emergence+(np.log(0.5*CCx/crop.CC0)/CGC))
+            
+            
+        Full_CCx = round(crop.Emergence+(np.log((0.25*CCx*CCx/crop.CC0)
+                                                                    /(CCx-(0.98*CCx)))/CGC))
+        
+        if gdd_cum.values[-1] < crop.Maturity:
+            Half_CCx = Half_CCx*gdd_cum.values[-1]/crop.Maturity
+            Full_CCx = Full_CCx*gdd_cum.values[-1]/crop.Maturity
 
+        Half_CCxCD = (gdd_cum>Half_CCx).idxmax()+1
+        Full_CCxCD = (gdd_cum>Full_CCx).idxmax()+1
+        #Full_CCxCD=crop.MaxCanopyCD
+
+        Ks_Tr=[]# cold stress 
+        Kc_Tr=[]# crop transpiration coefficient with soil fertility stress 
+        Ksc_Total=[]
+        max_cc=0
+
+        for day_ in range(1,np.min([crop.MaturityCD+1,len(gdd_cum)])):
+            #cold tress
+            GDD_=gdd_cum.values[day_]-gdd_cum.values[day_-1]
+            
+            #copy from solution.py
+            if crop.TrColdStress == 0:
+            # Cold temperature stress does not affect transpiration
+                KsCold = 1
+            elif crop.TrColdStress == 1:
+                # Transpiration can be affected by cold temperature stress
+                if GDD_ >= crop.GDD_up:
+                    # No cold temperature stress
+                    KsCold = 1
+                elif GDD_ <= crop.GDD_lo:
+                    # Transpiration fully inhibited by cold temperature stress
+                    KsCold = 0
+                else:
+                    # Transpiration partially inhibited by cold temperature stress
+                    # Get parameters for logistic curve
+                    KsTr_up = 1
+                    KsTr_lo = 0.02
+                    fshapeb = (-1) * (
+                        np.log(((KsTr_lo * KsTr_up) - 0.98 * KsTr_lo) / (0.98 * (KsTr_up - KsTr_lo)))
+                    )
+                    # Calculate cold stress level
+                    GDDrel = (GDD_ - crop.GDD_lo) / (crop.GDD_up - crop.GDD_lo)
+                    KsCold = (KsTr_up * KsTr_lo) / (
+                        KsTr_lo + (KsTr_up - KsTr_lo) * np.exp(-fshapeb * GDDrel)
+                    )
+                    KsCold = KsCold - KsTr_lo * (1 - GDDrel)
+            #record cold stress 
+            Ks_Tr.append(KsCold)
+
+            if gdd_cum.values[day_]<crop.Emergence:
+                CC=0
+                Kctr=crop.Kcb
+            
+            elif gdd_cum.values[day_] <= Half_CCx:
+                CC=crop.CC0*np.exp((gdd_cum.values[day_]-crop.Emergence)*CGC)
+                if CC>CCx/2:
+                    CC=CCx-0.25*CCx*CCx/crop.CC0*np.exp(-(gdd_cum.values[day_]-crop.Emergence)*CGC)
+                Kctr=crop.Kcb
+                
+                max_cc=CC
+
+            elif gdd_cum.values[day_] > Half_CCx and gdd_cum.values[day_] <= Full_CCx:
+                CC=CCx-0.25*CCx*CCx/crop.CC0*np.exp(-(gdd_cum.values[day_]-crop.Emergence)*CGC)
+                Kctr=crop.Kcb
+                
+                max_cc=CC
+                 
+            elif gdd_cum.values[day_] > Full_CCx and gdd_cum.values[day_-5] <= Full_CCx:
+            
+                if gdd_cum.values[day_]<crop.CanopyDevEnd:
+                    CC=CCx-0.25*CCx*CCx/crop.CC0*np.exp(-(gdd_cum.values[day_]-crop.Emergence)*CGC)
+                    max_cc=CC
+                else:
+                    CC=max_cc
+                    
+                Kctr=crop.Kcb
+
+            elif gdd_cum.values[day_-5] > Full_CCx and gdd_cum.values[day_] <= crop.Senescence:
+                
+                if gdd_cum.values[day_]<crop.CanopyDevEnd:
+                    CC=CCx-0.25*CCx*CCx/crop.CC0*np.exp(-(gdd_cum.values[day_]-crop.Emergence)*CGC)
+                    max_cc=CC
+                else:
+                    CC=max_cc
+
+                Kctr=crop.Kcb-(day_-Full_CCxCD-5)*(crop.fage / 100)*max_cc
+
+            elif gdd_cum.values[day_] > crop.Senescence and gdd_cum.values[day_] <= crop.Maturity:
+                CC_adj=max_cc
+                
+                CDC = crop.CDC*((CC_adj+2.29)/(crop.CCx+2.29))
+                CC=CC_adj*(1-0.05*(np.exp(3.33*CDC*(gdd_cum.values[day_]-crop.Senescence)/(CC_adj+2.29))-1))
+                Kctr=(crop.Kcb-(day_-Full_CCxCD-5)*(crop.fage / 100)*max_cc)*(CC/max_cc)**crop.a_Tr
+                
+            if CC<=0:
+                CC=0
+            CC_star=1.72*CC-CC*CC+0.3*CC*CC*CC
+
+            #print(CC)
+            #print(ParamStruct.CO2.CurrentConc)
+            try:
+                CO2conc=ParamStruct.CO2.current_concentration 
+            except:
+                CO2conc=ParamStruct.CO2.co2_data_processed.iloc[0]
+            Kc_TrCo2=1            
+            if CO2conc>369.41:
+                Kc_TrCo2=1-0.05*(CO2conc-369.41)/(550-369.41)
+            
+            Kc_Tr_=CC_star*Kctr*Kc_TrCo2
+            #print(day_)
+            #print(CC_star)
+            #print(Kctr)
+            #print(Kc_TrCo2)
+            #print(Kc_Tr_)
+            Kc_Tr.append(Kc_Tr_)
+
+            Ksc_Total.append(Kc_Tr_*KsCold)
+        
+        crop.TR_ET0_fertstress=np.sum(Ksc_Total[:])
+        #print(Ksc_Total[:])
+        #print(crop.MaturityCD)
+        
+        crop.HIGC = calculate_HIGC(
+            crop.YldFormCD,
+            crop.HI0,
+            crop.HIini,
+        )
+        if crop.CropType == 3:
+            # Determine linear switch point and HIGC rate for fruit/grain crops
+            crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
+                crop.YldFormCD, crop.HIini, crop.HI0, crop.HIGC
+            )
+        else:
+            # No linear switch for leafy vegetable or root/tiber crops
+            crop.tLinSwitch = 0
+            crop.dHILinear = 0.
+        
+        Bio_top=0
+        for i_ in range(len(Ksc_Total)):
+            #print(Bio_top)
+            crop.Bio_top[i_]=Bio_top
+            if i_>=crop.HIstartCD:
+
+                if ((crop.CropType == 2) or (crop.CropType == 3)):
+                
+                    if crop.CropType == 2:
+                        PctLagPhase_=100
+                    else:
+                        if (i_-crop.HIstartCD) < crop.tLinSwitch:
+                            PctLagPhase_ = 100*((i_-crop.HIstartCD)/crop.tLinSwitch)
+                        else:
+                            PctLagPhase_=100
+
+                    # Adjust WP for reproductive stage
+                    if crop.Determinant == 1:
+                        fswitch = PctLagPhase_/100
+                    else:
+                        if (i_-crop.HIstartCD) < (crop.YldFormCD/3):
+                            fswitch = (i_-crop.HIstartCD)/(crop.YldFormCD/3)
+                        else:
+                            fswitch = 1
+
+                    if fswitch>1:
+                        fswitch=1
+                        
+                    Bio_top+= Ksc_Total[i_]*(1-(1-crop.WPy/100)*fswitch)
+                else:
+                    Bio_top+= Ksc_Total[i_]
+            else:
+                Bio_top+= Ksc_Total[i_]
+        crop.Bio_top[len(Ksc_Total):len(Ksc_Total)+100]=Bio_top
+        
+        
         def Biomas_ini_es(Bio_mul,TopStress,Ksccx_temp,Ksexpf_temp,fcdecline_temp,Kswp_temp):
             CCx=crop.CCx*Ksccx_temp
         
@@ -350,45 +533,11 @@ def compute_crop_calendar(
     
             Half_CCxCD = (gdd_cum>Half_CCx).idxmax()+1
             Full_CCxCD = (gdd_cum>Full_CCx).idxmax()+1
-            
-            Ks_Tr=[]
-            Ksc_Total=[]
+
             Kc_Tr_es=[]# crop transpiration coefficient with soil fertility stress 
             max_cc=0
 
             for day_ in range(1,np.min([crop.MaturityCD+1,len(gdd_cum)])):
-            
-                #cold tress
-                GDD_=gdd_cum.values[day_]-gdd_cum.values[day_-1]
-                
-                #copy from solution.py
-                if crop.TrColdStress == 0:
-                # Cold temperature stress does not affect transpiration
-                    KsCold = 1
-                elif crop.TrColdStress == 1:
-                    # Transpiration can be affected by cold temperature stress
-                    if GDD_ >= crop.GDD_up:
-                        # No cold temperature stress
-                        KsCold = 1
-                    elif GDD_ <= crop.GDD_lo:
-                        # Transpiration fully inhibited by cold temperature stress
-                        KsCold = 0
-                    else:
-                        # Transpiration partially inhibited by cold temperature stress
-                        # Get parameters for logistic curve
-                        KsTr_up = 1
-                        KsTr_lo = 0.02
-                        fshapeb = (-1) * (
-                            np.log(((KsTr_lo * KsTr_up) - 0.98 * KsTr_lo) / (0.98 * (KsTr_up - KsTr_lo)))
-                        )
-                        # Calculate cold stress level
-                        GDDrel = (GDD_ - crop.GDD_lo) / (crop.GDD_up - crop.GDD_lo)
-                        KsCold = (KsTr_up * KsTr_lo) / (
-                            KsTr_lo + (KsTr_up - KsTr_lo) * np.exp(-fshapeb * GDDrel)
-                        )
-                        KsCold = KsCold - KsTr_lo * (1 - GDDrel)
-                #record cold stress 
-                Ks_Tr.append(KsCold)
 
                 # crop transpiration coefficient
                 if gdd_cum.values[day_]<crop.Emergence:
@@ -440,7 +589,8 @@ def compute_crop_calendar(
 
                 elif gdd_cum.values[day_] > crop.Senescence and gdd_cum.values[day_] <= crop.Maturity:
                     if crop.SenescenceCD>Full_CCxCD:
-                        
+                        CC_fs=max_cc-fcdecline_temp*(day_-Full_CCxCD)*(day_-Full_CCxCD)/(crop.SenescenceCD-Full_CCxCD)
+
                         CC_adj=max_cc-fcdecline_temp*(crop.SenescenceCD-Full_CCxCD)
                     else:
                         CC_fs=max_cc
@@ -478,7 +628,6 @@ def compute_crop_calendar(
                 #    print(CC_star)
                 #    print(Kctr)
                 Kc_Tr_es.append(Kc_Tr_)
-                Ksc_Total.append(Kc_Tr_*KsCold)
   
             Bio_cur=0
             Bio_up=0
@@ -486,96 +635,85 @@ def compute_crop_calendar(
             #print(len(Kc_Tr_es))
             #print(len(Kc_Tr))
             #print(len(Bio_mul))
-            if TopStress>-1:
-                for i in range(len(Kc_Tr_es)):
-                    if Curstress<TopStress:
-                        Curstress+=Kc_Tr_es[i]*Ks_Tr[i]
-                        Kswp_=1-(1-Kswp_temp)*(Curstress/TopStress)*(Curstress/TopStress)
-                    else:
-                        Kswp_=1-(1-Kswp_temp)
-                    Bio_cur+=Kswp_*Kc_Tr_es[i]*Ks_Tr[i]*Bio_mul[i]
-                    Bio_up+=Kc_Tr_es[i]*Ks_Tr[i]*Bio_mul[i]
-            else:
-                Bio_cur=[-1]
-                Bio_up=[-1]
+            for i in range(len(Kc_Tr_es)):
+                if Curstress<TopStress:
+                    Curstress+=Kc_Tr_es[i]*Ks_Tr[i]
+                    Kswp_=1-(1-Kswp_temp)*(Curstress/TopStress)*(Curstress/TopStress)
+                else:
+                    Kswp_=1-(1-Kswp_temp)
+                Bio_cur+=Kswp_*Kc_Tr_es[i]*Ks_Tr[i]*Bio_mul[i]
+                Bio_up+=Kc_Tr_es[i]*Ks_Tr[i]*Bio_mul[i]
             
-            return Bio_cur,Bio_up,Kc_Tr_es,Ks_Tr,Ksc_Total
-
-        _,_,_,_,Ksc_Total=Biomas_ini_es([-1],-1,1,1,0,1)
-
-        crop.TR_ET0_fertstress=np.sum(Ksc_Total[:])
-        TopStress=crop.TR_ET0_fertstress*crop.RelativeBio
-        #print(Ksc_Total[:])
-        #print(crop.MaturityCD)
+            return Bio_cur,Bio_up,Kc_Tr_es,Ks_Tr
         
-        crop.HIGC = calculate_HIGC(
+        
+        if crop.need_calib==1 or crop.need_calib==2:
+            
+            crop.HIGC = calculate_HIGC(
             crop.YldFormCD,
             crop.HI0,
             crop.HIini,
         )
-        if crop.CropType == 3:
-            # Determine linear switch point and HIGC rate for fruit/grain crops
-            crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
+            if crop.CropType == 3:
+                # Determine linear switch point and HIGC rate for fruit/grain crops
+                crop.tLinSwitch, crop.dHILinear = calculate_HI_linear(
                 crop.YldFormCD, crop.HIini, crop.HI0, crop.HIGC
             )
-        else:
-            # No linear switch for leafy vegetable or root/tiber crops
-            crop.tLinSwitch = 0
-            crop.dHILinear = 0.
+            else:
+                # No linear switch for leafy vegetable or root/tiber crops
+                crop.tLinSwitch = 0
+                crop.dHILinear = 0.
 
-        Bio_top=0
-        Bio_mul=[]
-        #print('TOtal')
-        #print(len(Ksc_Total))
-        for i_ in range(len(Ksc_Total)):
-            #print(i_)
-            crop.Bio_top[i_]=Bio_top
-            if i_>=crop.HIstartCD:
-                
-                if ((crop.CropType == 2) or (crop.CropType == 3)):
-                
-                    if crop.CropType == 2:
-                        PctLagPhase_=100
-                    else:
-                        if (i_-crop.HIstartCD) < crop.tLinSwitch:
-                            PctLagPhase_ = 100*((i_-crop.HIstartCD)/crop.tLinSwitch)
-                        else:
-                            PctLagPhase_=100
-
-                    # Adjust WP for reproductive stage
-                    if crop.Determinant == 1:
-                        fswitch = PctLagPhase_/100
-                    else:
-                        if (i_-crop.HIstartCD) < (crop.YldFormCD/3):
-                            fswitch = (i_-crop.HIstartCD)/(crop.YldFormCD/3)
-                        else:
-                            fswitch = 1
-
-                    if fswitch>1:
-                        fswitch=1
-                        
-                    Bio_top+= Ksc_Total[i_]*(1-(1-crop.WPy/100)*fswitch)
-                    Bio_mul.append(1-(1-crop.WPy/100)*fswitch)
+            TopStress=crop.TR_ET0_fertstress*crop.RelativeBio
+            
+            Bio_top=0
+            Bio_mul=[]
+            #print('TOtal')
+            #print(len(Ksc_Total))
+            for i_ in range(len(Ksc_Total)):
+                #print(i_)
+                if i_>=crop.HIstartCD:
                     
+                    if ((crop.CropType == 2) or (crop.CropType == 3)):
+                    
+                        if crop.CropType == 2:
+                            PctLagPhase_=100
+                        else:
+                            if (i_-crop.HIstartCD) < crop.tLinSwitch:
+                                PctLagPhase_ = 100*((i_-crop.HIstartCD)/crop.tLinSwitch)
+                            else:
+                                PctLagPhase_=100
+
+                        # Adjust WP for reproductive stage
+                        if crop.Determinant == 1:
+                            fswitch = PctLagPhase_/100
+                        else:
+                            if (i_-crop.HIstartCD) < (crop.YldFormCD/3):
+                                fswitch = (i_-crop.HIstartCD)/(crop.YldFormCD/3)
+                            else:
+                                fswitch = 1
+
+                        if fswitch>1:
+                            fswitch=1
+                            
+                        Bio_top+= Ksc_Total[i_]*(1-(1-crop.WPy/100)*fswitch)
+                        Bio_mul.append(1-(1-crop.WPy/100)*fswitch)
+                        
+                    else:
+                        Bio_top+= Ksc_Total[i_]
+                        Bio_mul.append(1)
                 else:
                     Bio_top+= Ksc_Total[i_]
                     Bio_mul.append(1)
-            else:
-                Bio_top+= Ksc_Total[i_]
-                Bio_mul.append(1)
-        crop.Bio_top[len(Ksc_Total):len(Ksc_Total)+1000]=Bio_top
-         
-        if crop.need_calib==1 or crop.need_calib==-1:
+                    
+        if crop.need_calib==1:
+            
             #initialze parameters
             adj_flag=True
+            Ksccx_temp=crop.Ksccx_in
             L123=crop.SenescenceCD
             L12=crop.MaxCanopyCD
             kk_=0#avoid periodic loop
-            if crop.need_calib==1:
-                Ksccx_temp=crop.Ksccx_in
-            else:
-                Ksccx_temp=crop.Ksccx
-
             while adj_flag and kk_<100:
                 kk_+=1
 
@@ -587,44 +725,37 @@ def compute_crop_calendar(
                 else:
                     CCxfinal=0.77*crop.CCx
                     
-                if crop.need_calib==-1 and kk_==1:
-                    fcdecline_temp=crop.fcdecline
-                    Ksexpf_temp=crop.Ksexpf
-                    Kswp_temp=crop.Kswp
-
+                if L123>L12:
+                    fcdecline_temp=(1-Ksccx_temp)*(crop.CCx-CCxfinal)/(L123-L12)
+                    if fcdecline_temp>0.01:
+                        fcdecline_temp=0.009
                 else:
-                    
-                    if L123>L12:
-                        fcdecline_temp=(1-Ksccx_temp)*(crop.CCx-CCxfinal)/(L123-L12)
-                        if fcdecline_temp>0.01:
-                            fcdecline_temp=0.009
-                    else:
-                        fcdecline_temp=0
-                    
-                    Ksexpf_temp=np.round((1-(1-Ksccx_temp)*0.6)*100)/100
-                    Kswp_temp=np.round((1-(1-Ksccx_temp)*0.5)*100)/100 
-                    
-                    full_temp = round(crop.EmergenceCD+(np.log((0.25*crop.CCx*Ksccx_temp*crop.CCx*Ksccx_temp/crop.CC0)
-                                                                        /(crop.CCx*Ksccx_temp-(0.98*crop.CCx*Ksccx_temp)))/crop.CGC_CD/Ksexpf_temp))
-                    
+                    fcdecline_temp=0
+                
+                Ksexpf_temp=np.round((1-(1-Ksccx_temp)*0.6)*100)/100
+                Kswp_temp=np.round((1-(1-Ksccx_temp)*0.5)*100)/100 
+                
+                full_temp = round(crop.EmergenceCD+(np.log((0.25*crop.CCx*Ksccx_temp*crop.CCx*Ksccx_temp/crop.CC0)
+                                                                    /(crop.CCx*Ksccx_temp-(0.98*crop.CCx*Ksccx_temp)))/crop.CGC_CD/Ksexpf_temp))
+                
 
-                    if full_temp>crop.CanopyDevEndCD:
+                if full_temp>crop.CanopyDevEndCD:
 
-                        while Ksexpf_temp<0.99 and full_temp>crop.CanopyDevEndCD:
-                            Ksexpf_temp=Ksexpf_temp+0.01
-                            full_temp = round(crop.EmergenceCD+(np.log((0.25*crop.CCx*Ksccx_temp*crop.CCx*Ksccx_temp/crop.CC0)
-                                                                        /(crop.CCx*Ksccx_temp-(0.98*crop.CCx*Ksccx_temp)))/crop.CGC_CD/Ksexpf_temp))
-                                                                
-                        while full_temp>crop.CanopyDevEndCD and crop.CCx*Ksccx_temp>0.1 and Ksccx_temp>0.5:
-                            Ksccx_temp=Ksccx_temp-0.01
-                            full_temp = round(crop.EmergenceCD+(np.log((0.25*crop.CCx*Ksccx_temp*crop.CCx*Ksccx_temp/crop.CC0)
-                                                                        /(crop.CCx*Ksccx_temp-(0.98*crop.CCx*Ksccx_temp)))/crop.CGC_CD/Ksexpf_temp))
+                    while Ksexpf_temp<0.99 and full_temp>crop.CanopyDevEndCD:
+                        Ksexpf_temp=Ksexpf_temp+0.01
+                        full_temp = round(crop.EmergenceCD+(np.log((0.25*crop.CCx*Ksccx_temp*crop.CCx*Ksccx_temp/crop.CC0)
+                                                                    /(crop.CCx*Ksccx_temp-(0.98*crop.CCx*Ksccx_temp)))/crop.CGC_CD/Ksexpf_temp))
+                                                            
+                    while full_temp>crop.CanopyDevEndCD and crop.CCx*Ksccx_temp>0.1 and Ksccx_temp>0.5:
+                        Ksccx_temp=Ksccx_temp-0.01
+                        full_temp = round(crop.EmergenceCD+(np.log((0.25*crop.CCx*Ksccx_temp*crop.CCx*Ksccx_temp/crop.CC0)
+                                                                    /(crop.CCx*Ksccx_temp-(0.98*crop.CCx*Ksccx_temp)))/crop.CGC_CD/Ksexpf_temp))
                 adj_wp=True
                 k_=0#avoid periodic loop
                 while adj_wp and k_<100:
                     #print('wp')
                     k_+=1
-                    bio_cur,_,_,_,_=Biomas_ini_es(Bio_mul,TopStress,Ksccx_temp,Ksexpf_temp,fcdecline_temp,Kswp_temp)
+                    bio_cur,_,_,_=Biomas_ini_es(Bio_mul,TopStress,Ksccx_temp,Ksexpf_temp,fcdecline_temp,Kswp_temp)
                     #print(Kswp_temp)
                     #print(int(bio_cur/Bio_top*100))
                     if int(bio_cur/Bio_top*100)==int(crop.RelativeBio*100):
@@ -655,7 +786,7 @@ def compute_crop_calendar(
                     k_=0
                     while adj_Ksexpf and k_<100:
                         k_+=1
-                        bio_cur,_,_,_,_=Biomas_ini_es(Bio_mul,TopStress,Ksccx_temp,Ksexpf_temp,fcdecline_temp,Kswp_temp)
+                        bio_cur,_,_,_=Biomas_ini_es(Bio_mul,TopStress,Ksccx_temp,Ksexpf_temp,fcdecline_temp,Kswp_temp)
                         if int(bio_cur/Bio_top*100)==int(crop.RelativeBio*100):
                             adj_flag=False
                             adj_Ksexpf=False
@@ -692,7 +823,7 @@ def compute_crop_calendar(
                     while adj_fcdecline and k_<100:
                         k_+=1
                         #print('fcdecline')
-                        bio_cur,_,_,_,_=Biomas_ini_es(Bio_mul,TopStress,Ksccx_temp,Ksexpf_temp,fcdecline_temp,Kswp_temp)
+                        bio_cur,_,_,_=Biomas_ini_es(Bio_mul,TopStress,Ksccx_temp,Ksexpf_temp,fcdecline_temp,Kswp_temp)
 
                         if int(bio_cur/Bio_top*100)==int(crop.RelativeBio*100):
                             adj_flag=False
@@ -740,56 +871,58 @@ def compute_crop_calendar(
                 
                 #if L12>L123:
                 #    print("L12>L123")
+
+
+            if (int(bio_cur/Bio_top*100)==int(crop.RelativeBio*100)) or (kk_>=100 and np.abs(int(bio_cur/Bio_top*100)-int(crop.RelativeBio*100))<5):
+            #accept some errors when exit because of maximum loop, in theory, the above can ensure ==
+            #if unable to calibrate, then return the defaul value (no soil fertility)
+                crop.Ksccx_in=Ksccx_temp
+                crop.Ksccx_es[0]=Ksccx_temp
+                crop.Ksexpf_es[0]=Ksexpf_temp
+                crop.fcdecline_es[0]=fcdecline_temp
+                crop.Kswp_es[0]=Kswp_temp
+                crop.sf_es[0]=1-bio_cur/Bio_top
+                crop.relbio_es[0]=bio_cur/Bio_top
                 
-                if (int(bio_cur/Bio_top*100)==int(crop.RelativeBio*100)) or (kk_>=100 and np.abs(int(bio_cur/Bio_top*100)-int(crop.RelativeBio*100))<5):
-                    #accept some errors when exit because of maximum loop, in theory, the above can ensure ==
-                    #if unable to calibrate, then return the defaul value (no soil fertility)
-                    crop.Ksccx_in=Ksccx_temp
-                    crop.Ksccx_es[0]=Ksccx_temp
-                    crop.Ksexpf_es[0]=Ksexpf_temp
-                    crop.fcdecline_es[0]=fcdecline_temp
-                    crop.Kswp_es[0]=Kswp_temp
-                    crop.sf_es[0]=1-bio_cur/Bio_top
-                    crop.relbio_es[0]=bio_cur/Bio_top
-
-                    def get_shape(ks,sf):
-                        if ks>1-sf:
-                            up_=50
-                            low_=0
+                def get_shape(ks,sf):
+                    if ks>1-sf:
+                        up_=50
+                        low_=0
+                    else:
+                        up_=0
+                        low_=-50
+                    flag_=True
+                    while flag_:
+                        shape_=(up_+low_)/2
+                        ks_=1-(np.exp(sf*shape_)-1)/(np.exp(shape_)-1)
+                        
+                        if np.abs(ks_-ks)<0.0001 or np.abs(up_-low_)<0.0001:
+                            flag_=False
+                        elif ks_<ks:
+                            low_=shape_
                         else:
-                            up_=0
-                            low_=-50
-                        flag_=True
-                        while flag_:
-                            shape_=(up_+low_)/2
-                            ks_=1-(np.exp(sf*shape_)-1)/(np.exp(shape_)-1)
-                            
-                            if np.abs(ks_-ks)<0.0001 or np.abs(up_-low_)<0.0001:
-                                flag_=False
-                            elif ks_<ks:
-                                low_=shape_
-                            else:
-                                up_=shape_
-                        return shape_
+                            up_=shape_
+                    return shape_
+                
+                Ksccx_shape=get_shape(Ksccx_temp,crop.sf_es[0])
+                Ksexpf_shape=get_shape(Ksexpf_temp,crop.sf_es[0])
+                Kswp_shape=get_shape(Kswp_temp,crop.sf_es[0])
+                fcdecline_shape=get_shape(1-fcdecline_temp*100,crop.sf_es[0])
+                
+                for i in range(0,100):
+                    crop.sf_es[i+1]=i/100
+                    Ksccx_temp=1-(np.exp(crop.sf_es[i+1]*Ksccx_shape)-1)/(np.exp(Ksccx_shape)-1)
+                    Ksexpf_temp=1-(np.exp(crop.sf_es[i+1]*Ksexpf_shape)-1)/(np.exp(Ksexpf_shape)-1)
+                    Kswp_temp=1-(np.exp(crop.sf_es[i+1]*Kswp_shape)-1)/(np.exp(Kswp_shape)-1)
+                    fcdecline_temp=(np.exp(crop.sf_es[i+1]*fcdecline_shape)-1)/(np.exp(fcdecline_shape)-1)/100
+                    bio_temp,_,_,_=Biomas_ini_es(Bio_mul,crop.TR_ET0_fertstress*(1-crop.sf_es[i+1]),Ksccx_temp,Ksexpf_temp,fcdecline_temp,Kswp_temp)
 
-                    Ksccx_shape=get_shape(Ksccx_temp,crop.sf_es[0])
-                    Ksexpf_shape=get_shape(Ksexpf_temp,crop.sf_es[0])
-                    Kswp_shape=get_shape(Kswp_temp,crop.sf_es[0])
-                    fcdecline_shape=get_shape(1-fcdecline_temp*100,crop.sf_es[0])
-                    
-                    for i in range(0,100):
-                        crop.sf_es[i+1]=i/100
-                        Ksccx_temp=1-(np.exp(crop.sf_es[i+1]*Ksccx_shape)-1)/(np.exp(Ksccx_shape)-1)
-                        Ksexpf_temp=1-(np.exp(crop.sf_es[i+1]*Ksexpf_shape)-1)/(np.exp(Ksexpf_shape)-1)
-                        Kswp_temp=1-(np.exp(crop.sf_es[i+1]*Kswp_shape)-1)/(np.exp(Kswp_shape)-1)
-                        fcdecline_temp=(np.exp(crop.sf_es[i+1]*fcdecline_shape)-1)/(np.exp(fcdecline_shape)-1)/100
-                        bio_temp,_,_,_,_=Biomas_ini_es(Bio_mul,crop.TR_ET0_fertstress*(1-crop.sf_es[i+1]),Ksccx_temp,Ksexpf_temp,fcdecline_temp,Kswp_temp)
+                    crop.Ksccx_es[i+1]=Ksccx_temp
+                    crop.Ksexpf_es[i+1]=Ksexpf_temp
+                    crop.fcdecline_es[i+1]=fcdecline_temp
+                    crop.Kswp_es[i+1]=Kswp_temp
+                    crop.relbio_es[i+1]=bio_temp/Bio_top
 
-                        crop.Ksccx_es[i+1]=Ksccx_temp
-                        crop.Ksexpf_es[i+1]=Ksexpf_temp
-                        crop.fcdecline_es[i+1]=fcdecline_temp
-                        crop.Kswp_es[i+1]=Kswp_temp
-                        crop.relbio_es[i+1]=bio_temp/Bio_top
 
         if crop.need_calib==2:
             
@@ -814,7 +947,7 @@ def compute_crop_calendar(
                         if Full_CCxCD>=crop.SenescenceCD:
                             break
                             
-                        _,Bio_up,Kc_Tr_es,Ks_Tr,_=Biomas_ini_es(Bio_mul,TopStress,crop.Ksccx_in,Ksexpf,fcdecline,1.0)
+                        _,Bio_up,Kc_Tr_es,Ks_Tr=Biomas_ini_es(Bio_mul,TopStress,crop.Ksccx_in,Ksexpf,fcdecline,1.0)
                             
                         if int(Bio_up/Bio_top*100)<int(crop.RelativeBio*100):
                             #pass

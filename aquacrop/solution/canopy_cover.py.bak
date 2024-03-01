@@ -142,16 +142,8 @@ def canopy_cover(
         elif Crop.CalendarType == 2:
             dtCC = gdd
             tCCadj = NewCond.gdd_cum - NewCond.delayed_gdds
-            
-        ##translate AQv7-WIN code
-        CGCGDDSF=Crop.CGC * Crop.Ksexpf
-        GDDCGCadjusted = CGCGDDSF
-        RatDGDD=1
-        if Crop.MaxCanopy<Crop.Senescence:
-            RatDGDD=(Crop.SenescenceCD-Crop.MaxCanopyCD)/(Crop.Senescence-Crop.MaxCanopy)
-        CCxSF=Crop.CCx*Crop.Ksccx
 
-        ## Canopy development (potential), considering soil fertility/salinity, weed stress (to be included)##
+        ## Canopy development (potential) ##
         if (tCCadj < Crop.Emergence) or (round(tCCadj) > Crop.Maturity):
             # No canopy development before emergence/germination or after
             # maturity
@@ -160,60 +152,38 @@ def canopy_cover(
             # Canopy growth can occur
             if InitCond_CC_NS <= Crop.CC0:
                 # Very small initial canopy_cover.
-                NewCond.canopy_cover_ns = Crop.CC0 * np.exp(CGCGDDSF * dtCC)
+                NewCond.canopy_cover_ns = Crop.CC0 * np.exp(Crop.CGC * dtCC)
                 # print(Crop.CC0,np.exp(Crop.CGC*dtCC))
             else:
                 # Canopy growing
                 tmp_tCC = tCCadj - Crop.Emergence
-                NewCond.canopy_cover_ns = cc_development(Crop.CC0,0.98*CCxSF,\
-                                                CGCGDDSF,Crop.CDC,tmp_tCC,'Growth',CCxSF)
+                NewCond.canopy_cover_ns = cc_development(
+                    Crop.CC0, 0.98 * Crop.CCx, Crop.CGC, Crop.CDC, tmp_tCC, "Growth", Crop.CCx
+                )
 
             # Update maximum canopy cover size in growing season
-            if NewCond.ccx_act_ns < NewCond.canopy_cover_ns:
-                NewCond.ccx_act_ns = NewCond.canopy_cover_ns
-                
-            if tCCadj > Crop.MaxCanopy and Crop.SenescenceCD>Crop.MaxCanopyCD:
-                day_fertility=NewCond.dap - Crop.MaxCanopyCD
-                NewCond.canopy_cover_ns=NewCond.ccx_act_ns-Crop.fcdecline*day_fertility*day_fertility/(Crop.SenescenceCD-Crop.MaxCanopyCD)
-            
+            NewCond.ccx_act_ns = NewCond.canopy_cover_ns
         elif tCCadj > Crop.CanopyDevEnd:
             # No more canopy growth is possible or canopy in decline
             # Set CCx for calculation of withered canopy effects
             NewCond.ccx_w_ns = NewCond.ccx_act_ns
             if tCCadj < Crop.Senescence:
-            
-                if Crop.SenescenceCD>Crop.MaxCanopyCD:
-                    day_fertility=NewCond.dap - Crop.MaxCanopyCD
-
-                    NewCond.canopy_cover_ns=NewCond.ccx_act_ns-Crop.fcdecline*day_fertility*day_fertility/(Crop.SenescenceCD-Crop.MaxCanopyCD)
-
-                else:
-                    NewCond.canopy_cover_ns = InitCond_canopy_cover_ns
-                if NewCond.canopy_cover_ns<0:
-                    NewCond.canopy_cover_ns=0
-
                 # Mid-season stage - no canopy growth
-                #NewCond.canopy_cover_ns = InitCond_CC_NS
+                NewCond.canopy_cover_ns = InitCond_CC_NS
                 # Update maximum canopy cover size in growing season
-                #NewCond.ccx_act_ns = NewCond.canopy_cover_ns
+                NewCond.ccx_act_ns = NewCond.canopy_cover_ns
             else:
                 # Late-season stage - canopy decline
-                if Crop.SenescenceCD>Crop.MaxCanopyCD:
-                    day_fertility=NewCond.dap - Crop.MaxCanopyCD
-                    CC_confs=NewCond.ccx_act_ns-Crop.fcdecline*day_fertility*day_fertility/(Crop.SenescenceCD-Crop.MaxCanopyCD)
-
-                    canopy_cover_ns=NewCond.ccx_act_ns-RatDGDD*Crop.fcdecline*(Crop.Senescence-Crop.MaxCanopy)
-                else:
-                    CC_confs=NewCond.ccx_act_ns
-                    canopy_cover_ns=NewCond.ccx_act_ns
-               
-                tmp_tCC = tCCadj-Crop.Senescence 
-                CDCadj = Crop.CDC*((canopy_cover_ns+2.29)/(Crop.CCx+2.29))
-                NewCond.canopy_cover_ns = cc_development(Crop.CC0,canopy_cover_ns, \
-                                                          Crop.CGC,CDCadj,tmp_tCC,'Decline',canopy_cover_ns)
-                
-                if NewCond.canopy_cover_ns<0:
-                    NewCond.canopy_cover_ns=0
+                tmp_tCC = tCCadj - Crop.Senescence
+                NewCond.canopy_cover_ns = cc_development(
+                    Crop.CC0,
+                    NewCond.ccx_act_ns,
+                    Crop.CGC,
+                    Crop.CDC,
+                    tmp_tCC,
+                    "Decline",
+                    NewCond.ccx_act_ns,
+                )
 
         ## Canopy development (actual) ##
         if (tCCadj < Crop.Emergence) or (round(tCCadj) > Crop.Maturity):
@@ -223,7 +193,6 @@ def canopy_cover(
             NewCond.cc0_adj = Crop.CC0
         elif tCCadj < Crop.CanopyDevEnd:
             # Canopy growth can occur
-            
             if InitCond_CC <= NewCond.cc0_adj or (
                 (InitCond_ProtectedSeed == True) and (InitCond_CC <= (1.25 * NewCond.cc0_adj))
             ):
@@ -231,8 +200,9 @@ def canopy_cover(
                 # growth. In this case, assume no leaf water expansion stress
                 if InitCond_ProtectedSeed == True:
                     tmp_tCC = tCCadj - Crop.Emergence
-                    NewCond.canopy_cover = cc_development(Crop.CC0,CCxSF, \
-                                                           Crop.CGC*Crop.Ksexpf,Crop.CDC,tmp_tCC,'Growth',Crop.CCx*Crop.Ksccx)
+                    NewCond.canopy_cover = cc_development(
+                        Crop.CC0, Crop.CCx, Crop.CGC, Crop.CDC, tmp_tCC, "Growth", Crop.CCx
+                    )
                     # Check if seed protection should be turned off
                     if NewCond.canopy_cover > (1.25 * NewCond.cc0_adj):
                         # Turn off seed protection - lead expansion stress can
@@ -240,15 +210,15 @@ def canopy_cover(
                         NewCond.protected_seed = False
 
                 else:
-                    NewCond.canopy_cover = NewCond.cc0_adj * np.exp(Crop.CGC *Crop.Ksexpf * dtCC)
-                
+                    NewCond.canopy_cover = NewCond.cc0_adj * np.exp(Crop.CGC * dtCC)
+
             else:
                 # Canopy growing
 
-                if InitCond_CC < (0.9799 * CCxSF):
+                if InitCond_CC < (0.9799 * Crop.CCx):
                     # Adjust canopy growth coefficient for leaf expansion water
                     # stress effects
-                    CGCadj = Crop.CGC * water_stress_coef.exp*Crop.Ksexpf
+                    CGCadj = Crop.CGC * water_stress_coef.exp
                     if CGCadj > 0:
 
                         # Adjust CCx for change in CGC
@@ -262,17 +232,17 @@ def canopy_cover(
                             tCCadj,
                             Crop.CanopyDevEnd,
                             Crop.CCx,
-                            Crop.Ksccx,
                         )
                         if CCXadj < 0:
 
                             NewCond.canopy_cover = InitCond_CC
-                        elif abs(InitCond_CC - (0.9799 * CCxSF)) < 0.001:
+                        elif abs(InitCond_CC - (0.9799 * Crop.CCx)) < 0.001:
 
                             # Approaching maximum canopy cover size
                             tmp_tCC = tCCadj - Crop.Emergence
-                            NewCond.canopy_cover = cc_development(Crop.CC0,CCxSF, \
-                                                                   Crop.CGC*Crop.Ksexpf,Crop.CDC,tmp_tCC,'Growth',CCxSF)
+                            NewCond.canopy_cover = cc_development(
+                                Crop.CC0, Crop.CCx, Crop.CGC, Crop.CDC, tmp_tCC, "Growth", Crop.CCx
+                            )
                         else:
 
                             # Determine time required to reach canopy_cover on previous,
@@ -292,14 +262,14 @@ def canopy_cover(
                                     Crop.CDC,
                                     tmp_tCC,
                                     "Growth",
-                                    CCXadj,
+                                    Crop.CCx,
                                 )
                                 # print(NewCond.dap,CCXadj,tReq)
 
                             else:
                                 # No canopy growth
                                 NewCond.canopy_cover = InitCond_CC
-                        
+
                     else:
 
                         # No canopy growth
@@ -313,24 +283,14 @@ def canopy_cover(
                 else:
                     # Canopy approaching maximum size
                     tmp_tCC = tCCadj - Crop.Emergence
-                    NewCond.canopy_cover = cc_development(Crop.CC0,CCxSF, \
-                                                                   Crop.CGC*Crop.Ksexpf,Crop.CDC,tmp_tCC,'Growth',CCxSF)
+                    NewCond.canopy_cover = cc_development(
+                        Crop.CC0, Crop.CCx, Crop.CGC, Crop.CDC, tmp_tCC, "Growth", Crop.CCx
+                    )
                     NewCond.cc0_adj = Crop.CC0
 
-            day_fertility=NewCond.dap - NewCond.delayed_cds
-            
-            if day_fertility <= Crop.MaxCanopyCD and Crop.SenescenceCD>Crop.MaxCanopyCD:
-                NewCond.CCx_fertstress=CCxSF#NewCond.CCx_fertstress is CCxSFCD in AQv7-WIN
-            elif day_fertility > Crop.MaxCanopyCD and Crop.SenescenceCD>Crop.MaxCanopyCD:
-                tmp_tCC = tCCadj-Crop.Emergence
-                CC_ = cc_development(Crop.CC0,CCxSF, \
-                                                       Crop.CGC*Crop.Ksexpf,Crop.CDC,tmp_tCC,'Growth',Crop.CCx*Crop.Ksccx)
-                NewCond.CCx_fertstress=CC_-Crop.fcdecline*(day_fertility-Crop.MaxCanopyCD)*(day_fertility-Crop.MaxCanopyCD)/(Crop.SenescenceCD-Crop.MaxCanopyCD)
-            if NewCond.CCx_fertstress<NewCond.canopy_cover and Crop.SenescenceCD>Crop.MaxCanopyCD:
-                NewCond.canopy_cover=NewCond.CCx_fertstress
-            if NewCond.canopy_cover<0:
-                    NewCond.canopy_cover=0
-            NewCond.ccx_act = NewCond.canopy_cover
+            if NewCond.canopy_cover > InitCond_CCxAct:
+                # Update actual maximum canopy cover size during growing season
+                NewCond.ccx_act = NewCond.canopy_cover
 
         elif tCCadj > Crop.CanopyDevEnd:
 
@@ -338,69 +298,34 @@ def canopy_cover(
             if tCCadj < Crop.Senescence:
                 # Mid-season stage - no canopy growth
                 NewCond.canopy_cover = InitCond_CC
-                
-                day_fertility=NewCond.dap - NewCond.delayed_cds
-                if day_fertility > Crop.MaxCanopyCD and Crop.SenescenceCD>Crop.MaxCanopyCD:
-                    NewCond.CCx_fertstress=CCxSF-Crop.fcdecline*(day_fertility-Crop.MaxCanopyCD)*(day_fertility-Crop.MaxCanopyCD)/(Crop.SenescenceCD-Crop.MaxCanopyCD)
-                
-                if NewCond.CCx_fertstress<NewCond.canopy_cover and Crop.SenescenceCD>Crop.MaxCanopyCD:
-                    NewCond.canopy_cover=NewCond.CCx_fertstress
-                if NewCond.canopy_cover<0:
-                    NewCond.canopy_cover=0
-                    
-                NewCond.ccx_act = NewCond.canopy_cover
+                if NewCond.canopy_cover > InitCond_CCxAct:
+                    # Update actual maximum canopy cover size during growing
+                    # season
+                    NewCond.ccx_act = NewCond.canopy_cover
 
             else:
                 # Late-season stage - canopy decline
                 # Adjust canopy decline coefficient for difference between actual
                 # and potential CCx
-                #print(NewCond.dap)
-                
-                NewCond.CCx_fertstress=CCxSF-RatDGDD*Crop.fcdecline*(Crop.Senescence-Crop.MaxCanopy)
-                if NewCond.CCx_fertstress<0:
-                    NewCond.CCx_fertstress=0
-                if NewCond.ccx_act>NewCond.CCx_fertstress:
-                    NewCond.ccx_act=NewCond.CCx_fertstress
-                if NewCond.ccx_act<0:
-                    NewCond.ccx_act=0
-                
-                if Crop.SenescenceCD>Crop.MaxCanopyCD:
-                    day_fertility=NewCond.dap - NewCond.delayed_cds
-                    CC_confs=CCxSF-Crop.fcdecline*(day_fertility-Crop.MaxCanopyCD)*(day_fertility-Crop.MaxCanopyCD)/(Crop.SenescenceCD-Crop.MaxCanopyCD)
-                    #CC_confs=CCxSF-RatDGDD*Crop.fcdecline*(tCCadj-Crop.MaxCanopy)*(tCCadj-Crop.MaxCanopy)/(Crop.Senescence-Crop.MaxCanopy)
-                else:
-                    CC_confs=NewCond.ccx_act
-                    
-                if CC_confs<0:
-                    NewCond.canopy_cover=0
-                else:
-                    
-                    # Determine new canopy size
-                    tmp_tCC = tCCadj-Crop.Senescence
-
-                    #cc_=cc_development(Crop.CC0,CCxSF, \
-                    #                                       Crop.CGC*Crop.Ksexpf,Crop.CDC,Crop.CanopyDevEnd-Crop.Emergence,'Growth',Crop.CCx*Crop.Ksccx)
-                    
-                    #I add additional adjustment here, double counting, but seems it helps to achieve the same results with AquaCrop-win in some cases, for other cases, nearly have no impact
-                    CDCadj = Crop.CDC*((NewCond.ccx_act+2.29)/(Crop.CCx+2.29))#*((cc_+2.29)/(Crop.CCx+2.29))
-                    
-                    NewCond.canopy_cover = cc_development(NewCond.cc0_adj,NewCond.ccx_act, \
-                                                           Crop.CGC,CDCadj,tmp_tCC,'Decline',NewCond.ccx_act)
-                    #print(NewCond.canopy_cover)
-                    #print(CC_confs)
-                    if CC_confs<NewCond.canopy_cover:#should enable for aquacrop v7, not sure about this, exclude seems also fine for v7
-                        NewCond.canopy_cover=CC_confs
-                    if NewCond.canopy_cover>NewCond.CCx_fertstress and Crop.SenescenceCD>Crop.MaxCanopyCD:#apply for aquacrop v6
-                        NewCond.canopy_cover=NewCond.CCx_fertstress
-                    if NewCond.canopy_cover<0:
-                        NewCond.canopy_cover=0
+                CDCadj = Crop.CDC * ((NewCond.ccx_act + 2.29) / (Crop.CCx + 2.29))
+                # Determine new canopy size
+                tmp_tCC = tCCadj - Crop.Senescence
+                NewCond.canopy_cover = cc_development(
+                    NewCond.cc0_adj,
+                    NewCond.ccx_act,
+                    Crop.CGC,
+                    CDCadj,
+                    tmp_tCC,
+                    "Decline",
+                    NewCond.ccx_act,
+                )
 
             # Check for crop growth termination
             if (NewCond.canopy_cover < 0.001) and (InitCond_CropDead == False):
                 # Crop has died
                 NewCond.canopy_cover = 0
                 NewCond.crop_dead = True
-        #The remaining bugs seems relate to the early senescence, how it interact with soil fertility module
+
         ## Canopy senescence due to water stress (actual) ##
         if tCCadj >= Crop.Emergence:
             if (tCCadj < Crop.Senescence) or (InitCond_tEarlySen > 0):
@@ -465,8 +390,8 @@ def canopy_cover(
                     # Update canopy cover size
                     if tCCadj < Crop.Senescence:
                         # Limit canopy_cover to CCx
-                        if CCsen > CCxSF:
-                            CCsen = CCxSF
+                        if CCsen > Crop.CCx:
+                            CCsen = Crop.CCx
 
                         # canopy_cover cannot be greater than value on previous day
                         NewCond.canopy_cover = CCsen
@@ -502,12 +427,7 @@ def canopy_cover(
                         # Rewatering of canopy in late season
                         # Get new values for CCx and CDC
                         tmp_tCC = tCCadj - dtCC - Crop.Senescence
-                        #CCXadj, CDCadj = update_CCx_CDC(InitCond_CC, Crop.CDC, Crop.CCx, tmp_tCC)
-
-                        CCXadj = InitCond_CC/(1-0.05*(np.exp(tmp_tCC*((Crop.CDC*3.33)/(NewCond.ccx_act+2.29)))-1))
-                        ## Get adjusted CDC ##
-                        CDCadj = Crop.CDC*((CCXadj+2.29)/(Crop.CCx+2.29))
-                        
+                        CCXadj, CDCadj = update_CCx_CDC(InitCond_CC, Crop.CDC, Crop.CCx, tmp_tCC)
                         NewCond.ccx_act = CCXadj
                         # Get new canopy_cover value for end of current day
                         tmp_tCC = tCCadj - Crop.Senescence
