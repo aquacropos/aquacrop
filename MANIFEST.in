@@ -7,6 +7,8 @@ include aquacrop/data/*.dat
 include aquacrop/data/*.st
 include aquacrop/data/*.OUT
 include aquacrop/data/*.csv
-include aquacrop/data/cmip6_woolpit/*.csv
+include aquacrop/data/cmip6_woolpit/CanESM5/*.csv
+include aquacrop/data/cmip6_woolpit/MIROC6/*.csv
+include aquacrop/data/cmip6_woolpit/NorESM2-LM/*.csv
 include aquacrop/scripts/*
 recursive-exclude * __pycache__
