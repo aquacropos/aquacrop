@@ -430,7 +430,7 @@ def solution_single_time_step(
     if growing_season is True:
         # Calculate crop yield_ (tonne/ha)
         NewCond.DryYield = (NewCond.biomass / 100) * NewCond.harvest_index_adj
-        NewCond.FreshYield = NewCond.DryYield / (1 - (Crop.YldWC / 100))
+        NewCond.FreshYield = NewCond.DryYield / (Crop.YldWC / 100)
         # print( clock_struct.time_step_counter,(NewCond.biomass/100),NewCond.harvest_index_adj)
         # Check if crop has reached maturity
         if ((Crop.CalendarType == 1) and (NewCond.dap >= Crop.Maturity)) or (
