@@ -8,6 +8,8 @@ import logging
 import warnings
 from typing import Dict, Union, Optional, Tuple, TYPE_CHECKING
 from .scripts.checkIfPackageIsCompiled import compile_all_AOT_files
+import numpy as np
+import sys
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
@@ -276,7 +278,42 @@ class AquaCropModel:
         """
 
         if initialize_model:
-            self._initialize()
+            if self.crop.need_calib==2:
+                
+                assert self.crop.RelativeBio<1, "Please give inputs for soil fertility calibration"
+                
+                self._initialize()
+                
+                num=np.argmin(self.crop.Ksexpf_es<1)
+
+                #Ksexpf_es=self.crop.Ksexpf_es[0:num]
+                #fcdecline_es=self.crop.fcdecline_es[0:num]
+                #Kswp_es=self.crop.Kswp_es[0:num]
+                
+                print("All possible parameters of soil fertility module have been found!")
+                print("Please look at the first {0} parameters of YourModelName.Ksexpf_es, YourModelName.fcdecline_es, and YourModelName.Kswp_es.".format(num))
+                print("Choose your preference then re-run the model with need_calib as -1 and your perfered parameters")
+                
+                sys.exit("Choose soil fertility stress parameters first...")
+
+            if self.crop.need_calib==1 or self.crop.need_calib==-1:
+            
+                assert self.crop.RelativeBio<1, "Please give inputs for soil fertility calibration"
+                
+                self._initialize()
+                
+                loc_=np.argmin(np.abs(self.crop.sf_es[0:100]-self.crop.sfertstress))
+
+                self.crop.Ksccx=self.crop.Ksccx_es[loc_]
+                self.crop.Ksexpf=self.crop.Ksexpf_es[loc_]
+                self.crop.Kswp=self.crop.Kswp_es[loc_]
+                self.crop.fcdecline=self.crop.fcdecline_es[loc_]
+                
+                self.crop.need_calib==0 #necessary, because the input parameter will be re-adjusted before used in simulation
+                
+            if self.crop.need_calib==0:#Should enable soil fertility stress without calibration here
+                self._initialize()
+
 
         if till_termination:
             self.__start_model_execution = time.time()

@@ -20,6 +20,9 @@ build/
 develop-eggs/
 dist/
 downloads/
+test_figs/
+AquaCropV61Nr02052018/
+AquaCropV71No13102023/
 eggs/
 .eggs/
 lib/
