@@ -158,7 +158,7 @@ def canopy_cover(
                 # Canopy growing
                 tmp_tCC = tCCadj - Crop.Emergence
                 NewCond.canopy_cover_ns = cc_development(
-                    Crop.CC0, 0.98 * Crop.CCx, Crop.CGC, Crop.CDC, tmp_tCC, "Growth", Crop.CCx
+                    Crop.CC0, 0.98*Crop.CCx, Crop.CGC, Crop.CDC, tmp_tCC, "Growth", Crop.CCx # used to be 0.98 * Crop.CCx instead of Crop.CCx
                 )
 
             # Update maximum canopy cover size in growing season

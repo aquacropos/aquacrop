@@ -573,3 +573,11 @@ v7_final_tidying.pptx
 outputs/
 
 test_test.py
+
+*.png
+
+gdd_compute_crop_cal_testing_200524.py
+
+no-stress-testing.py
+
+temp-delete.py

@@ -126,10 +126,10 @@ def compute_crop_calendar(
             weather_df = weather_df.loc[date_range]
             temp_min = weather_df.MinTemp
             temp_max = weather_df.MaxTemp
-
+          
             # Calculate gdd's
             if crop.GDDmethod == 1:
-
+                
                 Tmean = (temp_max + temp_min) / 2
                 Tmean = Tmean.clip(lower=crop.Tbase, upper=crop.Tupp)
                 gdd = Tmean - crop.Tbase
@@ -140,16 +140,21 @@ def compute_crop_calendar(
                 temp_min = temp_min.clip(lower=crop.Tbase, upper=crop.Tupp)
                 Tmean = (temp_max + temp_min) / 2
                 gdd = Tmean - crop.Tbase
+                
 
             elif crop.GDDmethod == 3:
 
                 temp_max = temp_max.clip(lower=crop.Tbase, upper=crop.Tupp)
                 temp_min = temp_min.clip(upper=crop.Tupp)
+                
                 Tmean = (temp_max + temp_min) / 2
                 Tmean = Tmean.clip(lower=crop.Tbase)
+                
                 gdd = Tmean - crop.Tbase
+                
 
             gdd_cum = np.cumsum(gdd)
+            
             # Find gdd equivalent for each crop calendar variable
             # 1. gdd's from sowing to emergence
             crop.Emergence = gdd_cum.iloc[int(crop.EmergenceCD)]
