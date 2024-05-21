@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from ..entities.modelConstants import ModelConstants
+from ..utils.prepare_gdd import prepare_gdd
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -14,6 +15,7 @@ def compute_crop_calendar(
     crop: "Crop",
     clock_struct_planting_dates: "DatetimeIndex",
     clock_struct_simulation_start_date: str,
+    clock_struct_simulation_end_date: str,
     clock_struct_time_span: "DatetimeIndex",
     weather_df: "DataFrame",
 ) -> "Crop":
@@ -152,37 +154,12 @@ def compute_crop_calendar(
                 
                 gdd = Tmean - crop.Tbase
                 
-
-            gdd_cum = np.cumsum(gdd)
-            
-            # Find gdd equivalent for each crop calendar variable
-            # 1. gdd's from sowing to emergence
-            crop.Emergence = gdd_cum.iloc[int(crop.EmergenceCD)]
-            # 2. gdd's from sowing to 10# canopy cover
-            crop.Canopy10Pct = gdd_cum.iloc[int(crop.Canopy10PctCD)]
-            # 3. gdd's from sowing to maximum rooting
-            crop.MaxRooting = gdd_cum.iloc[int(crop.MaxRootingCD)]
-            # 4. gdd's from sowing to maximum canopy cover
-            crop.MaxCanopy = gdd_cum.iloc[int(crop.MaxCanopyCD)]
-            # 5. gdd's from sowing to end of vegetative growth
-            crop.CanopyDevEnd = gdd_cum.iloc[int(crop.CanopyDevEndCD)]
-            # 6. gdd's from sowing to senescence
-            crop.Senescence = gdd_cum.iloc[int(crop.SenescenceCD)]
-            # 7. gdd's from sowing to maturity
-            crop.Maturity = gdd_cum.iloc[int(crop.MaturityCD)]
-            # 8. gdd's from sowing to start of yield_ formation
-            crop.HIstart = gdd_cum.iloc[int(crop.HIstartCD)]
-            # 9. gdd's from sowing to start of yield_ formation
-            crop.HIend = gdd_cum.iloc[int(crop.HIendCD)]
-            # 10. Duration of yield_ formation (gdd's)
-            crop.YldForm = crop.HIend - crop.HIstart
-
-            # 11. Duration of flowering (gdd's) - (fruit/grain crops only)
-            if crop.CropType == 3:
-                # gdd's from sowing to end of flowering
-                crop.FloweringEnd = gdd_cum.iloc[int(crop.FloweringEndCD)]
-                # Duration of flowering (gdd's)
-                crop.Flowering = crop.FloweringEnd - crop.HIstart
+            print('switch type:')
+            print(crop.gdd_switch_type)
+            crop = prepare_gdd(weather_df, 
+                               clock_struct_simulation_start_date,
+                               clock_struct_simulation_end_date, 
+                               gdd, crop, crop.gdd_switch_type)
 
             # Convert CGC to gdd mode
             # crop.CGC_CD = crop.CGC

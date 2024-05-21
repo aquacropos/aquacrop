@@ -89,6 +89,7 @@ def compute_variables(
             crop,
             clock_struct.planting_dates,
             clock_struct.simulation_start_date,
+            clock_struct.simulation_end_date,
             clock_struct.time_span,
             weather_df,
         )

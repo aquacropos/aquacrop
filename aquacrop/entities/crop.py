@@ -67,6 +67,7 @@ class Crop:
         self.bface = (
             0.001165  # WP co2 adjustment parameter given by FACE experiments
         )
+        self.gdd_switch_type = 'mean' # when switching CD to GDD to calculate growth stages, take mean or median of all sim years' values?
 
         if c_name == "custom":
 
@@ -110,6 +111,7 @@ class Crop:
             "PlantMethod",
             "CalendarType",
             "SwitchGDD",
+            "gdd_switch_type",
             "planting_date",
             "harvest_date",
             "Emergence",
@@ -258,6 +260,7 @@ crop_spec = [
     ("PlantMethod", int64),
     ("CalendarType", int64),
     ("SwitchGDD", int64),
+    ("gdd_switch_type", str),
     ("EmergenceCD", int64),
     ("Canopy10PctCD", int64),
     ("MaxRootingCD", int64),
@@ -377,7 +380,7 @@ class CropStruct(object):
             2  # Calendar Type (1 = Calendar days, 2 = Growing degree days)
         )
         self.SwitchGDD = 0  # Convert calendar to gdd mode if inputs are given in calendar days (0 = No; 1 = Yes)
-
+        self.gdd_switch_type = 'mean'
         self.EmergenceCD = 0
         self.Canopy10PctCD = 0
         self.MaxRootingCD = 0
