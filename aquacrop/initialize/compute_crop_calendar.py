@@ -154,8 +154,8 @@ def compute_crop_calendar(
                 
                 gdd = Tmean - crop.Tbase
                 
-            print('switch type:')
-            print(crop.gdd_switch_type)
+            # print('switch type:')
+            # print(crop.gdd_switch_type)
             crop = prepare_gdd(weather_df, 
                                clock_struct_simulation_start_date,
                                clock_struct_simulation_end_date, 
@@ -171,12 +171,11 @@ def compute_crop_calendar(
             ) / (-(crop.MaxCanopy - crop.Emergence))
 
             # Convert CDC to gdd mode
-            # crop.CDC_CD = crop.CDC
             tCD = crop.MaturityCD - crop.SenescenceCD
             if tCD <= 0:
                 tCD = 1
 
-            CCi = crop.CCx * (1 - 0.05 * (np.exp((crop.CDC_CD / crop.CCx) * tCD) - 1))
+            CCi = crop.CCx * (1 - 0.05 * (np.exp(((3.33 * crop.CDC_CD) / (crop.CCx + 2.29)) * tCD) - 1))
             if CCi < 0:
                 CCi = 0
 
@@ -184,7 +183,7 @@ def compute_crop_calendar(
             if tGDD <= 0:
                 tGDD = 5
 
-            crop.CDC = (crop.CCx / tGDD) * np.log(1 + ((1 - CCi / crop.CCx) / 0.05))
+            crop.CDC = ((crop.CCx + 2.29) * np.log((((CCi/crop.CCx) - 1) / -0.05) + 1)) / (3.33 * tGDD) 
             # Set calendar type to gdd mode
             crop.CalendarType = 2
 
