@@ -1,9 +1,10 @@
 """
 Test exeptions in the model.
 """
-import unittest
 import os
 os.environ['DEVELOPMENT'] = 'True'
+import unittest
+
 
 from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent, GroundWater
 from aquacrop.utils import prepare_weather, get_filepath
