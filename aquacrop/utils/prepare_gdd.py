@@ -116,16 +116,10 @@ def prepare_gdd(weather_df, sim_start, sim_end, gdd, crop, sum_fun):
     # calculate mean/median of GDD growth stages using dictionary logic,
     # set the attribute to update the crop object
     if sum_fun == 'mean':
-        print('run mean')
         for stage, values in gdd_lists.items():
-            print('Mean values:')
-            print(values)
             setattr(crop, stage, np.mean(values))
     elif sum_fun == 'median':
-        print('run median')
         for stage, values in gdd_lists.items():
-            print('Median values:')
-            print(values)
             setattr(crop, stage, np.median(values))
 
     return crop

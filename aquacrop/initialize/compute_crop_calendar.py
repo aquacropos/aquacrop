@@ -151,8 +151,6 @@ def compute_crop_calendar(
                 Tmean = Tmean.clip(lower=crop.Tbase)
                 gdd = Tmean - crop.Tbase
                 
-            print('switch type:')
-            print(crop.SwitchGDDType)
             crop = prepare_gdd(weather_df, 
                                clock_struct_simulation_start_date,
                                clock_struct_simulation_end_date, 
