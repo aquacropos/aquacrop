@@ -3,11 +3,13 @@ This test is for bug testing
 """
 import unittest
 
+import os
+os.environ['DEVELOPMENT'] = 'True'
+
 from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent, GroundWater
 from aquacrop.utils import prepare_weather, get_filepath
 
-import os
-os.environ['DEVELOPMENT'] = 'True'
+
 
 
 class TestModelExceptions(unittest.TestCase):
