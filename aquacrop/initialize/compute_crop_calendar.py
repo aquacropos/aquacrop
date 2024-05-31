@@ -171,7 +171,7 @@ def compute_crop_calendar(
             if tCD <= 0:
                 tCD = 1
 
-            CCi = crop.CCx * (1 - 0.05 * (np.exp((crop.CDC_CD / crop.CCx) * tCD) - 1))
+            CCi = crop.CCx * (1 - 0.05 * (np.exp(((3.33 * crop.CDC_CD) / (crop.CCx + 2.29)) * tCD) - 1))
             if CCi < 0:
                 CCi = 0
 
@@ -179,7 +179,7 @@ def compute_crop_calendar(
             if tGDD <= 0:
                 tGDD = 5
 
-            crop.CDC = (crop.CCx / tGDD) * np.log(1 + ((1 - CCi / crop.CCx) / 0.05))
+            crop.CDC = ((crop.CCx + 2.29) * np.log((((CCi/crop.CCx) - 1) / -0.05) + 1)) / (3.33 * tGDD) 
             # Set calendar type to gdd mode
             crop.CalendarType = 2
 
