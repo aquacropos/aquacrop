@@ -1,5 +1,6 @@
 import os
 os.environ['DEVELOPMENT'] = 'True'
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -32,19 +33,19 @@ model = AquaCropModel(sim_start_time=f'{1979}/10/01',
                       )
 model.run_model(till_termination=True)
 
-fig,ax=plt.subplots(2,1,figsize=(12,14))
+# fig,ax=plt.subplots(2,1,figsize=(12,14))
 
 
 # YIELD POTENTIAL TESTS
 model._outputs.final_stats=model._outputs.final_stats.set_index('Harvest Date (YYYY/MM/DD)')
-final_stats_m=model._outputs.final_stats.melt(value_name='yield', value_vars=['Yield potential (tonne/ha)', 'Dry yield (tonne/ha)'], var_name='yield type', ignore_index=False).reset_index()
+# final_stats_m=model._outputs.final_stats.melt(value_name='yield', value_vars=['Yield potential (tonne/ha)', 'Dry yield (tonne/ha)'], var_name='yield type', ignore_index=False).reset_index()
 
-sns.barplot(data=final_stats_m, x='Harvest Date (YYYY/MM/DD)', y='yield',hue='yield type', ax=ax[0])
+# sns.barplot(data=final_stats_m, x='Harvest Date (YYYY/MM/DD)', y='yield',hue='yield type', ax=ax[0])
 
-model._outputs.crop_growth=model._outputs.crop_growth.set_index('time_step_counter')
-crop_growth_m=model._outputs.crop_growth.melt(value_name='yield', value_vars=['YieldPot', 'DryYield'], var_name='yield type', ignore_index=False).reset_index()
+# model._outputs.crop_growth=model._outputs.crop_growth.set_index('time_step_counter')
+# crop_growth_m=model._outputs.crop_growth.melt(value_name='yield', value_vars=['YieldPot', 'DryYield'], var_name='yield type', ignore_index=False).reset_index()
 
-sns.scatterplot(data=crop_growth_m, x='time_step_counter', y='yield',hue='yield type', ax=ax[1])
+# sns.scatterplot(data=crop_growth_m, x='time_step_counter', y='yield',hue='yield type', ax=ax[1])
 
 # FRESH/DRY YIELD TESTS
 # model._outputs.final_stats=model._outputs.final_stats.set_index('Harvest Date (YYYY/MM/DD)')
@@ -57,4 +58,4 @@ sns.scatterplot(data=crop_growth_m, x='time_step_counter', y='yield',hue='yield 
 
 # sns.lineplot(data=crop_growth_m, x='time_step_counter', y='yield',hue='yield type', ax=ax[1])
 
-plt.show()
+# plt.show()
