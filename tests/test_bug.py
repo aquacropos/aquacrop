@@ -1,13 +1,14 @@
 """
 This test is for bug testing
 """
+import os
+os.environ['DEVELOPMENT'] = 'True'
 import unittest
 
 from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent, GroundWater
 from aquacrop.utils import prepare_weather, get_filepath
 
-import os
-os.environ['DEVELOPMENT'] = 'True'
+
 
 
 class TestModelExceptions(unittest.TestCase):

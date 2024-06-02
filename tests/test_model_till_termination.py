@@ -1,10 +1,12 @@
+import os
+os.environ['DEVELOPMENT'] = 'True'
 import unittest
+
 
 from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent
 from aquacrop.utils import prepare_weather, get_filepath
 
-import os
-os.environ['DEVELOPMENT'] = 'True'
+
 
 
 class TestModelTillTermination(unittest.TestCase):

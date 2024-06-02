@@ -1,11 +1,10 @@
 """
 Test file for irrigation
 """
-import unittest
-import pandas as pd
-
 import os
 os.environ['DEVELOPMENT'] = 'True'
+import unittest
+import pandas as pd
 
 from aquacrop import (
     AquaCropModel,
