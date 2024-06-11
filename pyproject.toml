@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "aquacrop-ss"
-version = "3.0.7.dev0"
+version = "3.0.7.dev1"
 description = "A copy of aquacrop model based on version 3.0.7, fixed some deprecated warnings."
 authors = ["SongshGeo <songshgeo@gmail.com>"]
 license = "MIT"
