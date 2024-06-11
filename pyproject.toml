@@ -1,12 +1,16 @@
 [build-system]
-requires = ["setuptools>=42"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "aquacrop-ss"
-version = "0.1.2"
+version = "3.0.7.dev0"
 description = "A copy of aquacrop model based on version 3.0.7, fixed some deprecated warnings."
 authors = ["SongshGeo <songshgeo@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "aquacrop"}]
+
 
 [tool.poetry.dependencies]
 python = "3.10.x"
