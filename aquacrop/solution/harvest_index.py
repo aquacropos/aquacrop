@@ -16,12 +16,12 @@ if __name__ != "__main__":
         from .HIadj_post_anthesis import HIadj_post_anthesis
         from .HIadj_pollination import HIadj_pollination
     else:
-        from .solution_water_stress import water_stress
-        from .solution_root_zone_water import root_zone_water
-        from .solution_temperature_stress import temperature_stress
-        from .solution_HIadj_pre_anthesis import HIadj_pre_anthesis
-        from .solution_HIadj_post_anthesis import HIadj_post_anthesis
-        from .solution_HIadj_pollination import HIadj_pollination
+        from .water_stress import water_stress
+        from .root_zone_water import root_zone_water
+        from .temperature_stress import temperature_stress
+        from .HIadj_pre_anthesis import HIadj_pre_anthesis
+        from .HIadj_post_anthesis import HIadj_post_anthesis
+        from .HIadj_pollination import HIadj_pollination
 else:
     from .water_stress import water_stress
     from .root_zone_water import root_zone_water

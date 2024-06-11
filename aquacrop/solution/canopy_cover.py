@@ -16,11 +16,11 @@ if __name__ != "__main__":
         from .update_CCx_CDC import update_CCx_CDC
         from .cc_required_time import cc_required_time
     else:
-        from .solution_water_stress import water_stress
-        from .solution_root_zone_water import root_zone_water
-        from .solution_cc_development import cc_development
-        from .solution_update_CCx_CDC import update_CCx_CDC
-        from .solution_cc_required_time import cc_required_time
+        from .water_stress import water_stress
+        from .root_zone_water import root_zone_water
+        from .cc_development import cc_development
+        from .update_CCx_CDC import update_CCx_CDC
+        from .cc_required_time import cc_required_time
 else:
     from .water_stress import water_stress
     from .root_zone_water import root_zone_water

@@ -30,16 +30,16 @@ if os.getenv("DEVELOPMENT"):
     from ..solution.HIref_current_day import HIref_current_day
     from ..solution.biomass_accumulation import biomass_accumulation
 else:
-    from ..solution.solution_growing_degree_day import growing_degree_day
-    from ..solution.solution_drainage import drainage
-    from ..solution.solution_root_zone_water import root_zone_water
-    from ..solution.solution_rainfall_partition import rainfall_partition
-    from ..solution.solution_check_groundwater_table import check_groundwater_table
-    from ..solution.solution_soil_evaporation import soil_evaporation
-    from ..solution.solution_root_development import root_development
-    from ..solution.solution_infiltration import infiltration
-    from ..solution.solution_HIref_current_day import HIref_current_day
-    from ..solution.solution_biomass_accumulation import biomass_accumulation
+    from ..solution.growing_degree_day import growing_degree_day
+    from ..solution.drainage import drainage
+    from ..solution.root_zone_water import root_zone_water
+    from ..solution.rainfall_partition import rainfall_partition
+    from ..solution.check_groundwater_table import check_groundwater_table
+    from ..solution.soil_evaporation import soil_evaporation
+    from ..solution.root_development import root_development
+    from ..solution.infiltration import infiltration
+    from ..solution.HIref_current_day import HIref_current_day
+    from ..solution.biomass_accumulation import biomass_accumulation
 
 from typing import Tuple, TYPE_CHECKING
 

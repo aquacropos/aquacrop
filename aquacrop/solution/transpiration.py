@@ -15,9 +15,9 @@ if __name__ != "__main__":
         from .root_zone_water import root_zone_water
         from .aeration_stress import aeration_stress
     else:
-        from .solution_water_stress import water_stress
-        from .solution_root_zone_water import root_zone_water
-        from .solution_aeration_stress import aeration_stress
+        from .water_stress import water_stress
+        from .root_zone_water import root_zone_water
+        from .aeration_stress import aeration_stress
 else:
     from .water_stress import water_stress
     from .root_zone_water import root_zone_water
