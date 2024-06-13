@@ -581,3 +581,11 @@ no-stress-testing.py
 temp-delete.py
 
 gdd_compute_crop_cal_testing_200524.py
+
+BS1_plot_case_studies.py
+
+BS1_troubleshoot_zero_yields.py
+
+BS1d_case_study_runs.py
+
+quick plotting.py
