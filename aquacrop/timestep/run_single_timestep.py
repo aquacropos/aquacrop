@@ -179,7 +179,7 @@ def solution_single_time_step(
 
     # Run simulations %%
     # 1. Check for groundwater table
-    NewCond.th_fc_Adj, NewCond.wt_in_soil = check_groundwater_table(
+    NewCond.th_fc_Adj, NewCond.wt_in_soil, NewCond.z_gw = check_groundwater_table(
         Soil.Profile,
         NewCond.z_gw,
         NewCond.th,
@@ -189,7 +189,7 @@ def solution_single_time_step(
     )
 
     # 2. Root development
-    NewCond.z_root = root_development(
+    NewCond.z_root, NewCond.r_cor = root_development(
         Crop,
         Soil.Profile,
         NewCond.dap,
@@ -270,7 +270,7 @@ def solution_single_time_step(
         NewCond.th,
         NewCond.surface_storage,
         DeepPerc,
-        Runoff,
+        RunoffTot,
         Infl,
         FluxOut,
     ) = infiltration(
@@ -396,8 +396,8 @@ def solution_single_time_step(
         NewCond.delayed_cds,
         NewCond.yield_form,
         NewCond.pct_lag_phase,
-        #NewCond.cc_prev,
         NewCond.canopy_cover,
+        NewCond.cc_prev,
         NewCond.ccx_w,
         Crop,
         growing_season,
