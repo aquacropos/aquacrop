@@ -272,7 +272,7 @@ def root_development(
         # No root system outside of the growing season
         NewCond_Zroot = 0
 
-    return NewCond_Zroot
+    return NewCond_Zroot, NewCond_rCor
 
 if __name__ == "__main__":
     cc.compile()

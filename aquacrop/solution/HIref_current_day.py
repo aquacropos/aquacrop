@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from aquacrop.entities.crop import CropStructNT
 
 
-@cc.export("HIref_current_day", (f8,f8,i8,i8,b1,f8,f8,f8,CropStructNT_type_sig,b1))
+@cc.export("HIref_current_day", (f8,f8,i8,i8,b1,f8,f8,f8,f8,CropStructNT_type_sig,b1))
 def HIref_current_day(
     NewCond_HIref: float,
     NewCond_HIfinal: float,
@@ -27,6 +27,7 @@ def HIref_current_day(
     NewCond_YieldForm: bool,
     NewCond_PctLagPhase: float,
     NewCond_CC: float,
+    NewCond_CC_prev: float,
     NewCond_CCxW: float,
     Crop: "CropStructNT",
     growing_season: bool,
@@ -102,55 +103,59 @@ def HIref_current_day(
             NewCond_HIref = 0
             NewCond_PctLagPhase = 0
         else:
-            # Check crop type
-            if (Crop.CropType == 1) or (Crop.CropType == 2):
-                # If crop type is leafy vegetable or root/tuber, then proceed with
-                # logistic growth (i.e. no linear switch)
-                NewCond_PctLagPhase = 100  # No lag phase
-                # Calculate reference harvest index for current day
-                NewCond_HIref = (Crop.HIini * Crop.HI0) / (
-                    Crop.HIini + (Crop.HI0 - Crop.HIini) * np.exp(-Crop.HIGC * HIt))
-                # Harvest index apprAOSP_hing maximum limit
-                if NewCond_HIref >= (0.9799 * Crop.HI0):
-                    NewCond_HIref = Crop.HI0
-
-            elif Crop.CropType == 3:
-                # If crop type is fruit/grain producing, check for linear switch
-                if HIt < Crop.tLinSwitch:
-                    # Not yet reached linear switch point, therefore proceed with
-                    # logistic build-up
-                    NewCond_PctLagPhase = 100 * (HIt / Crop.tLinSwitch)
+            if NewCond_CC_prev <= (Crop.CCmin*Crop.CCx):
+                # HI cannot develop further as canopy cover is too small
+                NewCond_HIref = InitCond_HIref
+            else:
+                # Check crop type
+                if (Crop.CropType == 1) or (Crop.CropType == 2):
+                    # If crop type is leafy vegetable or root/tuber, then proceed with
+                    # logistic growth (i.e. no linear switch)
+                    NewCond_PctLagPhase = 100  # No lag phase
                     # Calculate reference harvest index for current day
-                    # (logistic build-up)
                     NewCond_HIref = (Crop.HIini * Crop.HI0) / (
                         Crop.HIini + (Crop.HI0 - Crop.HIini) * np.exp(-Crop.HIGC * HIt))
-                else:
-                    # Linear switch point has been reached
-                    NewCond_PctLagPhase = 100
-                    # Calculate reference harvest index for current day
-                    # (logistic portion)
-                    NewCond_HIref = (Crop.HIini * Crop.HI0) / (Crop.HIini
-                        + (Crop.HI0 - Crop.HIini) * np.exp(-Crop.HIGC * Crop.tLinSwitch))
-                    # Calculate reference harvest index for current day
-                    # (total - logistic portion + linear portion)
-                    NewCond_HIref = NewCond_HIref + (Crop.dHILinear * (HIt - Crop.tLinSwitch))
-
-            # Limit hi_ref and round off computed value
-            if NewCond_HIref > Crop.HI0:
-                NewCond_HIref = Crop.HI0
-            elif NewCond_HIref <= (Crop.HIini + 0.004):
-                NewCond_HIref = 0
-            elif (Crop.HI0 - NewCond_HIref) < 0.004:
-                NewCond_HIref = Crop.HI0
-            
-            # Adjust hi_ref for inadequate photosynthesis
-            if (NewCond_HIfinal == Crop.HI0) and (HIt <= Crop.YldFormCD) and (NewCond_CC <= 0.05) and (
-                NewCond_CCxW > 0) and (NewCond_CC < NewCond_CCxW) and (Crop.CropType==2 or Crop.CropType==3):
-
-                NewCond_HIfinal = NewCond_HIref
-            
-            if NewCond_HIref > NewCond_HIfinal:
-                NewCond_HIref = NewCond_HIfinal
+                    # Harvest index apprAOSP_hing maximum limit
+                    if NewCond_HIref >= (0.9799 * Crop.HI0):
+                        NewCond_HIref = Crop.HI0
+    
+                elif Crop.CropType == 3:
+                    # If crop type is fruit/grain producing, check for linear switch
+                    if HIt < Crop.tLinSwitch:
+                        # Not yet reached linear switch point, therefore proceed with
+                        # logistic build-up
+                        NewCond_PctLagPhase = 100 * (HIt / Crop.tLinSwitch)
+                        # Calculate reference harvest index for current day
+                        # (logistic build-up)
+                        NewCond_HIref = (Crop.HIini * Crop.HI0) / (
+                            Crop.HIini + (Crop.HI0 - Crop.HIini) * np.exp(-Crop.HIGC * HIt))
+                    else:
+                        # Linear switch point has been reached
+                        NewCond_PctLagPhase = 100
+                        # Calculate reference harvest index for current day
+                        # (logistic portion)
+                        NewCond_HIref = (Crop.HIini * Crop.HI0) / (Crop.HIini
+                            + (Crop.HI0 - Crop.HIini) * np.exp(-Crop.HIGC * Crop.tLinSwitch))
+                        # Calculate reference harvest index for current day
+                        # (total - logistic portion + linear portion)
+                        NewCond_HIref = NewCond_HIref + (Crop.dHILinear * (HIt - Crop.tLinSwitch))
+    
+                # Limit hi_ref and round off computed value
+                if NewCond_HIref > Crop.HI0:
+                    NewCond_HIref = Crop.HI0
+                elif NewCond_HIref <= (Crop.HIini + 0.004):
+                    NewCond_HIref = 0
+                elif (Crop.HI0 - NewCond_HIref) < 0.004:
+                    NewCond_HIref = Crop.HI0
+                
+                # Adjust hi_ref for inadequate photosynthesis
+                if (NewCond_HIfinal == Crop.HI0) and (HIt <= Crop.YldFormCD) and (NewCond_CC <= 0.05) and (
+                    NewCond_CCxW > 0) and (NewCond_CC < NewCond_CCxW) and (Crop.CropType==2 or Crop.CropType==3):
+    
+                    NewCond_HIfinal = NewCond_HIref
+                
+                if NewCond_HIref > NewCond_HIfinal:
+                    NewCond_HIref = NewCond_HIfinal
 
     else:
         # Reference harvest index is zero outside of growing season
