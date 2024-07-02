@@ -270,7 +270,7 @@ def solution_single_time_step(
         NewCond.th,
         NewCond.surface_storage,
         DeepPerc,
-        RunoffTot,
+        Runoff,
         Infl,
         FluxOut,
     ) = infiltration(
