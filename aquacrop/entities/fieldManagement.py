@@ -19,7 +19,7 @@ class FieldMngt:
 
         f_mulch (float): Soil evaporation adjustment factor due to effect of mulches
 
-        z_bund (float): Bund height (m)
+        z_bund (float): Bund height, user specifies in (m) but immediately converted to (mm) on initialisation for coherent calculations
 
         bund_water (float): Initial water height in surface bunds (mm)
 
@@ -47,7 +47,7 @@ class FieldMngt:
 
         self.mulch_pct = mulch_pct  #  Area of soil surface covered by mulches (%)
         self.f_mulch = f_mulch  # Soil evaporation adjustment factor due to effect of mulches
-        self.z_bund = z_bund  # Bund height (m)
+        self.z_bund = z_bund * 1000 # Bund height, user-specified as (m), here immediately converted to (mm)
         self.bund_water = bund_water  # Initial water height in surface bunds (mm)
         self.curve_number_adj_pct = curve_number_adj_pct  # Percentage change in curve number (positive or negative)
 

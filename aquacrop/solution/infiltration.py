@@ -290,7 +290,7 @@ def infiltration(
                     # Additonal water above top of bunds becomes runoff
                     Runoff = RunoffIni + (NewCond_SurfaceStorage - FieldMngt_zBund)
                     # Set surface storage to bund height
-                    NewCond_SurfaceStorage = FieldMngt_zBund * 1
+                    NewCond_SurfaceStorage = FieldMngt_zBund
                 else:
                     # No additional overtopping of bunds
                     Runoff = RunoffIni
