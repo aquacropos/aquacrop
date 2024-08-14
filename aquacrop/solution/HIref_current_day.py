@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from aquacrop.entities.crop import CropStructNT
 
 
-@cc.export("HIref_current_day", (f8,f8,i8,i8,b1,f8,f8,f8,CropStructNT_type_sig,b1))
+@cc.export("HIref_current_day", (f8,f8,i8,i8,b1,f8,f8,f8,f8,CropStructNT_type_sig,b1))
 def HIref_current_day(
     NewCond_HIref: float,
     NewCond_HIfinal: float,
@@ -27,6 +27,7 @@ def HIref_current_day(
     NewCond_YieldForm: bool,
     NewCond_PctLagPhase: float,
     NewCond_CC: float,
+    NewCond_CC_prev: float,
     NewCond_CCxW: float,
     Crop: "CropStructNT",
     growing_season: bool,
