@@ -31,21 +31,14 @@ print(model_results)
 
 ## About
 
-AquaCrop-OSPy is a python implementation of the popular crop-water model AquaCrop, built from the AquaCrop-OS source code. 
+AquaCrop-OSPy is an open-source Python crop-water model developed by Tim Foster and others (Tom Kelly and Chris Bowden) within the Agriculture, Water and Climate research group at the University of Manchester. The AquaCrop-OSPy code has been developed with support from the the University of Manchester, Daugherty Water for Food Global Institute, Imperial College London, along with input from the United Nations Food and Agriculture Organization's (FAO) AquaCrop Core Development Group. 
 
-AquaCrop-OS, an open source version of FAO’s multi-crop model, was released in August 2016 and is the result of collaboration between researchers at the University of Manchester, Water for Food Global Institute, U.N. Food and Agriculture Organization, and Imperial College London.
+Please note that AquaCrop-OSPy is not an official implementation or version of the FAO AquaCrop model. AquaCrop-OSPy currently mirrors most features available in version 7.1 of the official FAO AquaCrop model, with the exception of routines for salinity and fertility stress, weed management, and perennial herbaceous crops that are still to be developed. AquaCrop-OSPy has been rigorously tested to verify that the model reproduces accurately the calculations and outputs performed by the official FAO AquaCrop model. However, some bugs or errors may still be found. Please use the Issues tab to raise any issues encountered with the AquaCrop-OSPy. More details about the official FAO AquaCrop model on which AquaCrop-OSPy is based can be obtained <a href=https://www.fao.org/aquacrop> here </a>.
 
-AquaCrop-OSPy has been designed in way that users can conduct cutting edge research with only basic python experience. In particular for the design and testing of irrigation stratgeies.
+For further information about the AquaCrop-OSPy model, you can consult the accompanying open-access journal paper on the code <a href=https://doi.org/10.1016/j.agwat.2021.106976> here </a>. 
+There is also an extensive <a href=https://aquacropos.github.io/aquacrop/>documentation </a> for the model, along with a series of tutorials to help you get started with the Python code (see Quickstart below). AquaCrop-OSPy builds upon an earlier version of code developed in Matlab, more information about which can be found <a href=https://doi.org/10.1016/j.agwat.2016.11.015> here </a>. 
 
-AquaCrop-OSPy is currently up to date with AquaCrop FAO version 6.0, with exception of some features not yet included in Python code (salinity and fertility stress, and weed management)
-
-Open access journal article <a href=https://doi.org/10.1016/j.agwat.2021.106976> here </a>
-
-It is built upon the AquaCropOS crop-growth model written in Matlab (<a href=https://doi.org/10.1016/j.agwat.2016.11.015> paper </a>, <a href=https://www.aquacropos.com/> webpage </a>) which itself itself is based on the FAO AquaCrop model <a href=http://www.fao.org/aquacrop/en/>Webpage </a>. Comparisons to both base models are shown <a href=https://aquacropos.github.io/aquacrop/comparison.html> here. </a>
-
-A <a href=https://github.com/aquacropos/aquacrop/discussions>forum </a> has also been created so that users of AquaCrop-OSPy and AquaCrop-OS can discuss research, bugs and future development.
-
-There is also an extensive <a href=https://aquacropos.github.io/aquacrop/>documentation </a> for the model
+More information about the official FAO AquaCrop model on which AquaCrop-OSPy is based can be obtained <a href=https://www.fao.org/aquacrop> here </a>, where you can also access the official raw source AquaCrop code, compiled executables, and most recent code releases that are developed and provided by FAO.
 
 ## Install
 
@@ -68,12 +61,6 @@ If you receive an error message such as "No module named aquacrop.scripts.initia
 
 1. Run "python -m aquacrop.scripts.initiate_library" in your terminal, if this generates an error such as "RuntimeError: Attempted to compile AOT function without the compiler used by numpy.distutils present. Cannot find suitable msvc.", then you need to download and install an MSVC compiler such as the one included in Visual Studio build tools (see https://www.youtube.com/watch?v=p_R3tXSq0KI).
 
-2. If Step 1 doesn't help, then you can run aquacrop in pure python (this will be slower) using: <br>
+2. If Step 1 doesn't help, then you can run aquacrop in development mode using the code below. This will turn off some function compilation, resulting in minor increases in runtime: <br>
 ```import os```<br>
 ```os.environ['DEVELOPMENT'] = 'DEVELOPMENT'```
-
-More information, including screenshots and gifs, can be found at The University of Manchester's [article](https://www.manchester.ac.uk/discover/news/manchester-scientists-launch-new-interactive-tool-for-agricultural-water-management-and-climate-risk-assessment/), Tim Foster's medium [post](https://medium.com/@agwater/aquaplan-a-new-interactive-tool-for-agricultural-water-management-and-climate-risk-assessment-82c50cb10144), or twitter [thread](https://twitter.com/tim_foster_88/status/1557728807758737408).
-
-A seperate [category](https://github.com/aquacropos/aquacrop/discussions/categories/aquaplan) inside the AquaCrop-OSPy forum has been created to discuss
-AquaPlan, including any issues, questions, or suggestions.
-
