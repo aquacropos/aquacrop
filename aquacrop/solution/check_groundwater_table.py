@@ -123,7 +123,7 @@ def check_groundwater_table(
         # prof.th_fc_Adj = thfcAdj
         return (NewCond_th_fc_Adj, NewCond_WTinSoil, NewCond_zGW)
 
-    return (NewCond_th_fc_Adj, None, None)
+    return (NewCond_th_fc_Adj, None, 0)
 
 if __name__ == "__main__":
     cc.compile()

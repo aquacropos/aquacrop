@@ -17,7 +17,7 @@ def prepare_gdd(weather_df, sim_start, sim_end, gdd, crop, sum_fun):
         
         crop (Crop object):  Crop object containing crop parameters
             
-        sum_fun (str): 'mean' or 'median', select method of summarising
+        sum_fun (int): 1 for 'mean' or 2 for 'median', select method of summarising
                         multiple years of GDD growth stages calculations
     Returns:
         crop (Crop object): updated crop object with new GDD growth stages
@@ -115,10 +115,10 @@ def prepare_gdd(weather_df, sim_start, sim_end, gdd, crop, sum_fun):
 
     # calculate mean/median of GDD growth stages using dictionary logic,
     # set the attribute to update the crop object
-    if sum_fun == 'mean':
+    if sum_fun == 1:
         for stage, values in gdd_lists.items():
             setattr(crop, stage, np.mean(values))
-    elif sum_fun == 'median':
+    elif sum_fun == 2:
         for stage, values in gdd_lists.items():
             setattr(crop, stage, np.median(values))
 

@@ -67,7 +67,7 @@ class Crop:
         self.bface = (
             0.001165  # WP co2 adjustment parameter given by FACE experiments
         )
-        self.SwitchGDDType = 'mean' # calculate GDD phenology based on mean of CD phenology across entire simulation period (mean/median)
+        self.SwitchGDDType = 1 # calculate GDD phenology based on mean of CD phenology across entire simulation period (1 mean/ 2 median)
 
         if c_name == "custom":
 
@@ -260,7 +260,7 @@ crop_spec = [
     ("PlantMethod", int64),
     ("CalendarType", int64),
     ("SwitchGDD", int64),
-    ("SwitchGDDType", str),
+    ("SwitchGDDType", int64),
     ("EmergenceCD", int64),
     ("Canopy10PctCD", int64),
     ("MaxRootingCD", int64),
@@ -380,7 +380,7 @@ class CropStruct(object):
             2  # Calendar Type (1 = Calendar days, 2 = Growing degree days)
         )
         self.SwitchGDD = 0  # Convert calendar to gdd mode if inputs are given in calendar days (0 = No; 1 = Yes)
-        self.SwitchGDDType = 'mean' # calculate GDD phenology based on mean of CD phenology across entire simulation period (mean/median)
+        self.SwitchGDDType = 1 # calculate GDD phenology based on mean of CD phenology across entire simulation period (1 mean/2 median)
 
         self.EmergenceCD = 0
         self.Canopy10PctCD = 0
