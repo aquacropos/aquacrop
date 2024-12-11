@@ -1,5 +1,5 @@
-import os
-os.environ['DEVELOPMENT'] = 'True'
+#import os
+#os.environ['DEVELOPMENT'] = 'True'
 import pandas as pd
 
 from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent, IrrigationManagement, CO2

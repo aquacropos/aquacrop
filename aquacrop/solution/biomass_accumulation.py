@@ -1,10 +1,5 @@
 import numpy as np
 
-try:
-    from ..entities.crop import CropStructNT_type_sig
-except:
-    from entities.crop import CropStructNT_type_sig
-
 from typing import NamedTuple, Tuple
 
 def biomass_accumulation(

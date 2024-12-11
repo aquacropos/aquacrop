@@ -36,11 +36,11 @@ class ParamStruct:
 
         python_fallow_crop (Crop): Crop object for off season
 
-        Seasonal_Crop_List (list): List of CropStructs, one for each season (jit class objects)
+        Seasonal_Crop_List (list): List of Crop objects, one for each season
 
         crop_name_list (list): List of crop names, one for each season
 
-        Fallow_Crop (CropStruct): CropStruct object (jit class) for off season
+        Fallow_Crop (Crop): Crop object for off season
 
         Fallow_Crop_Name (str): name of fallow crop
 
