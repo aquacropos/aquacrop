@@ -1,8 +1,5 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
 try:
     from ..entities.crop import CropStructNT_type_sig
     from ..entities.waterStressCoefficients import KswNT_type_sig
@@ -17,11 +14,6 @@ if TYPE_CHECKING:
     from aquacrop.entities.crop import CropStructNT
     from entities.waterStressCoefficients import KswNT
 
-# temporary name for compiled module
-cc = CC("solution_HIadj_post_anthesis")
-
-
-@cc.export("HIadj_post_anthesis", (i8,f8,f8,i8,f8,f8,f8,f8,CropStructNT_type_sig,KswNT_type_sig,))
 def HIadj_post_anthesis(
     NewCond_DelayedCDs: int,
     NewCond_sCor1: float,
@@ -135,6 +127,3 @@ def HIadj_post_anthesis(
             NewCond_fpost_upp,
             NewCond_fpost_dwn,
             NewCond_Fpost)
-
-if __name__ == "__main__":
-    cc.compile()

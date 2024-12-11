@@ -1,15 +1,9 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
 try:
     from ..entities.soilProfile import SoilProfileNT_typ_sig
 except:
     from entities.soilProfile import SoilProfileNT_typ_sig
-    
-# temporary name for compiled module
-cc = CC("solution_rainfall_partition")
 
 
 from typing import TYPE_CHECKING, Tuple
@@ -20,7 +14,6 @@ if TYPE_CHECKING:
     from numpy import ndarray
 
 
-@cc.export("rainfall_partition", (f8,f8[:],i8,f8,b1,f8,f8,f8,f8,f8,f8,SoilProfileNT_typ_sig))
 def rainfall_partition(
     precipitation: float,
     InitCond_th: "ndarray",
@@ -165,6 +158,3 @@ def rainfall_partition(
         Infl = precipitation
 
     return Runoff, Infl, NewCond_DaySubmerged
-
-if __name__ == "__main__":
-    cc.compile()

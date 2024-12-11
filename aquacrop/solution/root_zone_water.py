@@ -1,13 +1,9 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
 try:
     from ..entities.soilProfile import SoilProfileNT_typ_sig
 except:
     from entities.soilProfile import SoilProfileNT_typ_sig
-    
 
 from typing import TYPE_CHECKING, Tuple
 
@@ -16,13 +12,6 @@ if TYPE_CHECKING:
     from aquacrop.entities.soilProfile import SoilProfileNT
     from numpy import ndarray
 
-
-
-
-# temporary name for compiled module
-cc = CC("solution_root_zone_water")
-@njit
-@cc.export("root_zone_water", (SoilProfileNT_typ_sig,f8,f8[:],f8,f8,f8))
 def root_zone_water(
     prof: "SoilProfileNT_typ_sig",
     InitCond_Zroot: float,
@@ -204,6 +193,3 @@ def root_zone_water(
         thRZ_Dry,
         thRZ_Aer,
     )
-
-if __name__ == "__main__":
-    cc.compile()

@@ -1,5 +1,3 @@
-from numba import float64, int64, boolean, types
-
 
 class FieldMngt:
     """
@@ -50,20 +48,6 @@ class FieldMngt:
         self.z_bund = z_bund * 1000 # Bund height, user-specified as (m), here immediately converted to (mm)
         self.bund_water = bund_water  # Initial water height in surface bunds (mm)
         self.curve_number_adj_pct = curve_number_adj_pct  # Percentage change in curve number (positive or negative)
-
-
-
-spec = [
-    ("mulches", boolean),
-    ("bunds", boolean),
-    ("curve_number_adj", boolean),
-    ("sr_inhb", boolean),
-    ("mulch_pct", float64),
-    ("f_mulch", float64),
-    ("z_bund", float64),
-    ("bund_water", float64),
-    ("curve_number_adj_pct", float64),
-]
 
 
 

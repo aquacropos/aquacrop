@@ -1,9 +1,5 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
-
 try:
     from ..entities.waterStressCoefficients import KswNT_type_sig
     from ..entities.temperatureStressCoefficients import KstNT_type_sig
@@ -20,12 +16,6 @@ if TYPE_CHECKING:
     from aquacrop.entities.waterStressCoefficients import KswNT
     from aquacrop.entities.temperatureStressCoefficients import KstNT
 
-
-
-# temporary name for compiled module
-cc = CC("solution_HIadj_pollination")
-
-@cc.export("HIadj_pollination", (f8,f8,f8,f8,f8,KswNT_type_sig,KstNT_type_sig,f8))
 def HIadj_pollination(
     NewCond_CC: float,
     NewCond_Fpol: float,
@@ -130,6 +120,3 @@ def HIadj_pollination(
         NewCond_Fpol = 1
 
     return NewCond_Fpol
-
-if __name__ == "__main__":
-    cc.compile()

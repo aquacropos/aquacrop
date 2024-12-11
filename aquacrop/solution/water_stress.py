@@ -1,21 +1,11 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
-
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
     from numpy import ndarray
 
-
-# temporary name for compiled module
-cc = CC("solution_water_stress")
-
-@njit
-@cc.export("water_stress", "(f8[:],f8[:],f8,f8,f8[:],f8,f8,f8,f8,f8)")
 def water_stress(
     Crop_p_up: "ndarray",
     Crop_p_lo: "ndarray",
@@ -122,6 +112,3 @@ def water_stress(
     Ksw_StoLin = 1 - Drel[1]
 
     return Ksw_Exp, Ksw_Sto, Ksw_Sen, Ksw_Pol, Ksw_StoLin
-
-if __name__ == "__main__":
-    cc.compile()

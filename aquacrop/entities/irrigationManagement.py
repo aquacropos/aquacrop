@@ -1,7 +1,5 @@
 import numpy as np
 import pandas as pd
-from numba import float64, int64, boolean, types
-
 
 class IrrigationManagement:
 
@@ -81,20 +79,6 @@ class IrrigationManagement:
         }
 
         self.__dict__.update((k, v) for k, v in kwargs.items() if k in allowed_keys)
-
-
-spec = [
-    ("irrigation_method", int64),
-    ("WetSurf", float64),
-    ("AppEff", float64),
-    ("MaxIrr", float64),
-    ("MaxIrrSeason", float64),
-    ("SMT", float64[:]),
-    ("IrrInterval", int64),
-    ("Schedule", float64[:]),
-    ("NetIrrSMT", float64),
-    ("depth", float64),
-]
 
 
 

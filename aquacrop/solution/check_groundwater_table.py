@@ -1,15 +1,10 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
 
 try:
     from ..entities.soilProfile import SoilProfileNT_typ_sig
 except:
     from entities.soilProfile import SoilProfileNT_typ_sig
-# temporary name for compiled module
-cc = CC("solution_check_groundwater_table")
 
 from typing import TYPE_CHECKING, Tuple
 
@@ -21,9 +16,6 @@ if TYPE_CHECKING:
 
 
 
-
-
-@cc.export("check_groundwater_table", (SoilProfileNT_typ_sig,f8,f8[:],f8[:],i8,f8))
 def check_groundwater_table(
     prof: "SoilProfileNT",
     NewCond_zGW: float,
@@ -124,6 +116,3 @@ def check_groundwater_table(
         return (NewCond_th_fc_Adj, NewCond_WTinSoil, NewCond_zGW)
 
     return (NewCond_th_fc_Adj, None, None)
-
-if __name__ == "__main__":
-    cc.compile()

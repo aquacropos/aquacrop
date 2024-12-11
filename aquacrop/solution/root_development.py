@@ -1,8 +1,5 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
 try:
     from ..entities.soilProfile import SoilProfileNT_typ_sig
     from ..entities.crop import CropStructNT_type_sig
@@ -10,9 +7,6 @@ try:
 except:
     from entities.soilProfile import SoilProfileNT_typ_sig
     from entities.crop import CropStructNT_type_sig
-    
-# temporary name for compiled module
-cc = CC("solution_root_development")
 
 from typing import TYPE_CHECKING
 
@@ -22,8 +16,6 @@ if TYPE_CHECKING:
     from aquacrop.entities.crop import CropStructNT
     from numpy import ndarray
 
-
-@cc.export("root_development", (CropStructNT_type_sig,SoilProfileNT_typ_sig,f8,f8,f8,f8,f8,f8,f8[:],f8,f8,b1,f8,f8,f8,f8,b1,i8))
 def root_development(
     Crop: "CropStructNT",
     prof: "SoilProfileNT",
@@ -273,6 +265,3 @@ def root_development(
         NewCond_Zroot = 0
 
     return NewCond_Zroot, NewCond_rCor
-
-if __name__ == "__main__":
-    cc.compile()

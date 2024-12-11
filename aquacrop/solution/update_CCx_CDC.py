@@ -1,15 +1,7 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
-# temporary name for compiled module
-cc = CC("solution_update_CCx_CDC")
-
 from typing import Tuple
 
-
-@cc.export("update_CCx_CDC", "(f8,f8,f8,f8)")
 def update_CCx_CDC(
     cc_prev: float,
     CDC: float,
@@ -53,6 +45,3 @@ def update_CCx_CDC(
     CDCadj = CDC * ((CCXadj + 2.29) / (CCx + 2.29))
 
     return CCXadj, CDCadj
-
-if __name__ == "__main__":
-    cc.compile()

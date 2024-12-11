@@ -7,20 +7,11 @@ if TYPE_CHECKING:
     from numpy import ndarray
 
 
-
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
 try:
     from ..entities.soilProfile import SoilProfileNT_typ_sig
 except:
     from entities.soilProfile import SoilProfileNT_typ_sig
     
-# temporary name for compiled module
-cc = CC("solution_evap_layer_water_content")
-
-@njit
-@cc.export("evap_layer_water_content", (f8[:],f8,SoilProfileNT_typ_sig))
 def evap_layer_water_content(
     InitCond_th: "ndarray",
     InitCond_EvapZ: float,
@@ -90,6 +81,3 @@ def evap_layer_water_content(
         Wevap_Act = 0
 
     return Wevap_Sat, Wevap_Fc, Wevap_Wp, Wevap_Dry, Wevap_Act
-
-if __name__ == "__main__":
-    cc.compile()

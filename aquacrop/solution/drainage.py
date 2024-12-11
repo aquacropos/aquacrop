@@ -1,7 +1,5 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
 from typing import Tuple,TYPE_CHECKING
 
 try:
@@ -9,8 +7,6 @@ try:
 except:
     from entities.soilProfile import SoilProfileNT_typ_sig
 
-# temporary name for compiled module
-cc = CC("solution_drainage")
 
 
 if TYPE_CHECKING:
@@ -19,8 +15,6 @@ if TYPE_CHECKING:
     from numpy import ndarray
 
 
-
-@cc.export("drainage", (SoilProfileNT_typ_sig, f8[:], f8[:]))
 def drainage(
     prof: "SoilProfileNT",
     th_init: "ndarray",
@@ -343,7 +337,3 @@ def drainage(
     # NewCond.th = thnew
 
     return thnew, DeepPerc, FluxOut
-
-
-if __name__ == "__main__":
-    cc.compile()

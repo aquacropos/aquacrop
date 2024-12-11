@@ -1,10 +1,6 @@
 import os
 import numpy as np
 
-        
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
 try:
     from ..entities.soilProfile import SoilProfileNT_typ_sig
 except:
@@ -26,17 +22,6 @@ if TYPE_CHECKING:
     from aquacrop.entities.soilProfile import SoilProfileNT
     from numpy import ndarray
 
-
-
-# temporary name for compiled module
-cc = CC("solution_soil_evaporation")
-
-
-@cc.export(
-    "soil_evaporation", (i8,i8,i8,SoilProfileNT_typ_sig,
-    f8,f8,f8,f8,f8,f8,f8,i8,f8,i8,f8,b1,f8,f8,i8,f8,f8,f8,f8[:],f8,f8,f8,f8,f8,f8,
-        f8,b1,f8,f8,f8,f8,f8,f8,f8,b1),
-)
 def soil_evaporation(
     ClockStruct_EvapTimeSteps: int,
     ClockStruct_SimOffSeason: bool,
@@ -518,6 +503,3 @@ def soil_evaporation(
         EsAct,
         EsPot,
     )
-
-if __name__ == "__main__":
-    cc.compile()

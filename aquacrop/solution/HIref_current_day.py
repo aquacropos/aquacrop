@@ -1,15 +1,10 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
 try:
     from ..entities.crop import CropStructNT_type_sig
 except:
     from entities.crop import CropStructNT_type_sig
-    
-# temporary name for compiled module
-cc = CC("solution_HIref_current_day")
+
 
 from typing import TYPE_CHECKING, Tuple
 
@@ -17,8 +12,6 @@ if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
     from aquacrop.entities.crop import CropStructNT
 
-
-@cc.export("HIref_current_day", (f8,f8,i8,i8,b1,f8,f8,f8,f8,CropStructNT_type_sig,b1))
 def HIref_current_day(
     NewCond_HIref: float,
     NewCond_HIfinal: float,
@@ -162,6 +155,3 @@ def HIref_current_day(
             NewCond_PctLagPhase,
             #NewCond_HIfinal,
             )
-
-if __name__ == "__main__":
-    cc.compile()

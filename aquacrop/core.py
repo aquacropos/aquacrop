@@ -7,7 +7,6 @@ import os
 import logging
 import warnings
 from typing import Dict, Union, Optional, Tuple, TYPE_CHECKING
-from .scripts.checkIfPackageIsCompiled import compile_all_AOT_files
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
@@ -19,15 +18,6 @@ if TYPE_CHECKING:
     from aquacrop.entities.inititalWaterContent import InitialWaterContent
     from aquacrop.entities.paramStruct import ParamStruct
     from aquacrop.entities.soil import Soil
-
-
-# Important: This code is necessary to check if the AOT files are compiled.
-if os.getenv("DEVELOPMENT"):
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
-    logging.info("Running the simulation in development mode.")
-else:
-    compile_all_AOT_files()
 
 
 # pylint: disable=wrong-import-position

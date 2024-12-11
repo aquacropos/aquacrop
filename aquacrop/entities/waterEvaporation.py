@@ -1,21 +1,4 @@
 
-
-
-from numba import float64, int64, boolean, types
-
-
-
-
-spec = [
-    ("Act", float64),
-    ("Sat", float64),
-    ("Fc", float64),
-    ("Wp", float64),
-    ("Dry", float64),
-]
-
-
-
 class WaterEvaporation(object):
     """
     TODO: THIS CLASS IS NOT USED
