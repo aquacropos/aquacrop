@@ -1,17 +1,7 @@
 import os
 
-if __name__ != "__main__":
-    if os.getenv("DEVELOPMENT"):
-        from .cc_development import cc_development
-        from .cc_required_time import cc_required_time
-    else:
-        from .solution_cc_development import cc_development
-        from .solution_cc_required_time import cc_required_time
-else:
-    from .cc_development import cc_development
-    from .cc_required_time import cc_required_time
-   
-
+from .cc_development import cc_development
+from .cc_required_time import cc_required_time
 
 def adjust_CCx(
     cc_prev: float,

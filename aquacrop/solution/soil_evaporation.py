@@ -1,32 +1,23 @@
 import os
 import numpy as np
 
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
+from ..entities.soilProfile import SoilProfile
 
 
-if __name__ != "__main__":
-    if os.getenv("DEVELOPMENT"):
-        from .evap_layer_water_content import evap_layer_water_content
-    else:
-        from .solution_evap_layer_water_content import evap_layer_water_content
-else:
-    from .evap_layer_water_content import evap_layer_water_content
+from .evap_layer_water_content import evap_layer_water_content
 
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from numpy import ndarray
 
 def soil_evaporation(
     ClockStruct_EvapTimeSteps: int,
     ClockStruct_SimOffSeason: bool,
     ClockStruct_TimeStepCounter: int,
-    prof: "SoilProfileNT",
+    prof: "SoilProfile",
     Soil_EvapZmin: float,
     Soil_EvapZmax: float,
     Soil_REW: float,

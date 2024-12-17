@@ -1,8 +1,4 @@
 
-try:
-    from ..entities.rootZoneWaterContent import thRZNT_type_sig
-except:
-    from entities.rootZoneWaterContent import thRZNT_type_sig
 
 from typing import NamedTuple, Tuple
 

@@ -3,19 +3,17 @@ from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from numpy import ndarray
 
 
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
+
+from ..entities.soilProfile import SoilProfile
     
 def evap_layer_water_content(
     InitCond_th: "ndarray",
     InitCond_EvapZ: float,
-    prof: "SoilProfileNT",
+    prof: "SoilProfile",
 ) -> Tuple[float, float, float, float, float]:
     """
     Function to get water contents in the evaporation layer

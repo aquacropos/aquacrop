@@ -1,20 +1,17 @@
 import numpy as np
 
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
+from ..entities.soilProfile import SoilProfile
 
 
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from numpy import ndarray
 
 def infiltration(
-     prof: "SoilProfileNT",
+     prof: "SoilProfile",
      NewCond_SurfaceStorage: float, 
      NewCond_th_fc_Adj: "ndarray", 
      NewCond_th: "ndarray", 

@@ -24,7 +24,7 @@ def prepare_lars_weather(
     def vap_pres(t):
         return 0.6108 * np.exp((17.27 * t) / (t + 237.3))
 
-    df = pd.read_csv(file, delim_whitespace=True, header=None)
+    df = pd.read_csv(file, sep='\s+', header=None)
 
     if generated:
         df.columns = order

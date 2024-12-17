@@ -1,23 +1,19 @@
 import numpy as np
 
-
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
+from ..entities.soilProfile import SoilProfile
 
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from aquacrop.entities.initParamVariables import InitialCondition
     from numpy import ndarray
 
 
 
 def check_groundwater_table(
-    prof: "SoilProfileNT",
+    prof: "SoilProfile",
     NewCond_zGW: float,
     NewCond_th: "ndarray",
     NewCond_th_fc_Adj: "ndarray",

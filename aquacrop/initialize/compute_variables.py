@@ -216,15 +216,16 @@ def compute_variables(
     Fallow_Crop = deepcopy(crop_list[0])
 
     param_struct.Seasonal_Crop_List = []
+
     for crop in crop_list:
-        crop_struct = Crop() # changed from CropStruct to Crop during removal of numba AOT/JIT compilation
+        crop_struct = Crop(crop.Name, crop.planting_date) # changed from CropStruct to Crop during removal of numba AOT/JIT compilation
         for a, v in crop.__dict__.items():
             if hasattr(crop_struct, a):
                 crop_struct.__setattr__(a, v)
 
         param_struct.Seasonal_Crop_List.append(crop_struct)
 
-    fallow_struct = Crop() # changed from CropStruct to Crop during removal of numba AOT/JIT compilation
+    fallow_struct = Crop(crop.Name, crop.planting_date) # changed from CropStruct to Crop during removal of numba AOT/JIT compilation
     for a, v in Fallow_Crop.__dict__.items():
         if hasattr(fallow_struct, a):
             fallow_struct.__setattr__(a, v)

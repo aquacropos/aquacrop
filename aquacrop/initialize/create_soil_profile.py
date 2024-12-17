@@ -1,6 +1,6 @@
 import numpy as np
 
-from ..entities.soilProfile import SoilProfile, SoilProfileNT
+from ..entities.soilProfile import SoilProfile
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -57,24 +57,6 @@ def create_soil_profile(param_struct: "ParamStruct") -> "ParamStruct":
 
     # param_struct.Soil.profile = profile
 
-    param_struct.Soil.Profile = SoilProfileNT(
-        dz=profile.dz,
-        dzsum=profile.dzsum,
-        zBot=profile.zBot,
-        z_top=profile.z_top,
-        zMid=profile.zMid,
-        Comp=profile.Comp,
-        Layer=profile.Layer,
-        th_wp=profile.th_wp,
-        th_fc=profile.th_fc,
-        th_s=profile.th_s,
-        Ksat=profile.Ksat,
-        Penetrability=profile.Penetrability,
-        th_dry=profile.th_dry,
-        tau=profile.tau,
-        th_fc_Adj=profile.th_fc_Adj,
-        aCR=profile.aCR,
-        bCR=profile.bCR,
-    )
+    param_struct.Soil.Profile = profile
 
     return param_struct

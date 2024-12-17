@@ -1,14 +1,8 @@
 import numpy as np
 
-try:
-    from ..entities.waterStressCoefficients import KswNT_type_sig
-    from ..entities.temperatureStressCoefficients import KstNT_type_sig
+from ..entities.waterStressCoefficients import Ksw
+from ..entities.temperatureStressCoefficients import Kst
 
-except:
-    from entities.waterStressCoefficients import KswNT_type_sig
-    from entities.temperatureStressCoefficients import KstNT_type_sig
-
-    
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -22,8 +16,8 @@ def HIadj_pollination(
     Crop_FloweringCD: float, 
     Crop_CCmin: float, 
     Crop_exc: float, 
-    Ksw: "KswNT", 
-    Kst: "KstNT", 
+    Ksw: "Ksw", 
+    Kst: "Kst", 
     HIt: float,
 ) -> float:
     """

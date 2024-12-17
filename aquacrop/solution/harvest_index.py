@@ -1,50 +1,34 @@
 
-
-import os
-import numpy as np
 from ..entities.totalAvailableWater import TAW
 from ..entities.moistureDepletion import Dr
-from ..entities.waterStressCoefficients import  KswNT
-from ..entities.temperatureStressCoefficients import   KstNT
 
-if __name__ != "__main__":
-    if os.getenv("DEVELOPMENT"):
-        from .water_stress import water_stress
-        from .root_zone_water import root_zone_water
-        from .temperature_stress import temperature_stress
-        from .HIadj_pre_anthesis import HIadj_pre_anthesis
-        from .HIadj_post_anthesis import HIadj_post_anthesis
-        from .HIadj_pollination import HIadj_pollination
-    else:
-        from .solution_water_stress import water_stress
-        from .solution_root_zone_water import root_zone_water
-        from .solution_temperature_stress import temperature_stress
-        from .solution_HIadj_pre_anthesis import HIadj_pre_anthesis
-        from .solution_HIadj_post_anthesis import HIadj_post_anthesis
-        from .solution_HIadj_pollination import HIadj_pollination
-else:
-    from .water_stress import water_stress
-    from .root_zone_water import root_zone_water
-    from .temperature_stress import temperature_stress
-    from .HIadj_pre_anthesis import HIadj_pre_anthesis
-    from .HIadj_post_anthesis import HIadj_post_anthesis
-    from .HIadj_pollination import HIadj_pollination
+
+from .water_stress import water_stress
+from .root_zone_water import root_zone_water
+from .temperature_stress import temperature_stress
+from .HIadj_pre_anthesis import HIadj_pre_anthesis
+from .HIadj_post_anthesis import HIadj_post_anthesis
+from .HIadj_pollination import HIadj_pollination
+from ..entities.waterStressCoefficients import Ksw
+from ..entities.temperatureStressCoefficients import Kst
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.crop import CropStructNT
+    from aquacrop.entities.crop import Crop
     from aquacrop.entities.initParamVariables import InitialCondition
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
+    from ..entities.waterStressCoefficients import Ksw
+    from ..entities.temperatureStressCoefficients import Kst
 
 
 
 
 def harvest_index(
-    prof: "SoilProfileNT",
+    prof: "SoilProfile",
     Soil_zTop: float,
-    Crop: "CropStructNT",
+    Crop: "Crop",
     InitCond: "InitialCondition",
     et0: float,
     temp_max: float,
@@ -125,7 +109,6 @@ def harvest_index(
         # Calculate water stress
         beta = True
         # Ksw = water_stress(Crop, NewCond, water_root_depletion, taw, et0, beta)
-        # Ksw = Ksw()
         Ksw_Exp, Ksw_Sto, Ksw_Sen, Ksw_Pol, Ksw_StoLin = water_stress(
             Crop.p_up,
             Crop.p_lo,
@@ -138,10 +121,14 @@ def harvest_index(
             et0,
             beta,
         )
-        Ksw = KswNT(exp=Ksw_Exp, sto=Ksw_Sto, sen=Ksw_Sen, pol=Ksw_Pol, sto_lin=Ksw_StoLin )
+        ksw = Ksw()
+        ksw.exp, ksw.sto, ksw.sen, ksw.pol, ksw.sto_lin = Ksw_Exp, Ksw_Sto, Ksw_Sen, Ksw_Pol, Ksw_StoLin
+        #Ksw = Ksw(exp=Ksw_Exp, sto=Ksw_Sto, sen=Ksw_Sen, pol=Ksw_Pol, sto_lin=Ksw_StoLin )
         # Calculate temperature stress
         (Kst_PolH,Kst_PolC) = temperature_stress(Crop, temp_max, temp_min)
-        Kst = KstNT(PolH=Kst_PolH,PolC=Kst_PolC)
+        kst = Kst()
+        kst.PolH, kst.PolC = Kst_PolH, Kst_PolC
+        #Kst = Kst(PolH=Kst_PolH,PolC=Kst_PolC)
         # Get reference harvest index on current day
         HIi = NewCond.hi_ref
 
@@ -171,8 +158,8 @@ def harvest_index(
                             Crop.FloweringCD,
                             Crop.CCmin,
                             Crop.exc,
-                            Ksw,
-                            Kst,
+                            ksw,
+                            kst,
                             HIt,
                         )
 
@@ -196,7 +183,7 @@ def harvest_index(
                                                         NewCond.fpost_upp,
                                                         NewCond.fpost_dwn,
                                                         Crop, 
-                                                        Ksw)
+                                                        ksw)
 
                 # Limit harvest_index to maximum allowable increase due to pre- and
                 # post-anthesis water stress combinations

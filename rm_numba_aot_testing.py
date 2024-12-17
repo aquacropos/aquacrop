@@ -1,5 +1,7 @@
 #import os
 #os.environ['DEVELOPMENT'] = 'True'
+import sys
+sys.setrecursionlimit(2000)
 import pandas as pd
 
 from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent, IrrigationManagement, CO2
@@ -27,7 +29,7 @@ irr_mngt = IrrigationManagement(irrigation_method=0)
 co2_data = pd.read_csv(
                     "C:/Users/s10034cb/Dropbox (The University of Manchester)/Manchester Postdoc/aquacrop/aquacrop/data/MaunaLoaCO2.txt",
                     header=1,
-                    delim_whitespace=True,
+                    sep='\s+',
                     names=["year", "ppm"],
     )
 
@@ -41,5 +43,8 @@ model = AquaCropModel(sim_start_time=f'{1979}/10/15',
                       co2_concentration=CO2(co2_data=co2_data)
                       )
 model.run_model(till_termination=True)
-
-print(model._outputs.final_stats)
+print(model.crop.Name)
+water_flux=model.get_water_flux()
+crop_growth=model.get_crop_growth()
+water_flux.to_csv('../AquaCrop docs/water_flux.csv')
+crop_growth.to_csv('../AquaCrop docs/crop_growth.csv')

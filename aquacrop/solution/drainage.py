@@ -2,21 +2,16 @@ import numpy as np
 
 from typing import Tuple,TYPE_CHECKING
 
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
-
-
+from ..entities.soilProfile import SoilProfile
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from numpy import ndarray
 
 
 def drainage(
-    prof: "SoilProfileNT",
+    prof: "SoilProfile",
     th_init: "ndarray",
     th_fc_Adj_init: "ndarray",
     ) -> Tuple["ndarray", float, float]:

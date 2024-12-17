@@ -1,4 +1,3 @@
-import os
 import numpy as np
 
 from aquacrop.entities.output import Output
@@ -6,7 +5,7 @@ from aquacrop.entities.output import Output
 
 from ..entities.totalAvailableWater import TAW
 from ..entities.moistureDepletion import Dr
-from ..entities.crop import CropStructNT
+from ..entities.crop import Crop
 
 from ..solution.pre_irrigation import pre_irrigation
 from ..solution.irrigation import irrigation
@@ -18,28 +17,17 @@ from ..solution.transpiration import transpiration
 from ..solution.groundwater_inflow import groundwater_inflow
 from ..solution.harvest_index import harvest_index
 
-if os.getenv("DEVELOPMENT"):
-    from ..solution.growing_degree_day import growing_degree_day
-    from ..solution.drainage import drainage
-    from ..solution.root_zone_water import root_zone_water
-    from ..solution.rainfall_partition import rainfall_partition
-    from ..solution.check_groundwater_table import check_groundwater_table
-    from ..solution.soil_evaporation import soil_evaporation
-    from ..solution.root_development import root_development
-    from ..solution.infiltration import infiltration
-    from ..solution.HIref_current_day import HIref_current_day
-    from ..solution.biomass_accumulation import biomass_accumulation
-else:
-    from ..solution.solution_growing_degree_day import growing_degree_day
-    from ..solution.solution_drainage import drainage
-    from ..solution.solution_root_zone_water import root_zone_water
-    from ..solution.solution_rainfall_partition import rainfall_partition
-    from ..solution.solution_check_groundwater_table import check_groundwater_table
-    from ..solution.solution_soil_evaporation import soil_evaporation
-    from ..solution.solution_root_development import root_development
-    from ..solution.solution_infiltration import infiltration
-    from ..solution.solution_HIref_current_day import HIref_current_day
-    from ..solution.solution_biomass_accumulation import biomass_accumulation
+
+from ..solution.growing_degree_day import growing_degree_day
+from ..solution.drainage import drainage
+from ..solution.root_zone_water import root_zone_water
+from ..solution.rainfall_partition import rainfall_partition
+from ..solution.check_groundwater_table import check_groundwater_table
+from ..solution.soil_evaporation import soil_evaporation
+from ..solution.root_development import root_development
+from ..solution.infiltration import infiltration
+from ..solution.HIref_current_day import HIref_current_day
+from ..solution.biomass_accumulation import biomass_accumulation
 
 from typing import Tuple, TYPE_CHECKING
 
@@ -50,6 +38,7 @@ if TYPE_CHECKING:
     from aquacrop.entities.initParamVariables import InitialCondition
     from aquacrop.entities.paramStruct import ParamStruct
     from aquacrop.entities.output import Output
+    from aquacrop.entities.crop import Crop
 
 def solution_single_time_step(
     init_cond: "InitialCondition",
@@ -175,7 +164,8 @@ def solution_single_time_step(
         for key, value in Crop_.__dict__.items()
         if not key.startswith("__") and not callable(key)
     }
-    Crop = CropStructNT(**class_args)
+
+    crop = Crop(c_name = class_args['Name'],  **class_args)
 
     # Run simulations %%
     # 1. Check for groundwater table
@@ -190,7 +180,7 @@ def solution_single_time_step(
 
     # 2. Root development
     NewCond.z_root, NewCond.r_cor = root_development(
-        Crop,
+        crop,
         Soil.Profile,
         NewCond.dap,
         NewCond.z_root,
@@ -212,7 +202,7 @@ def solution_single_time_step(
 
     # 3. Pre-irrigation
     NewCond, PreIrr = pre_irrigation(
-        Soil.Profile, Crop, NewCond, growing_season, IrrMngt
+        Soil.Profile, crop, NewCond, growing_season, IrrMngt
     )
 
     # 4. Drainage
@@ -257,7 +247,7 @@ def solution_single_time_step(
         NewCond.th,
         NewCond.dap,
         NewCond.time_step_counter,
-        Crop,
+        crop,
         Soil.Profile,
         Soil.z_top,
         growing_season,
@@ -303,18 +293,18 @@ def solution_single_time_step(
         NewCond,
         Soil.z_germ,
         Soil.Profile,
-        Crop.GermThr,
-        Crop.PlantMethod,
+        crop.GermThr,
+        crop.PlantMethod,
         gdd,
         growing_season,
     )
 
     # 10. Update growth stage
-    NewCond = growth_stage(Crop, NewCond, growing_season)
+    NewCond = growth_stage(crop, NewCond, growing_season)
 
     # 11. Canopy cover development
     NewCond = canopy_cover(
-        Crop, Soil.Profile, Soil.z_top, NewCond, gdd, et0, growing_season
+        crop, Soil.Profile, Soil.z_top, NewCond, gdd, et0, growing_season
     )
 
     # 12. Soil evaporation
@@ -340,8 +330,8 @@ def solution_single_time_step(
         Soil.fwcc,
         Soil.f_wrel_exp,
         Soil.f_evap,
-        Crop.CalendarType,
-        Crop.Senescence,
+        crop.CalendarType,
+        crop.Senescence,
         IrrMngt.irrigation_method,
         IrrMngt.WetSurf,
         FieldMngt.mulches,
@@ -375,7 +365,7 @@ def solution_single_time_step(
         Soil.Profile,
         Soil.nComp,
         Soil.z_top,
-        Crop,
+        crop,
         IrrMngt.irrigation_method,
         IrrMngt.NetIrrSMT,
         NewCond,
@@ -399,13 +389,13 @@ def solution_single_time_step(
         NewCond.canopy_cover,
         NewCond.cc_prev,
         NewCond.ccx_w,
-        Crop,
+        crop,
         growing_season,
     )
 
     # 16. Biomass accumulation
     (NewCond.biomass, NewCond.biomass_ns) = biomass_accumulation(
-        Crop,
+        crop,
         NewCond.dap,
         NewCond.delayed_cds,
         NewCond.hi_ref,
@@ -420,7 +410,7 @@ def solution_single_time_step(
 
     # 17. Harvest index
     NewCond = harvest_index(
-        Soil.Profile, Soil.z_top, Crop, NewCond, et0, temp_max, temp_min, growing_season
+        Soil.Profile, Soil.z_top, crop, NewCond, et0, temp_max, temp_min, growing_season
     )
 
     # 18. Yield potential
@@ -430,11 +420,11 @@ def solution_single_time_step(
     if growing_season is True:
         # Calculate crop yield_ (tonne/ha)
         NewCond.DryYield = (NewCond.biomass / 100) * NewCond.harvest_index_adj
-        NewCond.FreshYield = NewCond.DryYield / (Crop.YldWC / 100)
+        NewCond.FreshYield = NewCond.DryYield / (crop.YldWC / 100)
         # print( clock_struct.time_step_counter,(NewCond.biomass/100),NewCond.harvest_index_adj)
         # Check if crop has reached maturity
-        if ((Crop.CalendarType == 1) and (NewCond.dap >= Crop.Maturity)) or (
-            (Crop.CalendarType == 2) and (NewCond.gdd_cum >= Crop.Maturity)
+        if ((crop.CalendarType == 1) and (NewCond.dap >= crop.Maturity)) or (
+            (crop.CalendarType == 2) and (NewCond.gdd_cum >= crop.Maturity)
         ):
             # Crop has reached maturity
             NewCond.crop_mature = True
@@ -454,8 +444,8 @@ def solution_single_time_step(
         float(NewCond.z_root),
         NewCond.th,
         Soil.z_top,
-        float(Crop.Zmin),
-        Crop.Aer,
+        float(crop.Zmin),
+        crop.Aer,
     )
 
     # 21. Update net irrigation to add any pre irrigation

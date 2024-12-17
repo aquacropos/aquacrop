@@ -1,16 +1,12 @@
 import numpy as np
 
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
-
+from ..entities.soilProfile import SoilProfile
 
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from numpy import ndarray
 
 
@@ -26,7 +22,7 @@ def rainfall_partition(
     Soil_AdjCN: float,
     Soil_zCN: float,
     Soil_nComp: int,
-    prof: "SoilProfileNT",
+    prof: "SoilProfile",
 ) -> Tuple[float, float, float]:
     """
     Function to partition rainfall into surface runoff and infiltration using the curve number approach

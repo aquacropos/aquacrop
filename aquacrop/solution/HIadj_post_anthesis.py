@@ -1,18 +1,14 @@
 import numpy as np
 
-try:
-    from ..entities.crop import CropStructNT_type_sig
-    from ..entities.waterStressCoefficients import KswNT_type_sig
-except:
-    from entities.crop import CropStructNT_type_sig
-    from entities.waterStressCoefficients import KswNT_type_sig
+from ..entities.crop import Crop
+from ..entities.waterStressCoefficients import Ksw
 
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.crop import CropStructNT
-    from entities.waterStressCoefficients import KswNT
+    from aquacrop.entities.crop import Crop
+    from entities.waterStressCoefficients import Ksw
 
 def HIadj_post_anthesis(
     NewCond_DelayedCDs: int,
@@ -23,8 +19,8 @@ def HIadj_post_anthesis(
     NewCond_CC: float,
     NewCond_fpost_upp: float,
     NewCond_fpost_dwn: float,
-    Crop: "CropStructNT", 
-    Ksw: "KswNT",
+    Crop: "Crop", 
+    Ksw: "Ksw",
     ) -> Tuple[float, float, float, float, float]:
     """
     Function to calculate adjustment to harvest index for post-anthesis water

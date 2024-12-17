@@ -8,37 +8,25 @@ from ..entities.moistureDepletion import Dr
 from ..entities.waterStressCoefficients import  Ksw
 from .adjust_CCx import adjust_CCx
 
-if __name__ != "__main__":
-    if os.getenv("DEVELOPMENT"):
-        from .water_stress import water_stress
-        from .root_zone_water import root_zone_water
-        from .cc_development import cc_development
-        from .update_CCx_CDC import update_CCx_CDC
-        from .cc_required_time import cc_required_time
-    else:
-        from .solution_water_stress import water_stress
-        from .solution_root_zone_water import root_zone_water
-        from .solution_cc_development import cc_development
-        from .solution_update_CCx_CDC import update_CCx_CDC
-        from .solution_cc_required_time import cc_required_time
-else:
-    from .water_stress import water_stress
-    from .root_zone_water import root_zone_water
-    from .cc_development import cc_development
-    from .update_CCx_CDC import update_CCx_CDC
-    from .cc_required_time import cc_required_time
+
+from .water_stress import water_stress
+from .root_zone_water import root_zone_water
+from .cc_development import cc_development
+from .update_CCx_CDC import update_CCx_CDC
+from .cc_required_time import cc_required_time
+
 
 from typing import NamedTuple, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
     from aquacrop.entities.initParamVariables import InitialCondition
-    from aquacrop.entities.soilProfile import SoilProfileNT
-    from aquacrop.entities.crop import CropStructNT
+    from aquacrop.entities.soilProfile import SoilProfile
+    from aquacrop.entities.crop import CropStruct
 
 def canopy_cover(
-    Crop: "CropStructNT",
-    prof: "SoilProfileNT",
+    Crop: "CropStruct",
+    prof: "SoilProfile",
     Soil_zTop: float,
     InitCond: "InitialCondition",
     gdd: float,

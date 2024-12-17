@@ -35,7 +35,6 @@ def growth_stage(
 
     ## Store initial conditions in new structure for updating ##
     NewCond = InitCond
-
     ## Get growth stage (if in growing season) ##
     if growing_season == True:
         # Adjust time for any delayed growth

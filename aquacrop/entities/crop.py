@@ -4,11 +4,7 @@ Crop class module
 import numpy as np
 import typing
 
-try:
-    from .crops.crop_params import crop_params
-except:
-    from crops.crop_params import crop_params
-
+from .crops.crop_params import crop_params
 
 class Crop:
     """
@@ -66,7 +62,119 @@ class Crop:
         self.bface = (
             0.001165  # WP co2 adjustment parameter given by FACE experiments
         )
+        
+        # added in Read_Model_Paramaters (CB added in from duplicate CropStruct object whilst removing AOT 13/12/24)
+        self.CropType = 3  # Crop Type (1 = Leafy vegetable, 2 = Root/tuber, 3 = Fruit/grain)
+        self.PlantMethod = 1  # Planting method (0 = Transplanted, 1 =  Sown)
+        self.CalendarType = (
+            2  # Calendar Type (1 = Calendar days, 2 = Growing degree days)
+        )
+        self.SwitchGDD = 0  # Convert calendar to gdd mode if inputs are given in calendar days (0 = No; 1 = Yes)
         self.SwitchGDDType = 'mean' # calculate GDD phenology based on mean of CD phenology across entire simulation period (mean/median)
+
+        self.EmergenceCD = 0
+        self.Canopy10PctCD = 0
+        self.MaxRootingCD = 0
+        self.SenescenceCD = 0
+        self.MaturityCD = 0
+        self.MaxCanopyCD = 0
+        self.CanopyDevEndCD = 0
+        self.HIstartCD = 0
+        self.HIendCD = 0
+        self.YldFormCD = 0
+
+        self.Emergence = 80  # Growing degree/Calendar days from sowing to emergence/transplant recovery
+        self.MaxRooting = (
+            1420  # Growing degree/Calendar days from sowing to maximum rooting
+        )
+        self.Senescence = (
+            1420  # Growing degree/Calendar days from sowing to senescence
+        )
+        self.Maturity = (
+            1670  # Growing degree/Calendar days from sowing to maturity
+        )
+        self.HIstart = 850  # Growing degree/Calendar days from sowing to start of yield_ formation
+        self.Flowering = 190  # Duration of flowering in growing degree/calendar days (-999 for non-fruit/grain crops)
+        self.YldForm = (
+            775  # Duration of yield_ formation in growing degree/calendar days
+        )
+        self.HIend = 0
+        self.MaxCanopy = 0
+        self.CanopyDevEnd = 0
+        self.Canopy10Pct = 0
+        self.YldWC = 0
+        self.GDDmethod = 2  # Growing degree day calculation method
+        self.Tbase = (
+            8  # Base temperature (degC) below which growth does not progress
+        )
+        self.Tupp = 30  # Upper temperature (degC) above which crop development no longer increases
+        self.PolHeatStress = (
+            1  # Pollination affected by heat stress (0 = No, 1 = Yes)
+        )
+        self.Tmax_up = 40  # Maximum air temperature (degC) above which pollination begins to fail
+        self.Tmax_lo = 45  # Maximum air temperature (degC) at which pollination completely fails
+        self.PolColdStress = (
+            1  # Pollination affected by cold stress (0 = No, 1 = Yes)
+        )
+        self.Tmin_up = 10  # Minimum air temperature (degC) below which pollination begins to fail
+        self.Tmin_lo = 5  # Minimum air temperature (degC) at which pollination completely fails
+        self.TrColdStress = 1  # Transpiration affected by cold temperature stress (0 = No, 1 = Yes)
+        self.GDD_up = 12  # Minimum growing degree days (degC/day) required for full crop transpiration potential
+        self.GDD_lo = 0  # Growing degree days (degC/day) at which no crop transpiration occurs
+        self.Zmin = 0.3  # Minimum effective rooting depth (m)
+        self.Zmax = 1.7  # Maximum rooting depth (m)
+        self.fshape_r = 1.3  # Shape factor describing root expansion
+        self.SxTopQ = 0.0480  # Maximum root water extraction at top of the root zone (m3/m3/day)
+        self.SxBotQ = 0.0117  # Maximum root water extraction at the bottom of the root zone (m3/m3/day)
+
+        self.SxTop = 0.0
+        self.SxBot = 0.0
+
+        self.SeedSize = 6.5  # Soil surface area (cm2) covered by an individual seedling at 90% emergence
+        self.PlantPop = 75_000  # Number of plants per hectare
+        self.CCx = 0.96  # Maximum canopy cover (fraction of soil cover)
+        self.CDC = (
+            0.01  # Canopy decline coefficient (fraction per gdd/calendar day)
+        )
+        self.CGC = 0.0125  # Canopy growth coefficient (fraction per gdd)
+        self.CDC_CD = (
+            0.01  # Canopy decline coefficient (fraction per gdd/calendar day)
+        )
+        self.CGC_CD = 0.0125  # Canopy growth coefficient (fraction per gdd)
+        self.Kcb = 1.05  # Crop coefficient when canopy growth is complete but prior to senescence
+        self.fage = 0.3  #  Decline of crop coefficient due to ageing (%/day)
+        self.WP = 33.7  # Water productivity normalized for ET0 and C02 (g/m2)
+        self.WPy = 100  # Adjustment of water productivity in yield_ formation stage (% of WP)
+        self.fsink = 0.5  # Crop performance under elevated atmospheric CO2 concentration (%/100)
+        self.HI0 = 0.48  # Reference harvest index
+        self.dHI_pre = 0  # Possible increase of harvest index due to water stress before flowering (%)
+        self.a_HI = 7  # Coefficient describing positive impact on harvest index of restricted vegetative growth during yield_ formation
+        self.b_HI = 3  # Coefficient describing negative impact on harvest index of stomatal closure during yield_ formation
+        self.dHI0 = 15  # Maximum allowable increase of harvest index above reference value
+        self.Determinant = (
+            1  # Crop Determinancy (0 = Indeterminant, 1 = Determinant)
+        )
+        self.exc = 50  # Excess of potential fruits
+        self.p_up = np.zeros(
+            4
+        )  # Upper soil water depletion threshold for water stress effects on affect canopy expansion
+        self.p_lo = np.zeros(
+            4
+        )  # Lower soil water depletion threshold for water stress effects on canopy expansion
+        self.fshape_w = np.ones(
+            4
+        )  # Shape factor describing water stress effects on canopy expansion
+
+        self.CC0 = 0.0
+
+        self.HIGC = 0.0
+        self.tLinSwitch = 0
+        self.dHILinear = 0.0
+
+        self.fCO2 = 0.0
+
+        self.FloweringCD = 0
+        self.FloweringEnd = 0.0
 
         if c_name == "custom":
 

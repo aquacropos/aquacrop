@@ -1,16 +1,12 @@
 import numpy as np
 
-try:
-    from ..entities.crop import CropStructNT_type_sig
-except:
-    from entities.crop import CropStructNT_type_sig
-
+from ..entities.crop import Crop
 
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.crop import CropStructNT
+    from aquacrop.entities.crop import Crop
 
 def HIref_current_day(
     NewCond_HIref: float,

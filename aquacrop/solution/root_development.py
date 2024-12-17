@@ -1,24 +1,19 @@
 import numpy as np
 
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-    from ..entities.crop import CropStructNT_type_sig
-
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
-    from entities.crop import CropStructNT_type_sig
+from ..entities.soilProfile import SoilProfile
+from ..entities.crop import Crop
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
-    from aquacrop.entities.crop import CropStructNT
+    from aquacrop.entities.soilProfile import SoilProfile
+    from aquacrop.entities.crop import Crop
     from numpy import ndarray
 
 def root_development(
-    Crop: "CropStructNT",
-    prof: "SoilProfileNT",
+    Crop: "Crop",
+    prof: "SoilProfile",
     NewCond_DAP: float,
     NewCond_Zroot: float,
     NewCond_DelayedCDs: float,

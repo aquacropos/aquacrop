@@ -1,9 +1,6 @@
 import numpy as np
 
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
+from ..entities.soilProfile import SoilProfile
 
 from typing import TYPE_CHECKING, Tuple
 
@@ -13,7 +10,7 @@ if TYPE_CHECKING:
     from numpy import ndarray
 
 def root_zone_water(
-    prof: "SoilProfileNT_typ_sig",
+    prof: "SoilProfile",
     InitCond_Zroot: float,
     InitCond_th: "ndarray",
     Soil_zTop: float,
