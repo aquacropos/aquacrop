@@ -271,7 +271,6 @@ class AquaCropModel:
         if till_termination:
             self.__start_model_execution = time.time()
             while self._clock_struct.model_is_finished is False:
-
                 (
                     self._clock_struct,
                     self._init_cond,

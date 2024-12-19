@@ -1,6 +1,8 @@
 #import os
 #os.environ['DEVELOPMENT'] = 'True'
 import sys
+import seaborn as sns
+import matplotlib.pyplot as plt
 sys.setrecursionlimit(2000)
 import pandas as pd
 
@@ -34,7 +36,7 @@ co2_data = pd.read_csv(
     )
 
 model = AquaCropModel(sim_start_time=f'{1979}/10/15',
-                      sim_end_time=f'{2002}/03/31',
+                      sim_end_time=f'{2001}/03/31',
                       weather_df=tunis_weather,
                       soil=tunis_soil,
                       crop=wheat,
@@ -46,5 +48,22 @@ model.run_model(till_termination=True)
 print(model.crop.Name)
 water_flux=model.get_water_flux()
 crop_growth=model.get_crop_growth()
+final_stats = model._outputs.final_stats
 water_flux.to_csv('../AquaCrop docs/water_flux.csv')
 crop_growth.to_csv('../AquaCrop docs/crop_growth.csv')
+print(final_stats)
+sns.set_theme(style="whitegrid")  # Set a clean theme for the plots
+
+# List of columns to plot
+columns = ['canopy_cover', 'biomass', 'harvest_index', 'z_root']
+
+# Create separate plots for each column
+for col in columns:
+    plt.figure(figsize=(6, 4))  # Create a new figure
+    sns.lineplot(data=crop_growth, x='dap', y=col, color='blue')
+    plt.xlabel('Days After Planting (dap)')
+    plt.ylabel(col.replace('_', ' ').title())  # Format column name for the label
+    plt.title(f'{col.replace("_", " ").title()} vs. DAP')
+    plt.tight_layout()
+    plt.show()  # Show the plot
+

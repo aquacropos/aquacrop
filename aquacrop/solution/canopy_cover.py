@@ -136,6 +136,7 @@ def canopy_cover(
             # No canopy development before emergence/germination or after
             # maturity
             NewCond.canopy_cover_ns = 0
+
         elif tCCadj < Crop.CanopyDevEnd:
             # Canopy growth can occur
             if InitCond_CC_NS <= Crop.CC0:
@@ -202,7 +203,6 @@ def canopy_cover(
 
             else:
                 # Canopy growing
-
                 if InitCond_CC < (0.9799 * Crop.CCx):
                     # Adjust canopy growth coefficient for leaf expansion water
                     # stress effects
@@ -259,7 +259,6 @@ def canopy_cover(
                                 NewCond.canopy_cover = InitCond_CC
 
                     else:
-
                         # No canopy growth
                         NewCond.canopy_cover = InitCond_CC
                         # Update CC0
@@ -281,7 +280,6 @@ def canopy_cover(
                 NewCond.ccx_act = NewCond.canopy_cover
 
         elif tCCadj > Crop.CanopyDevEnd:
-
             # No more canopy growth is possible or canopy is in decline
             if tCCadj < Crop.Senescence:
                 # Mid-season stage - no canopy growth

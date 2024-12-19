@@ -2,6 +2,8 @@ import numpy as np
 
 from aquacrop.entities.output import Output
 
+# TEMP FOR TROUBLESHOOTING:
+from pprint import pprint
 
 from ..entities.totalAvailableWater import TAW
 from ..entities.moistureDepletion import Dr
@@ -103,7 +105,6 @@ def solution_single_time_step(
             growing_season = True
         else:
             growing_season = False
-
         # Assign crop, irrigation management, and field management structures
         Crop_ = param_struct.Seasonal_Crop_List[clock_struct.season_counter]
         Crop_Name = param_struct.CropChoices[clock_struct.season_counter]
@@ -132,7 +133,6 @@ def solution_single_time_step(
         # Calendar days after planting
         NewCond.dap = NewCond.dap + 1
         # Growing degree days after planting
-
         gdd = growing_degree_day(
             Crop_.GDDmethod, Crop_.Tupp, Crop_.Tbase, temp_max, temp_min
         )
@@ -158,14 +158,7 @@ def solution_single_time_step(
     NewCond.temp_min = weather_step[0]
     NewCond.et0 = weather_step[3]
 
-
-    class_args = {
-        key: value
-        for key, value in Crop_.__dict__.items()
-        if not key.startswith("__") and not callable(key)
-    }
-
-    crop = Crop(c_name = class_args['Name'],  **class_args)
+    crop = Crop_
 
     # Run simulations %%
     # 1. Check for groundwater table
