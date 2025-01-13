@@ -29,7 +29,7 @@ def check_groundwater_table(
 
     Arguments:
 
-        prof (SoilProfileNT): soil profile paramaters
+        prof (SoilProfile): soil profile paramaters
 
         NewCond_zGW (float): groundwater depth
 

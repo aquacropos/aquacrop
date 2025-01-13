@@ -15,12 +15,10 @@ from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.crop import CropStructNT
-    from entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.crop import Crop
+    from entities.soilProfile import SoilProfile
     from numpy import ndarray
 
-# @cc.export("_irrigation", (i8,f8[:],f8,f8,i8,f8[:],f8,f8,f8,f8,f8,f8[:],i8,i8,CropStructNT_type_sig,SoilProfileNT_typ_sig,f8,b1,f8,f8))
-# @njit
 def irrigation(
     IrrMngt_IrrMethod: int,
     IrrMngt_SMT: float,
@@ -38,8 +36,8 @@ def irrigation(
     NewCond_th: "ndarray",
     NewCond_DAP: int,
     NewCond_TimeStepCounter: int,
-    Crop: "CropStructNT",
-    prof: "SoilProfileNT",
+    Crop: "Crop",
+    prof: "SoilProfile",
     Soil_zTop: float,
     growing_season: bool,
     Rain: float,
@@ -87,9 +85,9 @@ def irrigation(
 
         NewCond_TimeStepCounter (int): current simulation timestep
 
-        Crop (CropStructNT): Crop paramaters
+        Crop (Crop): Crop paramaters
 
-        Soil (SoilProfileNT): Soil object containing soil paramaters
+        Soil (SoilProfile): Soil object containing soil paramaters
 
         growing_season (bool): is growing season (True or Flase)
 

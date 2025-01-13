@@ -5,14 +5,14 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from aquacrop.entities.initParamVariables import InitialCondition
 
 
 def germination(
     InitCond: "InitialCondition",
     Soil_zGerm: float,
-    prof: "SoilProfileNT",
+    prof: "SoilProfile",
     Crop_GermThr: float,
     Crop_PlantMethod: bool,
     gdd: float,
@@ -32,7 +32,7 @@ def germination(
 
         Soil_zGerm (float): Soil depth affecting germination
 
-        prof (SoilProfileNT): Soil object containing soil paramaters
+        prof (SoilProfile): Soil object containing soil paramaters
 
         Crop_GermThr (float): Crop germination threshold
 

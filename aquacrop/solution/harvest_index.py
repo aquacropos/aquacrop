@@ -45,11 +45,11 @@ def harvest_index(
     Arguments:
 
 
-        prof (SoilProfileNT): Soil profile paramaters
+        prof (SoilProfile): Soil profile paramaters
 
         Soil_zTop (float): topsoil depth
 
-        Crop (CropStructNT): Crop parameters
+        Crop (Crop): Crop parameters
 
         InitCond (InitialCondition): InitCond object containing model paramaters
 

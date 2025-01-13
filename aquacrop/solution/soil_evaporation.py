@@ -69,7 +69,7 @@ def soil_evaporation(
         
         ClockStruct_TimeStepCounter (int): time step counter
 
-        prof (SoilProfileNT): soil profile object
+        prof (SoilProfile): soil profile object
 
         Soil_EvapZmin (float): minimum evaporation depth (m)
 

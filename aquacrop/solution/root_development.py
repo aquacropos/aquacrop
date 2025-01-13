@@ -39,9 +39,9 @@ def root_development(
 
     Arguments:
 
-        Crop (CropStructNT): crop params
+        Crop (Crop): crop params
 
-        prof (SoilProfileNT): soilv profile paramaters
+        prof (SoilProfile): soilv profile paramaters
 
         NewCond_DAP (float): days after planting
 

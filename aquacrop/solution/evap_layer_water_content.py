@@ -27,7 +27,7 @@ def evap_layer_water_content(
 
         InitCond_EvapZ (float): evaporation depth
 
-        prof (SoilProfileNT): Soil object containing soil paramaters
+        prof (SoilProfile): Soil object containing soil paramaters
 
 
     Returns:

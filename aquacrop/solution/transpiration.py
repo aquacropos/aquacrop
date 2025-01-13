@@ -47,7 +47,7 @@ def transpiration(
     Arguments:
 
 
-        Soil_Profile (SoilProfileNT): Soil profile params
+        Soil_Profile (SoilProfile): Soil profile params
 
         Soil_nComp (int): number of soil components
 

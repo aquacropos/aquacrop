@@ -5,15 +5,15 @@ from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
-    from aquacrop.entities.crop import CropStructNT
+    from aquacrop.entities.soilProfile import SoilProfile
+    from aquacrop.entities.crop import Crop
     from aquacrop.entities.initParamVariables import InitialCondition
     from aquacrop.entities.irrigationManagement import IrrMngtStruct
 
 
 def pre_irrigation(
-    prof: "SoilProfileNT",
-    Crop: "CropStructNT",
+    prof: "SoilProfile",
+    Crop: "Crop",
     InitCond: "InitialCondition",
     growing_season: bool,
     IrrMngt: "IrrMngtStruct",
@@ -28,7 +28,7 @@ def pre_irrigation(
 
         prof (SoilProfile): Soil object containing soil paramaters
 
-        Crop (CropStruct): Crop object containing Crop paramaters
+        Crop (Crop): Crop object containing Crop paramaters
 
         InitCond (InitialCondition): InitCond object containing model paramaters
 

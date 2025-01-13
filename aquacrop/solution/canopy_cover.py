@@ -43,9 +43,9 @@ def canopy_cover(
 
     Arguments:
 
-        Crop (CropStructNT): NamedTuple of Crop object
+        Crop (CropStruct): Crop object
 
-        prof (SoilProfileNT): NamedTuple of SoilProfile object
+        prof (SoilProfile): SoilProfile object
 
         Soil_zTop (float): top soil depth
 
