@@ -1,7 +1,7 @@
-#import os
-#os.environ['DEVELOPMENT'] = 'True'
-import seaborn as sns
-import matplotlib.pyplot as plt
+import os
+os.environ['DEVELOPMENT'] = 'True'
+#import seaborn as sns
+#import matplotlib.pyplot as plt
 import pandas as pd
 
 from aquacrop import AquaCropModel, Soil, Crop, InitialWaterContent, IrrigationManagement, CO2, FieldMngt, GroundWater
@@ -462,7 +462,7 @@ def run_all_exercises(file_prefix):
     )
     
 
-run_all_exercises('rm_numba')
+run_all_exercises('rmNumbaTwo')
 
 #sns.set_theme(style="whitegrid")  # Set a clean theme for the plots
 
