@@ -1,12 +1,4 @@
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
 
-# temporary name for compiled module
-cc = CC("solution_growing_degree_day")
-
-
-
-@cc.export("growing_degree_day", "f8(i4,f8,f8,f8,f8)")
 def growing_degree_day(
     GDDmethod: int,
     Tupp: float,
@@ -69,6 +61,3 @@ def growing_degree_day(
         gdd = Tmean - Tbase
 
     return gdd
-
-if __name__ == "__main__":
-    cc.compile()

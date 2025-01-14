@@ -1,21 +1,7 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-# temporary name for compiled module
-cc = CC("solution_biomass_accumulation")
-cc.verbose = False
-
-
-try:
-    from ..entities.crop import CropStructNT_type_sig
-except:
-    from entities.crop import CropStructNT_type_sig
-
 from typing import NamedTuple, Tuple
 
-
-@cc.export("biomass_accumulation", (CropStructNT_type_sig,i8,i8,f8,f8,f8,f8,f8,f8,f8,b1))
 def biomass_accumulation(
     Crop: NamedTuple,
     NewCond_DAP: int,
@@ -111,6 +97,3 @@ def biomass_accumulation(
 
     return (NewCond_B,
             NewCond_B_NS)
-
-if __name__ == "__main__":
-    cc.compile()

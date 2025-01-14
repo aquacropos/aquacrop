@@ -1,30 +1,16 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
-    
+from ..entities.soilProfile import SoilProfile
 
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from numpy import ndarray
 
-
-
-
-# temporary name for compiled module
-cc = CC("solution_root_zone_water")
-@njit
-@cc.export("root_zone_water", (SoilProfileNT_typ_sig,f8,f8[:],f8,f8,f8))
 def root_zone_water(
-    prof: "SoilProfileNT_typ_sig",
+    prof: "SoilProfile",
     InitCond_Zroot: float,
     InitCond_th: "ndarray",
     Soil_zTop: float,
@@ -204,6 +190,3 @@ def root_zone_water(
         thRZ_Dry,
         thRZ_Aer,
     )
-
-if __name__ == "__main__":
-    cc.compile()

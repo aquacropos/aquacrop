@@ -1,13 +1,4 @@
 
-from numba import float64, int64, boolean, types
-
-spec = [
-    ("Rz", float64),
-    ("Zt", float64),
-]
-
-
-
 class Dr:
     """
     Depletion class to hold the rootzone and topsoil depletion

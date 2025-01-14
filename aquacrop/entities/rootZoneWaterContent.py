@@ -1,16 +1,4 @@
-from numba import float64, types
 import typing
-
-
-
-thRZ_spec = [
-    ("Act", float64),
-    ("S", float64),
-    ("FC", float64),
-    ("WP", float64),
-    ("Dry", float64),
-    ("Aer", float64),
-]
 
 
 
@@ -47,6 +35,3 @@ class RootZoneWater(object):
         self.WP = 0.0
         self.Dry = 0.0
         self.Aer = 0.0
-
-thRZNT = typing.NamedTuple("thRZNT", thRZ_spec)
-thRZNT_type_sig= types.NamedTuple(tuple(dict(thRZ_spec).values()),thRZNT)

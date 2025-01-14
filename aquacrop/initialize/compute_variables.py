@@ -5,7 +5,7 @@ from .compute_crop_calendar import compute_crop_calendar
 from .calculate_HIGC import calculate_HIGC
 from .calculate_HI_linear import calculate_HI_linear
 from ..entities.co2 import CO2
-from ..entities.crop import CropStruct
+from ..entities.crop import Crop
 from copy import deepcopy
 from os.path import dirname, abspath
 
@@ -17,8 +17,6 @@ if TYPE_CHECKING:
     from aquacrop.entities.clockStruct import ClockStruct
     from aquacrop.entities.paramStruct import ParamStruct
 
-# print("dirname = ", dirname(dirname(abspath(__file__))))
-
 
 def compute_variables(
     param_struct: "ParamStruct",
@@ -28,7 +26,6 @@ def compute_variables(
 ) -> "ParamStruct":
     """
     Function to compute additional variables needed to run the model eg. CO2
-    Creates cropstruct jit class objects
 
     Arguments:
 
@@ -219,15 +216,16 @@ def compute_variables(
     Fallow_Crop = deepcopy(crop_list[0])
 
     param_struct.Seasonal_Crop_List = []
+
     for crop in crop_list:
-        crop_struct = CropStruct()
-        for a, v in crop.__dict__.items():
-            if hasattr(crop_struct, a):
-                crop_struct.__setattr__(a, v)
+        #crop_struct = Crop(crop.Name, crop.planting_date) # changed from CropStruct to Crop during removal of numba AOT/JIT compilation
+        #for a, v in crop.__dict__.items():
+        #    if hasattr(crop_struct, a):
+        #        crop_struct.__setattr__(a, v)
 
-        param_struct.Seasonal_Crop_List.append(crop_struct)
+        param_struct.Seasonal_Crop_List.append(crop)
 
-    fallow_struct = CropStruct()
+    fallow_struct = Crop(crop.Name, crop.planting_date) # changed from CropStruct to Crop during removal of numba AOT/JIT compilation
     for a, v in Fallow_Crop.__dict__.items():
         if hasattr(fallow_struct, a):
             fallow_struct.__setattr__(a, v)

@@ -360,7 +360,7 @@ class Soil:
         self,
     ):
 
-        self.profile = self.profile.fillna(method="ffill")
+        self.profile = self.profile.ffill()
 
         self.profile.dz = self.profile.dz.round(2)
 

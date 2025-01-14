@@ -187,7 +187,6 @@ def compute_crop_calendar(
             crop.CDC = crop.CDC_CD
             crop.CGC = crop.CGC_CD
 
-        # print(crop.__dict__)
     elif Mode == 2:
         # Growth in growing degree days
         # Time from sowing to end of vegatative growth period

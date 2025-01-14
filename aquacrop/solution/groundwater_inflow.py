@@ -6,14 +6,14 @@ from typing import Tuple,TYPE_CHECKING
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from aquacrop.entities.initParamVariables import InitialCondition
 
 
 
 
 def groundwater_inflow(
-    prof: "SoilProfileNT",
+    prof: "SoilProfile",
     NewCond: "InitialCondition"
     ) -> Tuple["InitialCondition",float]:
     """
@@ -24,7 +24,7 @@ def groundwater_inflow(
 
     Arguments:
 
-        prof (SoilProfileNT): Soil profile parameters
+        prof (SoilProfile): Soil profile parameters
 
         NewCond (InitialCondition): model parameters
 

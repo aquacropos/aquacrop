@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from aquacrop.entities.initParamVariables import InitialCondition
     from numpy import ndarray
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 def capillary_rise(
-    prof: "SoilProfileNT",
+    prof: "SoilProfile",
     Soil_nLayer: int,
     Soil_fshape_cr: float,
     NewCond: "InitialCondition",
@@ -28,7 +28,7 @@ def capillary_rise(
     Arguments:
 
 
-        prof (SoilProfileNT): Soil profile named tuple
+        prof (SoilProfile): Soil profile named tuple
 
         Soil_nLayer (int): number of soil layers
 

@@ -8,37 +8,25 @@ from ..entities.moistureDepletion import Dr
 from ..entities.waterStressCoefficients import  Ksw
 from .adjust_CCx import adjust_CCx
 
-if __name__ != "__main__":
-    if os.getenv("DEVELOPMENT"):
-        from .water_stress import water_stress
-        from .root_zone_water import root_zone_water
-        from .cc_development import cc_development
-        from .update_CCx_CDC import update_CCx_CDC
-        from .cc_required_time import cc_required_time
-    else:
-        from .solution_water_stress import water_stress
-        from .solution_root_zone_water import root_zone_water
-        from .solution_cc_development import cc_development
-        from .solution_update_CCx_CDC import update_CCx_CDC
-        from .solution_cc_required_time import cc_required_time
-else:
-    from .water_stress import water_stress
-    from .root_zone_water import root_zone_water
-    from .cc_development import cc_development
-    from .update_CCx_CDC import update_CCx_CDC
-    from .cc_required_time import cc_required_time
+
+from .water_stress import water_stress
+from .root_zone_water import root_zone_water
+from .cc_development import cc_development
+from .update_CCx_CDC import update_CCx_CDC
+from .cc_required_time import cc_required_time
+
 
 from typing import NamedTuple, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
     from aquacrop.entities.initParamVariables import InitialCondition
-    from aquacrop.entities.soilProfile import SoilProfileNT
-    from aquacrop.entities.crop import CropStructNT
+    from aquacrop.entities.soilProfile import SoilProfile
+    from aquacrop.entities.crop import CropStruct
 
 def canopy_cover(
-    Crop: "CropStructNT",
-    prof: "SoilProfileNT",
+    Crop: "CropStruct",
+    prof: "SoilProfile",
     Soil_zTop: float,
     InitCond: "InitialCondition",
     gdd: float,
@@ -55,9 +43,9 @@ def canopy_cover(
 
     Arguments:
 
-        Crop (CropStructNT): NamedTuple of Crop object
+        Crop (CropStruct): Crop object
 
-        prof (SoilProfileNT): NamedTuple of SoilProfile object
+        prof (SoilProfile): SoilProfile object
 
         Soil_zTop (float): top soil depth
 
@@ -148,6 +136,7 @@ def canopy_cover(
             # No canopy development before emergence/germination or after
             # maturity
             NewCond.canopy_cover_ns = 0
+
         elif tCCadj < Crop.CanopyDevEnd:
             # Canopy growth can occur
             if InitCond_CC_NS <= Crop.CC0:
@@ -214,7 +203,6 @@ def canopy_cover(
 
             else:
                 # Canopy growing
-
                 if InitCond_CC < (0.9799 * Crop.CCx):
                     # Adjust canopy growth coefficient for leaf expansion water
                     # stress effects
@@ -271,7 +259,6 @@ def canopy_cover(
                                 NewCond.canopy_cover = InitCond_CC
 
                     else:
-
                         # No canopy growth
                         NewCond.canopy_cover = InitCond_CC
                         # Update CC0
@@ -293,7 +280,6 @@ def canopy_cover(
                 NewCond.ccx_act = NewCond.canopy_cover
 
         elif tCCadj > Crop.CanopyDevEnd:
-
             # No more canopy growth is possible or canopy is in decline
             if tCCadj < Crop.Senescence:
                 # Mid-season stage - no canopy growth

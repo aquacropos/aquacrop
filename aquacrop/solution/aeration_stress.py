@@ -1,22 +1,7 @@
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
-try:
-    from ..entities.rootZoneWaterContent import thRZNT_type_sig
-except:
-    from entities.rootZoneWaterContent import thRZNT_type_sig
 
 from typing import NamedTuple, Tuple
 
-
-# temporary name for compiled module
-cc = CC("solution_aeration_stress")
-cc.verbose = False
-
-
-
-@cc.export("aeration_stress", (f8,f8,thRZNT_type_sig))
 def aeration_stress(
     NewCond_AerDays: float,
     Crop_LagAer: float,
@@ -68,6 +53,3 @@ def aeration_stress(
         NewCond_AerDays = 0
 
     return Ksa_Aer, NewCond_AerDays
-
-if __name__ == "__main__":
-    cc.compile()

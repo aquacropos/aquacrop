@@ -1,12 +1,6 @@
 import numpy as np
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
 import sys
-# temporary name for compiled module
-cc = CC("solution_cc_development")
 
-
-@cc.export("cc_development", "f8(f8,f8,f8,f8,f8,unicode_type,f8)")
 def cc_development(
     CCo: float,
     CCx: float,
@@ -81,6 +75,3 @@ def cc_development(
         canopy_cover = 0
 
     return canopy_cover
-
-if __name__ == "__main__":
-    cc.compile()

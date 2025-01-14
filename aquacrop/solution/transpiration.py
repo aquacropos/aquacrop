@@ -3,41 +3,28 @@ import os
 import numpy as np
 from ..entities.totalAvailableWater import TAW
 from ..entities.moistureDepletion import Dr
-from ..entities.rootZoneWaterContent import RootZoneWater, thRZNT
-from ..entities.waterStressCoefficients import  Ksw,  KswNT
+from ..entities.rootZoneWaterContent import RootZoneWater
+from ..entities.waterStressCoefficients import  Ksw
 
 
 # This compiled function is called a few times inside other functions
-
-if __name__ != "__main__":
-    if os.getenv("DEVELOPMENT"):
-        from .water_stress import water_stress
-        from .root_zone_water import root_zone_water
-        from .aeration_stress import aeration_stress
-    else:
-        from .solution_water_stress import water_stress
-        from .solution_root_zone_water import root_zone_water
-        from .solution_aeration_stress import aeration_stress
-else:
-    from .water_stress import water_stress
-    from .root_zone_water import root_zone_water
-    from .aeration_stress import aeration_stress
+from .water_stress import water_stress
+from .root_zone_water import root_zone_water
+from .aeration_stress import aeration_stress
      
 
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from aquacrop.entities.crop import CropStructNT
     from aquacrop.entities.initParamVariables import InitialCondition
     from aquacrop.entities.co2 import CO2
 
 
-
-
 def transpiration(
-    Soil_Profile: "SoilProfileNT",
+    Soil_Profile: "SoilProfile",
     Soil_nComp: int,
     Soil_zTop: float,
     Crop: "CropStructNT",
@@ -60,7 +47,7 @@ def transpiration(
     Arguments:
 
 
-        Soil_Profile (SoilProfileNT): Soil profile params
+        Soil_Profile (SoilProfile): Soil profile params
 
         Soil_nComp (int): number of soil components
 
@@ -266,7 +253,7 @@ def transpiration(
         )
 
         class_args = {key:value for key, value in thRZ.__dict__.items() if not key.startswith('__') and not callable(key)}
-        thRZ = thRZNT(**class_args)
+        #thRZ = thRZNT(**class_args)
 
         # _,water_root_depletion,taw,thRZ = root_zone_water(Soil_Profile,float(NewCond.z_root),NewCond.th,Soil_zTop,float(Crop.Zmin),Crop.Aer)
         # Check whether to use root zone or top soil depletions for calculating

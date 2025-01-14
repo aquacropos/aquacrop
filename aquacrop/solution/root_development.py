@@ -1,32 +1,19 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-    from ..entities.crop import CropStructNT_type_sig
-
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
-    from entities.crop import CropStructNT_type_sig
-    
-# temporary name for compiled module
-cc = CC("solution_root_development")
+from ..entities.soilProfile import SoilProfile
+from ..entities.crop import Crop
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
-    from aquacrop.entities.crop import CropStructNT
+    from aquacrop.entities.soilProfile import SoilProfile
+    from aquacrop.entities.crop import Crop
     from numpy import ndarray
 
-
-@cc.export("root_development", (CropStructNT_type_sig,SoilProfileNT_typ_sig,f8,f8,f8,f8,f8,f8,f8[:],f8,f8,b1,f8,f8,f8,f8,b1,i8))
 def root_development(
-    Crop: "CropStructNT",
-    prof: "SoilProfileNT",
+    Crop: "Crop",
+    prof: "SoilProfile",
     NewCond_DAP: float,
     NewCond_Zroot: float,
     NewCond_DelayedCDs: float,
@@ -52,9 +39,9 @@ def root_development(
 
     Arguments:
 
-        Crop (CropStructNT): crop params
+        Crop (Crop): crop params
 
-        prof (SoilProfileNT): soilv profile paramaters
+        prof (SoilProfile): soilv profile paramaters
 
         NewCond_DAP (float): days after planting
 
@@ -273,6 +260,3 @@ def root_development(
         NewCond_Zroot = 0
 
     return NewCond_Zroot, NewCond_rCor
-
-if __name__ == "__main__":
-    cc.compile()

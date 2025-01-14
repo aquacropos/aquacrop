@@ -1,28 +1,5 @@
 import numpy as np
-from numba import float64, int64, boolean, types
 import typing
-
-
-SoilProfileNT_spec = [
-    ("Comp", int64[:]),
-    ("dz", float64[:]),
-    ("Layer", int64[:]),
-    ("dzsum", float64[:]),
-    ("th_fc", float64[:]),
-    ("th_s", float64[:]),
-    ("th_wp", float64[:]),
-    ("Ksat", float64[:]),
-    ("Penetrability", float64[:]),
-    ("th_dry", float64[:]),
-    ("tau", float64[:]),
-    ("zBot", float64[:]),
-    ("z_top", float64[:]),
-    ("zMid", float64[:]),
-    ("th_fc_Adj", float64[:]),
-    ("aCR", float64[:]),
-    ("bCR", float64[:]),
-]
-
 
 
 class SoilProfile:
@@ -65,6 +42,3 @@ class SoilProfile:
         self.th_fc_Adj = np.zeros(length, dtype=np.float64)
         self.aCR = np.zeros(length, dtype=np.float64)
         self.bCR = np.zeros(length, dtype=np.float64)
-
-SoilProfileNT = typing.NamedTuple("SoilProfileNT", SoilProfileNT_spec)
-SoilProfileNT_typ_sig= types.NamedTuple(tuple(dict(SoilProfileNT_spec).values()),SoilProfileNT)

@@ -1,14 +1,5 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
-
-# temporary name for compiled module
-cc = CC("solution_HIadj_pre_anthesis")
-
-
-@cc.export("HIadj_pre_anthesis", (f8,f8,f8,f8))
 def HIadj_pre_anthesis(
     NewCond_B: float,
     NewCond_B_NS: float,
@@ -78,6 +69,3 @@ def HIadj_pre_anthesis(
         NewCond_Fpre = 0
 
     return NewCond_Fpre
-
-if __name__ == "__main__":
-    cc.compile()

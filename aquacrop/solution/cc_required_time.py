@@ -1,14 +1,5 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
-# temporary name for compiled module
-cc = CC("solution_cc_required_time")
-
-
-
-@cc.export("cc_required_time", "f8(f8,f8,f8,f8,f8,unicode_type)")
 def cc_required_time(
     cc_prev: float,
     CCo: float,
@@ -66,5 +57,3 @@ def cc_required_time(
 
     return tReq
 
-if __name__ == "__main__":
-    cc.compile()

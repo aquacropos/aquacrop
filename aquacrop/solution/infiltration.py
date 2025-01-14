@@ -1,27 +1,17 @@
 import numpy as np
 
+from ..entities.soilProfile import SoilProfile
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
-    
-# temporary name for compiled module
-cc = CC("solution_infiltration")
 
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from numpy import ndarray
 
-@cc.export("infiltration", (SoilProfileNT_typ_sig,f8,f8[:],f8[:],f8,f8,f8,b1,f8,f8[:],f8,f8,b1))
 def infiltration(
-     prof: "SoilProfileNT",
+     prof: "SoilProfile",
      NewCond_SurfaceStorage: float, 
      NewCond_th_fc_Adj: "ndarray", 
      NewCond_th: "ndarray", 
@@ -304,6 +294,3 @@ def infiltration(
     RunoffTot = Runoff + Runoff0
 
     return NewCond_th,NewCond_SurfaceStorage, DeepPerc, RunoffTot, Infl, FluxOut
-
-if __name__ == "__main__":
-    cc.compile()

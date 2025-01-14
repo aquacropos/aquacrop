@@ -1,27 +1,16 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
+from ..entities.crop import Crop
 
-try:
-    from ..entities.crop import CropStructNT_type_sig
-except:
-    from entities.crop import CropStructNT_type_sig
-    
-# temporary name for compiled module
-cc = CC("solution_temperature_stress")
 
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.crop import CropStructNT
+    from aquacrop.entities.crop import Crop
 
-
-
-@cc.export("temperature_stress", (CropStructNT_type_sig,f8,f8))
 def temperature_stress(
-    Crop: "CropStructNT",
+    Crop: "Crop",
     temp_max: float,
     temp_min: float,
     ) -> Tuple[float,float]:
@@ -96,6 +85,3 @@ def temperature_stress(
             )
 
     return (Kst_PolH,Kst_PolC)
-
-if __name__ == "__main__":
-    cc.compile()

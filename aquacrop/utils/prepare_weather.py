@@ -20,7 +20,7 @@ weather_df (pandas.DataFrame):  weather data for simulation period
 
     """
 
-    weather_df = pd.read_csv(weather_file_path, header=0, delim_whitespace=True)
+    weather_df = pd.read_csv(weather_file_path, header=0, sep='\s+')
 
     assert len(weather_df.columns) == 7
 
@@ -35,7 +35,7 @@ weather_df (pandas.DataFrame):  weather data for simulation period
     weather_df = weather_df.drop(["Day", "Month", "Year"], axis=1)
 
     # set limit on ET0 to avoid divide by zero errors
-    weather_df.ReferenceET.clip(lower=0.1, inplace=True)
+    weather_df['ReferenceET'] = weather_df['ReferenceET'].clip(lower=0.1)
 
     return weather_df
 

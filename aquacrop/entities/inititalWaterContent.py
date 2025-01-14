@@ -1,4 +1,3 @@
-from numba import float64, int64, boolean, types
 
 class InitialWaterContent:
     """

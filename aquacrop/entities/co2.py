@@ -1,13 +1,7 @@
-from numba import float64
 import pandas as pd
 from os.path import dirname, abspath
 
 acfp: str = dirname(dirname(abspath(__file__)))
-
-spec = [
-    ("ref_concentration", float64),
-    ("Cur rentConc", float64),
-]
 
 
 class CO2(object):
@@ -42,10 +36,8 @@ class CO2(object):
             self.co2_data = pd.read_csv(
                     f"{acfp}/data/MaunaLoaCO2.txt",
                     header=1,
-                    delim_whitespace=True,
+                    sep='\s+',
                     names=["year", "ppm"],
     )
         self.co2_data_processed = None
-
-
 

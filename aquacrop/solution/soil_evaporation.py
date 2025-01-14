@@ -1,47 +1,23 @@
 import os
 import numpy as np
 
-        
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
-
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
+from ..entities.soilProfile import SoilProfile
 
 
-if __name__ != "__main__":
-    if os.getenv("DEVELOPMENT"):
-        from .evap_layer_water_content import evap_layer_water_content
-    else:
-        from .solution_evap_layer_water_content import evap_layer_water_content
-else:
-    from .evap_layer_water_content import evap_layer_water_content
+from .evap_layer_water_content import evap_layer_water_content
 
 from typing import TYPE_CHECKING, Tuple
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from numpy import ndarray
 
-
-
-# temporary name for compiled module
-cc = CC("solution_soil_evaporation")
-
-
-@cc.export(
-    "soil_evaporation", (i8,i8,i8,SoilProfileNT_typ_sig,
-    f8,f8,f8,f8,f8,f8,f8,i8,f8,i8,f8,b1,f8,f8,i8,f8,f8,f8,f8[:],f8,f8,f8,f8,f8,f8,
-        f8,b1,f8,f8,f8,f8,f8,f8,f8,b1),
-)
 def soil_evaporation(
     ClockStruct_EvapTimeSteps: int,
     ClockStruct_SimOffSeason: bool,
     ClockStruct_TimeStepCounter: int,
-    prof: "SoilProfileNT",
+    prof: "SoilProfile",
     Soil_EvapZmin: float,
     Soil_EvapZmax: float,
     Soil_REW: float,
@@ -93,7 +69,7 @@ def soil_evaporation(
         
         ClockStruct_TimeStepCounter (int): time step counter
 
-        prof (SoilProfileNT): soil profile object
+        prof (SoilProfile): soil profile object
 
         Soil_EvapZmin (float): minimum evaporation depth (m)
 
@@ -518,6 +494,3 @@ def soil_evaporation(
         EsAct,
         EsPot,
     )
-
-if __name__ == "__main__":
-    cc.compile()

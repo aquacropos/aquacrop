@@ -1,7 +1,5 @@
-numba>=0.56.0
-numpy==1.22.4
-pandas>=1.3.5
-tqdm>=4.64.0
-cffi==1.16.0
-matplotlib
-seaborn
+numpy >= 1.22.0
+pandas >= 2.0.0
+tqdm >= 4.65.0
+matplotlib >= 1.2.0
+seaborn >= 0.13.0

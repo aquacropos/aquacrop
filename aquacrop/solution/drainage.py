@@ -1,28 +1,17 @@
 import numpy as np
 
-from numba import njit, f8, i8, b1
-from numba.pycc import CC
 from typing import Tuple,TYPE_CHECKING
 
-try:
-    from ..entities.soilProfile import SoilProfileNT_typ_sig
-except:
-    from entities.soilProfile import SoilProfileNT_typ_sig
-
-# temporary name for compiled module
-cc = CC("solution_drainage")
-
+from ..entities.soilProfile import SoilProfile
 
 if TYPE_CHECKING:
     # Important: classes are only imported when types are checked, not in production.
-    from aquacrop.entities.soilProfile import SoilProfileNT
+    from aquacrop.entities.soilProfile import SoilProfile
     from numpy import ndarray
 
 
-
-@cc.export("drainage", (SoilProfileNT_typ_sig, f8[:], f8[:]))
 def drainage(
-    prof: "SoilProfileNT",
+    prof: "SoilProfile",
     th_init: "ndarray",
     th_fc_Adj_init: "ndarray",
     ) -> Tuple["ndarray", float, float]:
@@ -343,7 +332,3 @@ def drainage(
     # NewCond.th = thnew
 
     return thnew, DeepPerc, FluxOut
-
-
-if __name__ == "__main__":
-    cc.compile()
