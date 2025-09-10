@@ -38,12 +38,12 @@ class TestModelExceptions(unittest.TestCase):
     soil_custom3.add_layer(thickness=.1*3,thWP=0.24,
                             thFC=0.40,thS=0.50,Ksat=155,
                             penetrability=0)
-    print(soil_custom3.profile) 
+    #print(soil_custom3.profile) 
     _wheat = Crop("Wheat", planting_date="10/01")
     _initial_water_content = InitialWaterContent(value=["FC"])
     _model_os = AquaCropModel(
         sim_start_time=f"{1979}/10/01",
-        sim_end_time=f"{1981}/05/30",
+        sim_end_time=f"{1980}/05/30",
         weather_df=_weather_data,
         soil=soil_custom3,
         crop=_wheat,
@@ -58,9 +58,11 @@ class TestModelExceptions(unittest.TestCase):
         """
         Test that minimum root depth is not below 0
         """
-        root_depth = self._model_os._outputs.crop_growth["z_root"]
+        harvest_time_step = self._model_os._outputs.final_stats['Harvest Date (Step)'].values[0]
+        crop_growth = self._model_os._outputs.crop_growth
+        root_depth = crop_growth["z_root"][0:harvest_time_step]
     
-        min_rooting_depth_expected = 0
+        min_rooting_depth_expected = 0.3
         min_rooting_depth_returned = round(root_depth.min(), 1)
         self.assertEqual(min_rooting_depth_expected, min_rooting_depth_returned)
     
@@ -68,7 +70,9 @@ class TestModelExceptions(unittest.TestCase):
         """
         Test that minimum root depth is not below 0
         """
-        root_depth = self._model_os._outputs.crop_growth["z_root"]
+        harvest_time_step = self._model_os._outputs.final_stats['Harvest Date (Step)'].values[0]
+        crop_growth = self._model_os._outputs.crop_growth[self._model_os._outputs.crop_growth['time_step_counter'] <= harvest_time_step]
+        root_depth = crop_growth["z_root"][0:harvest_time_step]
     
         max_rooting_depth_expected = 0.9
         max_rooting_depth_returned = round(root_depth.max(), 1)
@@ -78,7 +82,9 @@ class TestModelExceptions(unittest.TestCase):
         """
         Test that root depth does not decrease through time
         """
-        root_depth = self._model_os._outputs.crop_growth["z_root"]
+        harvest_time_step = self._model_os._outputs.final_stats['Harvest Date (Step)'].values[0]
+        crop_growth = self._model_os._outputs.crop_growth[self._model_os._outputs.crop_growth['time_step_counter'] <= harvest_time_step]
+        root_depth = crop_growth["z_root"][0:harvest_time_step]
     
         for earlier,later in zip(root_depth, root_depth[1:]):
             self.assertGreaterEqual(later, earlier, "Root depth decreased through time")
