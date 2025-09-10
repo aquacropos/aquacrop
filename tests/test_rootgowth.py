@@ -56,7 +56,7 @@ class TestModelExceptions(unittest.TestCase):
 
     def test_minimum_root_depth(self):
         """
-        Test that minimum root depth is not below 0
+        Test that minimum root depth is not below 0.3.
         """
         harvest_time_step = self._model_os._outputs.final_stats['Harvest Date (Step)'].values[0]
         crop_growth = self._model_os._outputs.crop_growth
@@ -68,7 +68,7 @@ class TestModelExceptions(unittest.TestCase):
     
     def test_maximum_root_depth(self):
         """
-        Test that minimum root depth is not below 0
+        Test that maximum root depth is not greater than the depth where penetrability = 0.
         """
         harvest_time_step = self._model_os._outputs.final_stats['Harvest Date (Step)'].values[0]
         crop_growth = self._model_os._outputs.crop_growth[self._model_os._outputs.crop_growth['time_step_counter'] <= harvest_time_step]
@@ -80,7 +80,7 @@ class TestModelExceptions(unittest.TestCase):
     
     def test_root_depth(self):
         """
-        Test that root depth does not decrease through time
+        Test that root depth does not decrease through time.
         """
         harvest_time_step = self._model_os._outputs.final_stats['Harvest Date (Step)'].values[0]
         crop_growth = self._model_os._outputs.crop_growth[self._model_os._outputs.crop_growth['time_step_counter'] <= harvest_time_step]
