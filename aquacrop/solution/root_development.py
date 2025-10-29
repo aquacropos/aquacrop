@@ -176,7 +176,7 @@ def root_development(
                     deltaZ = soil_layer_dz
 
             # Correct Zr and dZr for effects of restrictive horizons
-            Zr = ZrOUT
+            Zr = max(ZrOUT, ZrOld)
             dZr = Zr - ZrOld
 
         # Adjust rate of expansion for any stomatal water stress
