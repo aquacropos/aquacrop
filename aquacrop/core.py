@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from aquacrop.entities.crop import Crop
     from aquacrop.entities.initParamVariables import InitialCondition
     from aquacrop.entities.inititalWaterContent import InitialWaterContent
+    from aquacrop.entities.cuttingManagement import CuttingManagement
     from aquacrop.entities.paramStruct import ParamStruct
     from aquacrop.entities.soil import Soil
 
@@ -25,6 +26,7 @@ from .entities.co2 import CO2
 from .entities.fieldManagement import FieldMngt
 from .entities.groundWater import GroundWater
 from .entities.irrigationManagement import IrrigationManagement
+from .entities.cuttingManagement import CuttingManagement
 from .entities.output import Output
 from .initialize.compute_variables import compute_variables
 from .initialize.create_soil_profile import create_soil_profile
@@ -32,6 +34,7 @@ from .initialize.read_clocks_parameters import read_clock_parameters
 from .initialize.read_field_managment import read_field_management
 from .initialize.read_groundwater_table import read_groundwater_table
 from .initialize.read_irrigation_management import read_irrigation_management
+from .initialize.read_cutting_management import read_cutting_management
 from .initialize.read_model_initial_conditions import read_model_initial_conditions
 from .initialize.read_model_parameters import read_model_parameters
 from .initialize.read_weather_inputs import read_weather_inputs
@@ -99,6 +102,7 @@ class AquaCropModel:
         crop: "Crop",
         initial_water_content: "InitialWaterContent",
         irrigation_management: Optional["IrrigationManagement"] = None,
+        cutting_management: Optional["CuttingManagement"] = None,
         field_management: Optional["FieldMngt"] = None,
         fallow_field_management: Optional["FieldMngt"] = None,
         groundwater: Optional["GroundWater"] = None,
@@ -116,6 +120,7 @@ class AquaCropModel:
         self.off_season = off_season
       
         self.irrigation_management = irrigation_management
+        self.cutting_management = cutting_management
         self.field_management = field_management
         self.fallow_field_management = fallow_field_management
         self.groundwater = groundwater
@@ -208,6 +213,11 @@ class AquaCropModel:
         # read irrigation management
         self._param_struct = read_irrigation_management(
             self._param_struct, self.irrigation_management, self._clock_struct
+        )
+
+        # read cutting management (optional)
+        self._param_struct = read_cutting_management(
+            self._param_struct, self.cutting_management, self._clock_struct
         )
 
         # read field management

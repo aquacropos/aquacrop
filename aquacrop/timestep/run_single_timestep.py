@@ -19,6 +19,7 @@ from ..solution.transpiration import transpiration
 from ..solution.groundwater_inflow import groundwater_inflow
 from ..solution.harvest_index import harvest_index
 
+from .apply_cutting import apply_cutting
 
 from ..solution.growing_degree_day import growing_degree_day
 from ..solution.drainage import drainage
@@ -406,26 +407,46 @@ def solution_single_time_step(
         Soil.Profile, Soil.z_top, crop, NewCond, et0, temp_max, temp_min, growing_season
     )
 
+    # Cutting / grazing management (after daily growth updates)
+    if growing_season is True and hasattr(param_struct, "CutMngt"):
+        CutMngt = param_struct.CutMngt
+        if (
+            getattr(CutMngt, "cut_mask", None) is not None
+            and CutMngt.cut_mask[clock_struct.time_step_counter]
+        ):
+            NewCond, _ = apply_cutting(NewCond, CutMngt, True, crop=crop)
+
     # 18. Yield potential
     NewCond.YieldPot = (NewCond.biomass_ns / 100) * NewCond.harvest_index
 
     # 19. Crop yield_ (dry and fresh)
+    using_cut_export = (
+        growing_season is True
+        and hasattr(param_struct, "CutMngt")
+        and getattr(param_struct.CutMngt, "export_as_yield", False)
+    )
+
     if growing_season is True:
-        # Calculate crop yield_ (tonne/ha)
-        NewCond.DryYield = (NewCond.biomass / 100) * NewCond.harvest_index_adj
-        NewCond.FreshYield = NewCond.DryYield / (crop.YldWC / 100)
-        # print( clock_struct.time_step_counter,(NewCond.biomass/100),NewCond.harvest_index_adj)
+        if not using_cut_export:
+            # Calculate crop yield_ (tonne/ha)
+            NewCond.DryYield = (NewCond.biomass / 100) * NewCond.harvest_index_adj
+        # Fresh yield is derived from DryYield when possible
+        if crop.YldWC and crop.YldWC > 0:
+            NewCond.FreshYield = NewCond.DryYield / (crop.YldWC / 100)
+        else:
+            NewCond.FreshYield = 0
+
         # Check if crop has reached maturity
         if ((crop.CalendarType == 1) and (NewCond.dap >= crop.Maturity)) or (
             (crop.CalendarType == 2) and (NewCond.gdd_cum >= crop.Maturity)
         ):
-            # Crop has reached maturity
             NewCond.crop_mature = True
 
     elif growing_season is False:
-        # Crop yield_ is zero outside of growing season
-        NewCond.DryYield = 0
-        NewCond.FreshYield = 0
+        if not using_cut_export:
+            # Crop yield_ is zero outside of growing season
+            NewCond.DryYield = 0
+            NewCond.FreshYield = 0
 
     # 20. Root zone water
     _TAW = TAW()

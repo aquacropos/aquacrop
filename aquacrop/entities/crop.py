@@ -5,6 +5,13 @@ import numpy as np
 import typing
 
 from .crops.crop_params import crop_params
+from .crops.ryegrass_clover import ryegrass_clover_params
+
+# Register minimal NZ pasture (perennial ryegrass + white clover) parameterisation.
+# AquaCrop is a single-crop model; this represents a pasture sward as one
+# "effective crop" suitable for local calibration.
+crop_params.setdefault("RyegrassClover", ryegrass_clover_params)
+crop_params.setdefault("NZPasture", ryegrass_clover_params)  # alias
 
 class Crop:
     """

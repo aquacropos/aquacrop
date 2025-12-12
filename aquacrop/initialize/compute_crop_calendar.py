@@ -257,27 +257,38 @@ def compute_crop_calendar(
 
         gdd_cum = np.cumsum(gdd).reset_index(drop=True)
 
-        assert (
-            gdd_cum.values[-1] > crop.Maturity
-        ), f"not enough growing degree days in simulation ({gdd_cum.values[-1]}) to reach maturity ({crop.Maturity})"
+        def _threshold_cd(threshold):
+            mask = gdd_cum > threshold
+            if mask.any():
+                return mask.idxmax() + 1
+            return len(gdd_cum)
 
-        crop.MaturityCD = (gdd_cum > crop.Maturity).idxmax() + 1
-
-        assert crop.MaturityCD < 365, "crop will take longer than 1 year to mature"
+        # Handle crops whose maturity lies beyond the simulation window
+        if gdd_cum.values[-1] <= crop.Maturity:
+            if (crop.Determinant == 0) or (crop.Maturity >= 9000):
+                crop.MaturityCD = len(gdd_cum)
+            else:
+                raise AssertionError(
+                    f"not enough growing degree days in simulation ({gdd_cum.values[-1]}) "
+                    f"to reach maturity ({crop.Maturity})"
+                )
+        else:
+            crop.MaturityCD = _threshold_cd(crop.Maturity)
+            assert crop.MaturityCD < 365, "crop will take longer than 1 year to mature"
 
         # 1. gdd's from sowing to maximum canopy cover
-        crop.MaxCanopyCD = (gdd_cum > crop.MaxCanopy).idxmax() + 1
+        crop.MaxCanopyCD = _threshold_cd(crop.MaxCanopy)
         # 2. gdd's from sowing to end of vegetative growth
-        crop.CanopyDevEndCD = (gdd_cum > crop.CanopyDevEnd).idxmax() + 1
+        crop.CanopyDevEndCD = _threshold_cd(crop.CanopyDevEnd)
         # 3. Calendar days from sowing to start of yield_ formation
-        crop.HIstartCD = (gdd_cum > crop.HIstart).idxmax() + 1
+        crop.HIstartCD = _threshold_cd(crop.HIstart)
         # 4. Calendar days from sowing to end of yield_ formation
-        crop.HIendCD = (gdd_cum > crop.HIend).idxmax() + 1
+        crop.HIendCD = _threshold_cd(crop.HIend)
         # 5. Duration of yield_ formation in calendar days
         crop.YldFormCD = crop.HIendCD - crop.HIstartCD
         if crop.CropType == 3:
             # 1. Calendar days from sowing to end of flowering
-            FloweringEnd = (gdd_cum > crop.FloweringEnd).idxmax() + 1
+            FloweringEnd = _threshold_cd(crop.FloweringEnd)
             # 2. Duration of flowering in calendar days
             crop.FloweringCD = FloweringEnd - crop.HIstartCD
         else:

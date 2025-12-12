@@ -53,6 +53,8 @@ class ParamStruct:
 
         # field management
         self.FallowFieldMngt = 0
+        self.CutMngt = 0
+        self.FallowCutMngt = 0
 
         # variables extracted from cropmix.txt
         self.NCrops = 0
