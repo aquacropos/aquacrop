@@ -5,10 +5,10 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v6
       - name: check docs
         run: |
           pip install --upgrade pip && pip install mkdocs-material mkdocstrings mkdocs-jupyter mkdocstrings-python
