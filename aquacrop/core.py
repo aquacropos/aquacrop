@@ -186,7 +186,14 @@ class AquaCropModel:
                 + "(Date MinTemp MaxTemp Precipitation ReferenceET)."
             )
 
-        self._weather_df = value
+        # Weather timesteps are consumed positionally by the model. Keep the
+        # required inputs in that order regardless of the caller's DataFrame
+        # column order, while retaining any additional columns after them.
+        ordered_columns = "MinTemp MaxTemp Precipitation ReferenceET Date".split(" ")
+        ordered_columns.extend(
+            column for column in value.columns if column not in ordered_columns
+        )
+        self._weather_df = value.loc[:, ordered_columns]
 
     def _initialize(self) -> None:
         """
