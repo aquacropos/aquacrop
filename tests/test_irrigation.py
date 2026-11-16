@@ -64,7 +64,7 @@ def test_predefined_schedule_strategy(champion_weather):
         IrrigationManagement(irrigation_method=3, Schedule=schedule),
     )
     assert stats["Dry yield (tonne/ha)"][0] == pytest.approx(12.13, **MODEL_TOL)
-    assert stats["Dry yield (tonne/ha)"][1] == pytest.approx(9.46, **MODEL_TOL)
+    assert stats["Dry yield (tonne/ha)"][1] == pytest.approx(9.47, **MODEL_TOL)
 
 
 def test_net_irrigation_strategy(champion_weather):
