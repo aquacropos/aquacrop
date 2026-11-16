@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -120,6 +122,13 @@ def compute_variables(
         [clock_struct.simulation_start_date, clock_struct.simulation_end_date]
     ).year
     sim_years = np.arange(start_year, end_year + 1)
+
+    co2 = param_struct.CO2
+    if getattr(co2, "default_scenario", False) and end_year > co2.observed_end:
+        warnings.warn(
+            f"Simulation runs past {co2.observed_end}, the last year of observed CO2. "
+            f"Later years follow SSP2-4.5 by default; pass CO2(scenario=...) to "
+            f"match the scenario of your climate data.", stacklevel=2)
 
     # Interpolate data
     CO2conc_interp = np.interp(sim_years, co2Data.year, co2Data.ppm)
