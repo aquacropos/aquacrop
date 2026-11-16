@@ -46,13 +46,13 @@ def _root_depth_to_harvest(model):
 
 def test_minimum_root_depth(root_growth_model):
     root_depth = _root_depth_to_harvest(root_growth_model)
-    assert root_depth.min() == pytest.approx(0.3, abs=0.05)
+    assert root_depth.min() == pytest.approx(0.3, **MODEL_TOL)
 
 
 def test_maximum_root_depth(root_growth_model):
     """Root depth must not exceed the depth where penetrability becomes 0."""
     root_depth = _root_depth_to_harvest(root_growth_model)
-    assert root_depth.max() == pytest.approx(0.9, abs=0.05)
+    assert root_depth.max() == pytest.approx(0.9, **MODEL_TOL)
 
 
 def test_root_depth_non_decreasing(root_growth_model):

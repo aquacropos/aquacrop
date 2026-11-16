@@ -10,7 +10,5 @@ reference and interactive exploration.
   plotting / exploration scripts (they print and draw figures, they do not
   assert). If a specific expected behaviour from one of these should be
   guaranteed, promote it into a real assertion-based test under `tests/`.
-- `fshape_r_testing.py`, `scratch.py` — small scratch calculations.
-- `pytest_testing.py` — superseded by `tests/test_irrigation.py`
-  (`test_rainfed_strategy` covers the same Maize rainfed scenario).
+- `fshape_r_testing.py` — a small scratch calculation.
 - `brussels_future.txt` — climate data used by the comparison notebook.
