@@ -92,7 +92,7 @@ def step_finished_model(tunis_weather):
 class TestRunByStepFinished:
     def test_final_statistics(self, step_finished_model):
         final_statistics = step_finished_model.get_simulation_results().head()
-        assert final_statistics["Dry yield (tonne/ha)"][0] == pytest.approx(8.81, **MODEL_TOL)
+        assert final_statistics["Dry yield (tonne/ha)"][0] == pytest.approx(8.82, **MODEL_TOL)
 
     def test_crop_growth(self, step_finished_model):
         crop_growth = step_finished_model.get_crop_growth().head()

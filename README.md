@@ -54,13 +54,3 @@ A number of tutorials has been created (more to be added in future) to help user
 2.  <a href=https://colab.research.google.com/github/aquacropos/aquacrop/blob/master/docs/notebooks/AquaCrop_OSPy_Notebook_2.ipynb>Estimation of irrigation water demands</a>
 3.  <a href=https://colab.research.google.com/github/aquacropos/aquacrop/blob/master/docs/notebooks/AquaCrop_OSPy_Notebook_3.ipynb>Optimisation of irrigation management strategies</a>
 4.  <a href=https://colab.research.google.com/github/aquacropos/aquacrop/blob/master/docs/notebooks/AquaCrop_OSPy_Notebook_4.ipynb>Projection of climate change impacts</a>
-
-
-## Installation troubleshooting
-If you receive an error message such as "No module named aquacrop.scripts.initiate_library" or "ModuleNotFoundError: No module named 'aquacrop.solution.solution_root_zone_water'", please try the following troubleshooting steps:
-
-1. Run "python -m aquacrop.scripts.initiate_library" in your terminal, if this generates an error such as "RuntimeError: Attempted to compile AOT function without the compiler used by numpy.distutils present. Cannot find suitable msvc.", then you need to download and install an MSVC compiler such as the one included in Visual Studio build tools (see https://www.youtube.com/watch?v=p_R3tXSq0KI).
-
-2. If Step 1 doesn't help, then you can run aquacrop in development mode using the code below. This will turn off some function compilation, resulting in minor increases in runtime: <br>
-```import os```<br>
-```os.environ['DEVELOPMENT'] = 'DEVELOPMENT'```

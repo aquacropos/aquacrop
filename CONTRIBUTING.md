@@ -2,27 +2,22 @@
 
 ## How to get started
 
-Install a virtualenv enviroment to test the code before publishing it to github.
+Install the package in editable mode in a virtual environment, with the test tools:
 
-Example:
 ```bash
-virtualenv venv
+python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install -e .
+pip install pytest pytest-cov
 ```
 
-Test the library before uploading changes
+Run the test suite before uploading changes:
 
-example using numba:
-Note: You have to delete the compiled files if you want to retest the changes.
 ```bash
-python -m unittest
+pytest
 ```
 
-example without using numba:
-```bash
-DEVELOPMENT="TRUE" python -m unittest 
-```
+Tests live in `tests/`; scripts and notebooks in `tests/manual/` are for exploration and are not run.
 
 It is very important to respect the lint rules. If you use VSCode, download the linting flake8 and pylint
 ## Did you find a bug?

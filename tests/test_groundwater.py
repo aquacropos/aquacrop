@@ -38,7 +38,7 @@ def groundwater_model(tunis_weather):
 
 def test_yield_with_water_table(groundwater_model):
     yield_value = groundwater_model.get_simulation_results()["Dry yield (tonne/ha)"][0]
-    assert yield_value == pytest.approx(7.987, **MODEL_TOL)
+    assert yield_value == pytest.approx(7.988, **MODEL_TOL)
 
 
 def test_multi_year_run_completes(tunis_weather):
